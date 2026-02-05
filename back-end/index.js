@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import mongoose from "mongoose";
+import { connectDB } from "./config/database.js";
 
 import { PORT, CLIENT_ORIGIN, NODE_ENV } from "./config/env.js";
 
@@ -16,6 +18,8 @@ app.use(
         credentials: true,
     })
 );
+
+connectDB();
 
 app.get("/", (req, res, next) => {
     res.send("API is okay");
