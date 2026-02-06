@@ -30,11 +30,10 @@ button {
     cursor: pointer;
 
     border: 1.5px solid gray;
-    border-radius: 8px;
-    padding-block: 6px;
-    padding-inline: 12px;
+    border-radius: 6px;
+    padding: 8px 16px;
     background-color: transparent;
-    transition: all 0.5s ease-in-out;
+    transition: all 0.3s ease-out;
 
     font-weight: 900;
     letter-spacing: 0.7px;
@@ -42,13 +41,13 @@ button {
 }
 
 button:hover {
-    cursor: pointer;
-    border: 1.5px solid black;
-    border-radius: 8px;
-    padding-block: 6px;
-    padding-inline: 12px;
-    background-color: black;
-    color: white;
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 gray;
+}
+
+button:active {
+    transform: translate(0, 0);
+    box-shadow: none;
 }
 
 a {
