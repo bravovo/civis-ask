@@ -4,6 +4,7 @@ import axios from "axios";
 
 import { SERVER_URL } from "../../config/env.js";
 import FormInput from "../../components/FormInput/FormInput.jsx";
+import { Link } from "react-router-dom";
 
 function Register() {
     const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ function Register() {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
 
-    const handleLoginSubmit = async (e) => {
+    const handleRegisterSubmit = async (e) => {
         e.preventDefault();
 
         try {
@@ -55,10 +56,12 @@ function Register() {
 
     return (
         <div className="w-full h-full flex flex-col justify-center items-center gap-6">
-            <h2 className="font-bold text-4xl">Створення акаунта</h2>
+            <h2 className="font-bold text-2xl md:text-4xl">
+                Створення акаунта
+            </h2>
             <form
-                onSubmit={handleLoginSubmit}
-                className="w-[450px] flex flex-col justify-center items-center gap-3 py-5 px-3 border-[1.5px] border-b-gray-400 rounded-[8px]"
+                onSubmit={handleRegisterSubmit}
+                className="w-2xs md:w-[450px] flex flex-col justify-center items-center gap-3 py-5 px-3 border-[1.5px] border-b-gray-400 rounded-[8px]"
             >
                 <FormInput
                     title="Електронна пошта"
@@ -90,12 +93,8 @@ function Register() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     type="password"
                 />
-                <button
-                    type="submit"
-                    className="border-[1.5px] border-gray-400 rounded-lg py-1.5 px-3 transition-all duration-500 ease-in-out hover:bg-black hover:text-white hover:border-black"
-                >
-                    Зареєструватись
-                </button>
+                <button type="submit">Зареєструватись</button>
+                <Link to="/login">Вже маєте акаунт?</Link>
             </form>
         </div>
     );

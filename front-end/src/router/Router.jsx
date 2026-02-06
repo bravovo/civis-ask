@@ -6,7 +6,7 @@ function Router() {
     return (
         <Routes>
             <Route path="/register" element={<Register />} />
-            <Route index path="/login" element={<Login />} />
+            <Route path="/login" element={<Login />} />
         </Routes>
     );
 }

@@ -14,7 +14,7 @@ export const register = async (req, res, next) => {
         const sameUser = await User.findOne({ email });
 
         if (sameUser) {
-            return res.status(400).json({
+            return res.status(409).json({
                 success: false,
                 message: "Користувач із такою електронною поштою вже існує",
             });
@@ -42,7 +42,7 @@ export const register = async (req, res, next) => {
     }
 };
 
-export const login = (req, res, next) => {
+export const login = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -52,9 +52,32 @@ export const login = (req, res, next) => {
         });
     }
 
-    console.log("LOGGED IN");
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        return res.status(400).json({
+            success: false,
+            message: "Невірні дані авторизації",
+        });
+    }
+
+    const isMatch = await user.comparePasswords(password);
+
+    if (!isMatch) {
+        console.log("NO MATCH", isMatch);
+        return res.status(400).json({
+            success: false,
+            message: "Невірні дані авторизації",
+        });
+    }
 
     return res.status(200).json({
+        user: {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+        },
         success: true,
         message: "Авторизація успішна",
     });
