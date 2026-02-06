@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import mongoose from "mongoose";
 import { connectDB } from "./config/database.js";
@@ -6,6 +7,9 @@ import { connectDB } from "./config/database.js";
 import { PORT, CLIENT_ORIGIN, NODE_ENV } from "./config/env.js";
 
 import authRoute from "./routes/auth.route.js";
+import userRoute from "./routes/user.route.js";
+
+import { checkUserAccess } from "./middlewares/jwt.middleware.js";
 
 const app = express();
 
@@ -19,6 +23,8 @@ app.use(
     })
 );
 
+app.use(cookieParser());
+
 connectDB();
 
 app.get("/", (req, res, next) => {
@@ -26,6 +32,10 @@ app.get("/", (req, res, next) => {
 });
 
 app.use("/api/auth", authRoute);
+
+app.use(checkUserAccess);
+
+app.use("/api/user", userRoute);
 
 app.use((err, req, res, next) => {
     if (err instanceof mongoose.Error.ValidationError) {

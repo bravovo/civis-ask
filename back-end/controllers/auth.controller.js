@@ -1,4 +1,6 @@
+import { NODE_ENV } from "../config/env.js";
 import User from "../models/user.model.js";
+import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js";
 
 export const register = async (req, res, next) => {
     try {
@@ -71,14 +73,29 @@ export const login = async (req, res, next) => {
         });
     }
 
+    const refreshToken = generateRefreshToken(email);
+    const accessToken = generateAccessToken(email);
+
+    if (!accessToken || !refreshToken) {
+        throw new Error("Генерація токенів доступу не вдалась");
+    }
+
+    res.cookie("token", refreshToken, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 7 * 1000,
+        secure: NODE_ENV === "production",
+        sameSite: "Strict",
+    });
+
     return res.status(200).json({
+        success: true,
+        accessToken,
         user: {
-            id: user.id,
+            id: user._id,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
         },
-        success: true,
         message: "Авторизація успішна",
     });
 };

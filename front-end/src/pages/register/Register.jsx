@@ -4,9 +4,10 @@ import axios from "axios";
 
 import { SERVER_URL } from "../../config/env.js";
 import FormInput from "../../components/FormInput/FormInput.jsx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Register() {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -47,7 +48,9 @@ function Register() {
             );
 
             if (response.status === 201) {
-                alert("Акаунт створено!");
+                navigate("/login", {
+                    state: { registered: true },
+                });
             }
         } catch (error) {
             console.error(error.response);

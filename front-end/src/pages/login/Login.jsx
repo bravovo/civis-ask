@@ -4,9 +4,12 @@ import axios from "axios";
 
 import { SERVER_URL } from "../../config/env.js";
 import FormInput from "../../components/FormInput/FormInput.jsx";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 function Login() {
+    const location = useLocation();
+    const isRegistered = location.state?.registered;
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -27,7 +30,8 @@ function Login() {
                 );
 
                 if (response.status === 200) {
-                    console.log(response.data);
+                    localStorage.setItem("token", response.data.accessToken);
+                    navigate("/dashboard");
                 }
             }
         } catch (error) {
@@ -38,6 +42,7 @@ function Login() {
     return (
         <div className="w-full h-full flex flex-col justify-center items-center gap-6">
             <h2 className="font-bold text-2xl md:text-4xl">Авторизація</h2>
+            <p>{isRegistered && "Користувача створено"}</p>
             <form
                 onSubmit={handleLoginSubmit}
                 className="w-2xs md:w-[450px] flex flex-col justify-center items-center gap-3 py-5 px-3 border-[1.5px] border-b-gray-400 rounded-[8px]"
@@ -55,7 +60,9 @@ function Login() {
                     type="password"
                 />
                 <button type="submit">Увійти</button>
-                <Link to="/register">Ще не маєте акаунта?</Link>
+                {!isRegistered && (
+                    <Link to="/register">Ще не маєте акаунта?</Link>
+                )}
             </form>
         </div>
     );
