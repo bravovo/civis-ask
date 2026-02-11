@@ -14,7 +14,7 @@ export const checkUserAccess = (req, res, next) => {
         const accessResult = verifyToken(accessToken, true);
 
         if (accessResult.email) {
-            req.user = accessResult.email;
+            req.user = { email: accessResult.email, role: accessResult.role };
             return next();
         }
         if (accessResult.error === "expired") {
@@ -36,7 +36,10 @@ export const checkUserAccess = (req, res, next) => {
                 });
             }
 
-            const newAccessToken = generateAccessToken(refreshResult.email);
+            const newAccessToken = generateAccessToken(
+                refreshResult.email,
+                refreshResult.role
+            );
 
             if (!newAccessToken) {
                 console.error(refreshResult.email);
@@ -46,7 +49,7 @@ export const checkUserAccess = (req, res, next) => {
                 });
             }
 
-            req.user = refreshResult.email;
+            req.user = { email: refreshResult.email, role: refreshResult.role };
             req.newToken = newAccessToken;
             return next();
         }

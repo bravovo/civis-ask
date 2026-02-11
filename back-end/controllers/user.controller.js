@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 
 export const getUser = async (req, res, next) => {
     try {
-        const email = req.user;
+        const { email } = req.user;
         const token = req.newToken;
 
         const user = await User.findOne({ email }, "-password");

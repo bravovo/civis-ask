@@ -5,8 +5,11 @@ import axios from "axios";
 import { SERVER_URL } from "../../config/env.js";
 import FormInput from "../../components/FormInput/FormInput.jsx";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { setCreds } from "../../features/auth/authSlice.js";
+import { useDispatch } from "react-redux";
 
 function Login() {
+    const dispatch = useDispatch();
     const location = useLocation();
     const isRegistered = location.state?.registered;
     const navigate = useNavigate();
@@ -30,7 +33,12 @@ function Login() {
                 );
 
                 if (response.status === 200) {
-                    localStorage.setItem("token", response.data.accessToken);
+                    dispatch(
+                        setCreds({
+                            user: response.data.user,
+                            token: response.data.accessToken,
+                        })
+                    );
                     navigate("/dashboard");
                 }
             }

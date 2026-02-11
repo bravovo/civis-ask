@@ -73,8 +73,8 @@ export const login = async (req, res, next) => {
         });
     }
 
-    const refreshToken = generateRefreshToken(email);
-    const accessToken = generateAccessToken(email);
+    const refreshToken = generateRefreshToken(email, user.role);
+    const accessToken = generateAccessToken(email, user.role);
 
     if (!accessToken || !refreshToken) {
         throw new Error("Генерація токенів доступу не вдалась");
@@ -95,6 +95,7 @@ export const login = async (req, res, next) => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
+            role: user.role,
         },
         message: "Авторизація успішна",
     });
