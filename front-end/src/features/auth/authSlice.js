@@ -5,7 +5,6 @@ import { SERVER_URL } from "../../config/env";
 const initialState = {
     user: null,
     token: localStorage.getItem("token") || null,
-    isLoading: false,
     authChecked: false,
 };
 
@@ -26,11 +25,7 @@ const authSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(me.pending, (state) => {
-                state.isLoading = true;
-            })
             .addCase(me.fulfilled, (state, action) => {
-                state.isLoading = false;
                 state.user = action.payload.user;
 
                 if (action.payload.token) {
@@ -40,7 +35,6 @@ const authSlice = createSlice({
                 state.authChecked = true;
             })
             .addCase(me.rejected, (state) => {
-                state.isLoading = false;
                 state.user = null;
                 state.token = null;
                 localStorage.removeItem("token");

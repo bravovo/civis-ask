@@ -17,6 +17,7 @@
 .popup div {
     width: 100%;
     padding: 24px 36px;
+    background-color: white;
     border: 1px solid gray;
     border-radius: 8px;
     box-shadow: 0 0 8px gray;

@@ -8,6 +8,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { setCreds } from "../../features/auth/authSlice.js";
 import { useDispatch } from "react-redux";
 import Popup from "../../components/Popup/Popup.jsx";
+import { setLoading } from "../../state/loaderSlice.js";
 
 function Login() {
     const dispatch = useDispatch();
@@ -16,11 +17,14 @@ function Login() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
 
         try {
+            setError("");
+            dispatch(setLoading(true));
             if (email && password) {
                 const response = await axios.post(
                     `${SERVER_URL}/auth/login`,
@@ -40,17 +44,25 @@ function Login() {
                             token: response.data.accessToken,
                         })
                     );
+                    dispatch(setLoading(false));
                     navigate("/dashboard");
                 }
             }
         } catch (error) {
-            console.error(error.response);
+            if (error.response) {
+                console.error(error.response);
+                setError(error.response.data.message);
+            } else {
+                console.error(error);
+            }
         }
+        dispatch(setLoading(false));
     };
 
     return (
         <div className="w-full h-full flex flex-col justify-center items-center gap-6">
             {isRegistered && <Popup text="Користувача створено успішно!" />}
+            {error && <Popup text={error} color="red" />}
             <h2 className="font-bold text-2xl md:text-4xl">Авторизація</h2>
             <form
                 onSubmit={handleLoginSubmit}
