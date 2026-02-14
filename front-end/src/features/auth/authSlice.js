@@ -6,6 +6,7 @@ const initialState = {
     user: null,
     token: localStorage.getItem("token") || null,
     isLoading: false,
+    authChecked: false,
 };
 
 const authSlice = createSlice({
@@ -17,6 +18,7 @@ const authSlice = createSlice({
             state.token = action.payload.token;
 
             localStorage.setItem("token", action.payload.token);
+            state.authChecked = true;
         },
         logout: () => {
             return initialState;
@@ -35,12 +37,14 @@ const authSlice = createSlice({
                     state.token = action.payload.token;
                     localStorage.setItem("token", action.payload.token);
                 }
+                state.authChecked = true;
             })
             .addCase(me.rejected, (state) => {
                 state.isLoading = false;
                 state.user = null;
                 state.token = null;
                 localStorage.removeItem("token");
+                state.authChecked = true;
             });
     },
 });
