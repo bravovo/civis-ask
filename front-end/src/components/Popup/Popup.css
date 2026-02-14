@@ -1,0 +1,41 @@
+.popup {
+    display: block;
+    top: 25px;
+    position: absolute;
+    max-width: 500px;
+    max-height: 400px;
+}
+
+.popup.active {
+    animation: slideIn 1s cubic-bezier(1, 0.12, 0.25, 1.5) forwards;
+}
+
+.popup.hidden {
+    animation: slideOut 1s cubic-bezier(1, 0.12, 0.25, 1.5) forwards;
+}
+
+.popup div {
+    width: 100%;
+    padding: 24px 36px;
+    border: 1px solid gray;
+    border-radius: 8px;
+    box-shadow: 0 0 8px gray;
+}
+
+@keyframes slideIn {
+    0% {
+        transform: translateY(-200%);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideOut {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-200%);
+    }
+}

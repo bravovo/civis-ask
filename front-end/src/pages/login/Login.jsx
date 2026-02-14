@@ -7,6 +7,7 @@ import FormInput from "../../components/FormInput/FormInput.jsx";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { setCreds } from "../../features/auth/authSlice.js";
 import { useDispatch } from "react-redux";
+import Popup from "../../components/Popup/Popup.jsx";
 
 function Login() {
     const dispatch = useDispatch();
@@ -49,8 +50,8 @@ function Login() {
 
     return (
         <div className="w-full h-full flex flex-col justify-center items-center gap-6">
+            {isRegistered && <Popup text="Користувача створено успішно!" />}
             <h2 className="font-bold text-2xl md:text-4xl">Авторизація</h2>
-            <p>{isRegistered && "Користувача створено"}</p>
             <form
                 onSubmit={handleLoginSubmit}
                 className="w-2xs md:w-[450px] flex flex-col justify-center items-center gap-3 py-5 px-3 border-[1.5px] border-b-gray-400 rounded-[8px]"
