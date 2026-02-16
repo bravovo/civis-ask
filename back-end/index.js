@@ -8,6 +8,7 @@ import { PORT, CLIENT_ORIGIN, NODE_ENV } from "./config/env.js";
 
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
+import uploadsRoute from "./routes/uploads.route.js";
 
 import { checkUserAccess } from "./middlewares/jwt.middleware.js";
 
@@ -36,10 +37,12 @@ app.use("/api/auth", authRoute);
 app.use(checkUserAccess);
 
 app.use("/api/user", userRoute);
+app.use("/api/uploads", uploadsRoute);
 
 app.use((err, req, res, next) => {
     if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(400).json({ message: err.message });
+        const errMsg = err.message.split(":")[2];
+        return res.status(400).json({ message: errMsg });
     }
 
     res.status(500).json({ message: err.message });

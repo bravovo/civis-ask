@@ -2,10 +2,10 @@ import User from "../models/user.model.js";
 
 export const getUser = async (req, res, next) => {
     try {
-        const { email } = req.user;
+        const { id } = req.user;
         const token = req.newToken;
 
-        const user = await User.findOne({ email }, "-password");
+        const user = await User.findById(id, "-password");
 
         if (!user) {
             return res.status(404).json({

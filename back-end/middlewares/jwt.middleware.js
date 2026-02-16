@@ -13,8 +13,8 @@ export const checkUserAccess = (req, res, next) => {
 
         const accessResult = verifyToken(accessToken, true);
 
-        if (accessResult.email) {
-            req.user = { email: accessResult.email, role: accessResult.role };
+        if (accessResult.id) {
+            req.user = { id: accessResult.id, role: accessResult.role };
             return next();
         }
         if (accessResult.error === "expired") {
@@ -29,7 +29,7 @@ export const checkUserAccess = (req, res, next) => {
             }
             const refreshResult = verifyToken(refreshToken, false);
 
-            if (!refreshResult.email) {
+            if (!refreshResult.id) {
                 return res.status(403).json({
                     success: false,
                     message: "Потрібна авторизація",
@@ -37,19 +37,19 @@ export const checkUserAccess = (req, res, next) => {
             }
 
             const newAccessToken = generateAccessToken(
-                refreshResult.email,
+                refreshResult.id,
                 refreshResult.role
             );
 
             if (!newAccessToken) {
-                console.error(refreshResult.email);
+                console.error(refreshResult.id);
                 return res.status(500).json({
                     success: false,
                     message: "Аутентифікація не вдалась",
                 });
             }
 
-            req.user = { email: refreshResult.email, role: refreshResult.role };
+            req.user = { id: refreshResult.id, role: refreshResult.role };
             req.newToken = newAccessToken;
             return next();
         }

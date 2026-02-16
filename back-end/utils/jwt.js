@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "../config/env.js";
 
-export function generateRefreshToken(email, role) {
+export function generateRefreshToken(id, role) {
     try {
-        return jwt.sign({ email, role }, REFRESH_TOKEN_SECRET, {
+        return jwt.sign({ id, role }, REFRESH_TOKEN_SECRET, {
             expiresIn: "7d",
         });
     } catch (error) {
@@ -11,9 +11,9 @@ export function generateRefreshToken(email, role) {
     }
 }
 
-export function generateAccessToken(email, role) {
+export function generateAccessToken(id, role) {
     try {
-        return jwt.sign({ email, role }, ACCESS_TOKEN_SECRET, {
+        return jwt.sign({ id, role }, ACCESS_TOKEN_SECRET, {
             expiresIn: "10m",
         });
     } catch (error) {
@@ -28,14 +28,14 @@ export const verifyToken = (token, isAccess = false) => {
             isAccess ? ACCESS_TOKEN_SECRET : REFRESH_TOKEN_SECRET
         );
 
-        if (decoded && decoded.email) {
-            return { email: decoded.email, role: decoded.role, error: null };
+        if (decoded && decoded.id) {
+            return { id: decoded.id, role: decoded.role, error: null };
         }
-        return { email: null, role: null, error: "Невірне наповнення токена" };
+        return { id: null, role: null, error: "Невірне наповнення токена" };
     } catch (error) {
         if (error.name === "TokenExpiredError") {
-            return { email: null, role: null, error: "expired" };
+            return { id: null, role: null, error: "expired" };
         }
-        return { email: null, role: null, error: error.message };
+        return { id: null, role: null, error: error.message };
     }
 };

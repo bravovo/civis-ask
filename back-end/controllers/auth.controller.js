@@ -13,6 +13,13 @@ export const register = async (req, res, next) => {
             });
         }
 
+        if (password.length < 8 || password.length > 64) {
+            return res.status(400).json({
+                success: false,
+                message: "Довжина паролю має складати від 8 до 64 символів",
+            });
+        }
+
         const sameUser = await User.findOne({ email });
 
         if (sameUser) {
@@ -73,8 +80,8 @@ export const login = async (req, res, next) => {
         });
     }
 
-    const refreshToken = generateRefreshToken(email, user.role);
-    const accessToken = generateAccessToken(email, user.role);
+    const refreshToken = generateRefreshToken(user.id, user.role);
+    const accessToken = generateAccessToken(user.id, user.role);
 
     if (!accessToken || !refreshToken) {
         throw new Error("Генерація токенів доступу не вдалась");
@@ -91,7 +98,7 @@ export const login = async (req, res, next) => {
         success: true,
         accessToken,
         user: {
-            id: user._id,
+            _id: user._id,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
