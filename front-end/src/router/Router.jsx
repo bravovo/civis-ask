@@ -5,16 +5,40 @@ import Dashboard from "../pages/dashboard/Dashboard";
 import Err403 from "../pages/error/403";
 import RoleCheck from "../components/RoleCheck/RoleCheck";
 import Err404 from "../pages/error/404";
+import Main from "../pages/main/Main";
+import Layout from "../layouts/Layout";
+import Profile from "../pages/profile/Profile";
 
 function Router() {
     return (
         <Routes>
+            <Route
+                path="/"
+                index
+                element={
+                    <RoleCheck roles={["civis", "admin"]}>
+                        <Layout>
+                            <Main />
+                        </Layout>
+                    </RoleCheck>
+                }
+            />
+            <Route
+                path="/profile"
+                element={
+                    <RoleCheck roles={["civis", "admin"]}>
+                        <Layout hasHeader={false}>
+                            <Profile />
+                        </Layout>
+                    </RoleCheck>
+                }
+            />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route
                 path="/dashboard"
                 element={
-                    <RoleCheck roles={["editor", "admin"]}>
+                    <RoleCheck roles={["civis", "admin"]}>
                         <Dashboard />{" "}
                     </RoleCheck>
                 }

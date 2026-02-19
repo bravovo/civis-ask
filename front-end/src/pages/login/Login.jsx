@@ -45,7 +45,7 @@ function Login() {
                         })
                     );
                     dispatch(setLoading(false));
-                    navigate("/dashboard");
+                    navigate("/");
                 }
             }
         } catch (error) {

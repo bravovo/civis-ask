@@ -19,11 +19,13 @@
 }
 
 body {
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin: 0;
+}
+
+html,
+body,
+#root {
+    height: 100%;
 }
 
 button {
