@@ -3,7 +3,7 @@ import axios from "axios";
 import { SERVER_URL } from "../config/env";
 
 const initialState = {
-  status: "edit",
+  status: "draft",
   title: "",
   description: "",
   questions: [],
@@ -91,8 +91,8 @@ const surveySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(saveSurvey.fulfilled, (state, action) => {
-      if (action.payload.data.success) {
-        console.log(action.payload.data.survey);
+      if (action.payload.success) {
+        console.log(action.payload.survey);
       }
     });
   },
@@ -100,15 +100,24 @@ const surveySlice = createSlice({
 
 export const saveSurvey = createAsyncThunk(
   "survey/saveSurvey",
-  async (_, { getState }) => {
+  async (action, { getState }) => {
     const survey = getState().survey;
 
-    const response = await axios.post(`${SERVER_URL}/surveys/survey`, survey, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+    console.log(action);
+
+    const response = await axios.post(
+      `${SERVER_URL}/surveys/survey`,
+      {
+        ...survey,
+        status: action.status === "publish" ? "published" : "draft",
       },
-      withCredentials: true,
-    });
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        withCredentials: true,
+      },
+    );
 
     return response.data;
   },

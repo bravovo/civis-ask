@@ -20,11 +20,10 @@ function NewSurvey() {
     el.style.height = el.scrollHeight + "px";
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = (type) => {
+    console.log(type);
     if (survey.title && survey.description && survey.questions.length > 0) {
-      dispatch(saveSurvey());
+      dispatch(saveSurvey({ status: type }));
     } else {
       alert("Всі дані повинні бути заповненні");
     }
@@ -33,7 +32,7 @@ function NewSurvey() {
   return (
     <div className="flex flex-col gap-3">
       <h2>Створіть нове опитування</h2>
-      <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
+      <div className="flex flex-col gap-2">
         <FormInput
           title={"Назва"}
           type="text"
@@ -65,10 +64,12 @@ function NewSurvey() {
         </div>
         <button onClick={() => dispatch(addQuestion())}>Додати питання</button>
         <div className="flex flex-row gap-2">
-          <button type="submit">Зберегти</button>
-          <button type="submit">Зберегти та опублікувати</button>
+          <button onClick={() => handleSubmit("save")}>Зберегти</button>
+          <button onClick={() => handleSubmit("publish")}>
+            Зберегти та опублікувати
+          </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
