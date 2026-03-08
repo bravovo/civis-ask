@@ -1,7 +1,7 @@
 function FormInput({ onChange, title, name, type }) {
     return (
         <label
-            htmlFor="userEmail"
+            htmlFor={name}
             className="w-full flex flex-col gap-1 justify-start m-0"
         >
             {title}

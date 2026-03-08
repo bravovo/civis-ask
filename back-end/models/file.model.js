@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const FileSchema = mongoose.Schema(
+const fileSchema = mongoose.Schema(
     {
         filename: {
             type: String,
@@ -19,6 +19,6 @@ const FileSchema = mongoose.Schema(
     { timestamps: true }
 );
 
-const File = mongoose.model("File", FileSchema);
+const File = mongoose.model("File", fileSchema);
 
 export default File;

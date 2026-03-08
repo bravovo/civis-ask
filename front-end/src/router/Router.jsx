@@ -8,6 +8,7 @@ import Err404 from "../pages/error/404";
 import Main from "../pages/main/Main";
 import Layout from "../layouts/Layout";
 import Profile from "../pages/profile/Profile";
+import NewSurvey from "../pages/newSurvey/NewSurvey";
 
 function Router() {
     return (
@@ -40,6 +41,16 @@ function Router() {
                 element={
                     <RoleCheck roles={["civis", "admin"]}>
                         <Dashboard />{" "}
+                    </RoleCheck>
+                }
+            />
+            <Route
+                path="/new-survey"
+                element={
+                    <RoleCheck roles={["civis", "admin"]}>
+                        <Layout>
+                            <NewSurvey />
+                        </Layout>
                     </RoleCheck>
                 }
             />
