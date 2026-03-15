@@ -2,12 +2,15 @@ import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
 import axios from "axios";
 import { SERVER_URL } from "../config/env";
 
-const initialState = {
-  status: "draft",
-  title: "",
-  description: "",
-  questions: [],
-};
+const localSurvey = localStorage.getItem("survey");
+const initialState = localSurvey
+  ? JSON.parse(localSurvey)
+  : {
+      status: "draft",
+      title: "",
+      description: "",
+      questions: [],
+    };
 
 const surveySlice = createSlice({
   name: "survey",
@@ -90,10 +93,8 @@ const surveySlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(saveSurvey.fulfilled, (state, action) => {
-      if (action.payload.success) {
-        console.log(action.payload.survey);
-      }
+    builder.addCase(saveSurvey.fulfilled, () => {
+      return initialState;
     });
   },
 });
@@ -119,6 +120,7 @@ export const saveSurvey = createAsyncThunk(
       },
     );
 
+    localStorage.removeItem("survey");
     return response.data;
   },
 );

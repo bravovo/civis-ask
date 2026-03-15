@@ -44,7 +44,15 @@ const surveySchema = mongoose.Schema(
           enum: ["radio", "check"],
           default: "text",
         },
-        answerOptions: [String],
+        answerOptions: [
+          {
+            value: {
+              type: String,
+              required: true,
+              trim: true,
+            },
+          },
+        ],
       },
     ],
     verified: {

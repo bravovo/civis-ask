@@ -3,11 +3,13 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/auth/authSlice";
 import loaderReducer from "./loaderSlice";
 import surveyReducer from "./surveySlice";
+import surveyListReducer from "./surveysSlice";
 
 export const store = configureStore({
-    reducer: {
-        auth: authReducer,
-        loader: loaderReducer,
-        survey: surveyReducer,
-    },
+  reducer: {
+    auth: authReducer,
+    loader: loaderReducer,
+    survey: surveyReducer,
+    surveyList: surveyListReducer,
+  },
 });

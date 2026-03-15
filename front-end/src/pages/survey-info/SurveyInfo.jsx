@@ -1,46 +1,24 @@
-import axios from "axios";
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { SERVER_URL } from "../../config/env";
-import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import useSurveyInfo from "../../hooks/useSurveyInfo";
+import { useSelector } from "react-redux";
+import Loader from "../../components/ui/Loader/Loader";
 
 function SurveyInfo() {
+  const { loading } = useSelector((state) => state.loader);
   const { surveyId } = useParams();
+  const { survey } = useSurveyInfo(surveyId);
 
-  const [survey, setSurvey] = useState({});
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    async function fetchSurvey() {
-      try {
-        if (!surveyId) {
-          throw new Error("ID опитування не знайдено");
-        }
+  const onPassSurveyClick = () => {
+    navigate(`/${surveyId}/pass`);
+  };
 
-        const response = await axios.get(
-          `${SERVER_URL}/surveys/survey/${surveyId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            withCredentials: true,
-          },
-        );
-
-        if (response.data.success) {
-          console.log(response.data.survey);
-          setSurvey(response.data.survey);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    fetchSurvey();
-  }, [surveyId]);
+  if (loading) return <Loader />;
 
   return (
     <div>
-      {survey.title && (
+      {survey && (
         <div>
           <div className="text-zinc-400 flex flex-col justify-start items-start">
             <p className={`${survey.verified ? "text-[green]" : "text-[red]"}`}>
@@ -52,7 +30,13 @@ function SurveyInfo() {
             <p>{survey.title}</p>
             <p>{survey.description}</p>
             <p>Кількість питань: {survey.questions.length}</p>
-            <p>Дата створення: {survey.createdAt}</p>
+            <p>
+              Дата створення:{" "}
+              {new Date(survey.createdAt).toLocaleDateString("en-GB")}
+            </p>
+          </div>
+          <div>
+            <button onClick={onPassSurveyClick}>Пройти опитування</button>
           </div>
         </div>
       )}

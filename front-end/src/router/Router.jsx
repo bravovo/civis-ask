@@ -10,6 +10,7 @@ import Layout from "../layouts/Layout";
 import Profile from "../pages/profile/Profile";
 import NewSurvey from "../pages/newSurvey/NewSurvey";
 import SurveyInfo from "../pages/survey-info/SurveyInfo";
+import PassSurvey from "../pages/passSurvey/PassSurvey";
 
 function Router() {
   return (
@@ -61,6 +62,16 @@ function Router() {
           <RoleCheck roles={["civis", "admin"]}>
             <Layout>
               <SurveyInfo />
+            </Layout>
+          </RoleCheck>
+        }
+      />
+      <Route
+        path="/:surveyId/pass"
+        element={
+          <RoleCheck roles={["civis", "admin"]}>
+            <Layout>
+              <PassSurvey />
             </Layout>
           </RoleCheck>
         }

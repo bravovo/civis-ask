@@ -1,4 +1,5 @@
 import Survey from "../models/survey.model.js";
+import SurveyTake from "../models/surveyTake.model.js";
 
 export const postSurvey = async (req, res, next) => {
   try {
@@ -9,7 +10,9 @@ export const postSurvey = async (req, res, next) => {
       title: q.title,
       required: q.required,
       type: q.type,
-      answerOptions: (q.options || []).map((opt) => opt.text),
+      answerOptions: (q.options || []).map((opt) => ({
+        value: opt.text,
+      })),
     }));
 
     const survey = await Survey.create({
@@ -71,6 +74,39 @@ export const getPublishedSurveys = async (req, res, next) => {
       success: true,
       message: `Знайдено опитувань: ${surveys.length}`,
       surveys,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const postSurveyPass = async (req, res, next) => {
+  const user = req.user;
+  const { surveyId } = req.params;
+  const { answers } = req.body;
+
+  try {
+    if (answers.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Відповіді на опитування порожні",
+      });
+    }
+
+    const surveyTake = await SurveyTake.create({
+      survey: surveyId,
+      user: user.id,
+      answers,
+    });
+
+    if (!surveyTake) {
+      throw new Error("Помилка проходження опитування");
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: "Опитування пройдено успішно",
+      surveyTake,
     });
   } catch (error) {
     next(error);

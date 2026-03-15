@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import FormInput from "../../components/FormInput/FormInput";
+import { useEffect, useRef } from "react";
+import FormInput from "../../components/ui/FormInput/FormInput";
 import { useSelector, useDispatch } from "react-redux";
 import {
   addQuestion,
@@ -13,6 +13,10 @@ function NewSurvey() {
   const survey = useSelector((state) => state.survey);
   const dispatch = useDispatch();
   const textAreaRef = useRef(null);
+
+  useEffect(() => {
+    localStorage.setItem("survey", JSON.stringify(survey));
+  }, [survey]);
 
   const handleInput = (e) => {
     const el = e.target;
@@ -37,6 +41,7 @@ function NewSurvey() {
           title={"Назва"}
           type="text"
           name="surveyTitle"
+          value={survey.title}
           onChange={(e) => {
             dispatch(changeTitle(e.target.value));
           }}
@@ -51,6 +56,7 @@ function NewSurvey() {
             required
             onInput={handleInput}
             name="surveyDesc"
+            value={survey.description}
             onChange={(e) => {
               dispatch(changeDescription(e.target.value));
             }}

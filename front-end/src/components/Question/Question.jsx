@@ -27,6 +27,7 @@ function Question({ id }) {
               type="text"
               required
               name="question-title"
+              value={question.title}
               onChange={(e) => editQuestionTitle(e.target.value)}
               className="border-[1px] rounded-[4px] border-zinc-400 py-1.5 px-3"
             />
