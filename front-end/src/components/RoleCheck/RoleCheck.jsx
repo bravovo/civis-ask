@@ -6,15 +6,19 @@ const RoleCheck = ({ roles, children }) => {
     (state) => state.profile
   );
 
-  if (token && !authChecked) {
-    return null;
-  }
-
-  if (authChecked && !email) {
+  if (!token) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!roles.includes(role)) {
+  if (!authChecked) {
+    return null;
+  }
+
+  if (!email) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (roles && !roles.includes(role)) {
     return <Navigate to="/403" replace />;
   }
 
