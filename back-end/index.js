@@ -70,3 +70,5 @@ app.listen(PORT, () => {
     console.log(NODE_ENV, "ENV");
     console.log("LISTENING ON PORT", PORT);
 });
+
+export default app;
