@@ -16,6 +16,7 @@ const surveyTake = mongoose.Schema(
       {
         questionId: {
           type: mongoose.Schema.Types.ObjectId,
+          required: true,
         },
         answer: {
           type: mongoose.Schema.Types.Mixed,

@@ -5,10 +5,10 @@ import axios from "axios";
 import { SERVER_URL } from "../../config/env.js";
 import FormInput from "../../components/ui/FormInput/FormInput.jsx";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { setCreds } from "../../features/auth/authSlice.js";
 import { useDispatch } from "react-redux";
 import Popup from "../../components/ui/Popup/Popup.jsx";
 import { setLoading } from "../../state/loaderSlice.js";
+import { setCreds } from "../../state/profileSlice.js";
 
 function Login() {
   const dispatch = useDispatch();
@@ -34,7 +34,7 @@ function Login() {
           },
           {
             withCredentials: true,
-          },
+          }
         );
 
         if (response.status === 200) {
@@ -42,7 +42,7 @@ function Login() {
             setCreds({
               user: response.data.user,
               token: response.data.accessToken,
-            }),
+            })
           );
           dispatch(setLoading(false));
           navigate("/");

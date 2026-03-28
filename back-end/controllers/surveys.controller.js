@@ -1,5 +1,9 @@
 import Survey from "../models/survey.model.js";
 import SurveyTake from "../models/surveyTake.model.js";
+import {
+  getUserSurveys,
+  getSurveysPassedByUser,
+} from "../services/survey.service.js";
 
 export const postSurvey = async (req, res, next) => {
   try {
@@ -107,6 +111,38 @@ export const postSurveyPass = async (req, res, next) => {
       success: true,
       message: "Опитування пройдено успішно",
       surveyTake,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCurrentUserSurveys = async (req, res, next) => {
+  try {
+    const user = req.user;
+
+    const userSurveys = await getUserSurveys(user);
+
+    return res.status(200).json({
+      success: true,
+      message: "Опитування користувача успішно знайдено",
+      surveys: userSurveys,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCurrentUserPassedSurveys = async (req, res, next) => {
+  try {
+    const user = req.user;
+
+    const surveysPassedByUser = await getSurveysPassedByUser(user);
+
+    return res.status(200).json({
+      success: true,
+      message: "Опитування, пройдені користувачем успішно знайдено",
+      surveys: surveysPassedByUser,
     });
   } catch (error) {
     next(error);
