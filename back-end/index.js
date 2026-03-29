@@ -39,11 +39,41 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.options("*", cors(corsOptions));
-
 app.use(cookieParser());
 
-connectDB();
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        res.status(500).json({ message: "Помилка підключення до бази даних" });
+    }
+});
+
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    console.log(origin);
+    if (
+        origin &&
+        (origin.endsWith(".vercel.app") || origin === CLIENT_ORIGIN)
+    ) {
+        res.setHeader("Access-Control-Allow-Origin", origin);
+    }
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET,POST,PUT,DELETE,OPTIONS,PATCH"
+    );
+    res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization"
+    );
+
+    if (req.method === "OPTIONS") {
+        return res.status(200).end();
+    }
+    next();
+});
 
 app.get("/", (req, res, next) => {
     res.send("API is okay");
