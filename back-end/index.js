@@ -37,19 +37,6 @@ const corsOptions = {
     allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-app.use(cors(corsOptions));
-
-app.use(cookieParser());
-
-app.use(async (req, res, next) => {
-    try {
-        await connectDB();
-        next();
-    } catch (err) {
-        res.status(500).json({ message: "Помилка підключення до бази даних" });
-    }
-});
-
 app.use((req, res, next) => {
     const origin = req.headers.origin;
     console.log(origin);
@@ -73,6 +60,19 @@ app.use((req, res, next) => {
         return res.status(200).end();
     }
     next();
+});
+
+app.use(cors(corsOptions));
+
+app.use(cookieParser());
+
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        res.status(500).json({ message: "Помилка підключення до бази даних" });
+    }
 });
 
 app.get("/", (req, res, next) => {
