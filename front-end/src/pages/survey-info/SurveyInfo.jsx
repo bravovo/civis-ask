@@ -18,6 +18,9 @@ function SurveyInfo() {
 
   return (
     <div>
+      <button onClick={() => navigate(-1)} className="w-20">
+        Назад
+      </button>
       {survey && (
         <div>
           <div className="text-zinc-400 flex flex-col justify-start items-start">

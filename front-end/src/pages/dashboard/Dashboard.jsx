@@ -1,12 +1,13 @@
-import axios from "axios";
 import { useState } from "react";
-import { SERVER_URL } from "../../config/env";
 import FormInput from "../../components/ui/FormInput/FormInput";
 import { useDispatch } from "react-redux";
 import { setLoading } from "../../state/loaderSlice";
 import Popup from "../../components/ui/Popup/Popup";
+import { useNavigate } from "react-router-dom";
+import api from "../../api/api";
 
 function Dashboard() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [fileData, setFileData] = useState({
     title: "",
@@ -38,12 +39,7 @@ function Dashboard() {
       formData.append("file", fileInput);
       formData.append("title", filenameInput);
 
-      const response = await axios.post(`${SERVER_URL}/uploads/pdf`, formData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        withCredentials: true,
-      });
+      const response = await api.post(`/uploads/pdf`, formData);
 
       if (response.status == 201) {
         setFileData(response.data.file);
@@ -61,7 +57,13 @@ function Dashboard() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col justify-center items-center gap-6">
+    <div className="w-full h-full flex flex-col justify-center items-center gap-6 relative">
+      <button
+        onClick={() => navigate(-1)}
+        className="absolute top-0 left-0 w-20"
+      >
+        Назад
+      </button>
       {error && <Popup text={error} color="red" />}
       <div className="w-2xs md:w-[450px] flex flex-col justify-center items-center gap-3 py-5 px-3 border-[1.5px] border-b-gray-400 rounded-[8px]">
         <form

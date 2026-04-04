@@ -1,13 +1,10 @@
 import { useState } from "react";
-
-import axios from "axios";
-
-import { SERVER_URL } from "../../config/env.js";
 import FormInput from "../../components/ui/FormInput/FormInput.jsx";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLoading } from "../../state/loaderSlice.js";
 import Popup from "../../components/ui/Popup/Popup.jsx";
+import api from "../../api/api.js";
 
 function Register() {
   const dispatch = useDispatch();
@@ -35,18 +32,12 @@ function Register() {
       }
       dispatch(setLoading(true));
 
-      const response = await axios.post(
-        `${SERVER_URL}/auth/register`,
-        {
-          email,
-          password,
-          firstName,
-          lastName,
-        },
-        {
-          withCredentials: true,
-        },
-      );
+      const response = await api.post(`/auth/register`, {
+        email,
+        password,
+        firstName,
+        lastName,
+      });
 
       if (response.status === 201) {
         dispatch(setLoading(false));

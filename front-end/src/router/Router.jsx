@@ -42,7 +42,9 @@ function Router() {
         path="/dashboard"
         element={
           <RoleCheck roles={["civis", "admin"]}>
-            <Dashboard />{" "}
+            <Layout>
+              <Dashboard />
+            </Layout>
           </RoleCheck>
         }
       />

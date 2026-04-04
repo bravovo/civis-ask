@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
-import axios from "axios";
-import { SERVER_URL } from "../config/env";
+import api from "../api/api";
 
 const localSurvey = localStorage.getItem("survey");
 const initialState = localSurvey
@@ -44,7 +43,7 @@ const surveySlice = createSlice({
     addOption: {
       reducer: (state, action) => {
         const question = state.questions.find(
-          (q) => q.id === action.payload.questionId,
+          (q) => q.id === action.payload.questionId
         );
 
         question.options.push(action.payload.option);
@@ -61,22 +60,22 @@ const surveySlice = createSlice({
     },
     editOption: (state, action) => {
       const question = state.questions.find(
-        (q) => q.id === action.payload.questionId,
+        (q) => q.id === action.payload.questionId
       );
 
       const option = question.options.find(
-        (opt) => opt.id === action.payload.optionId,
+        (opt) => opt.id === action.payload.optionId
       );
 
       option.text = action.payload.text;
     },
     removeOption: (state, action) => {
       const question = state.questions.find(
-        (q) => q.id === action.payload.questionId,
+        (q) => q.id === action.payload.questionId
       );
 
       question.options = question.options.filter(
-        (o) => o.id !== action.payload.optionId,
+        (o) => o.id !== action.payload.optionId
       );
     },
     editQuestion: (state, action) => {
@@ -86,7 +85,7 @@ const surveySlice = createSlice({
     },
     removeQuestion: (state, action) => {
       const filtered = state.questions.filter(
-        (q) => q.id !== action.payload.id,
+        (q) => q.id !== action.payload.id
       );
 
       return { ...state, questions: filtered };
@@ -106,23 +105,14 @@ export const saveSurvey = createAsyncThunk(
 
     console.log(action);
 
-    const response = await axios.post(
-      `${SERVER_URL}/surveys/survey`,
-      {
-        ...survey,
-        status: action.status === "publish" ? "published" : "draft",
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        withCredentials: true,
-      },
-    );
+    const response = await api.post(`/surveys/survey`, {
+      ...survey,
+      status: action.status === "publish" ? "published" : "draft",
+    });
 
     localStorage.removeItem("survey");
     return response.data;
-  },
+  }
 );
 
 export const {

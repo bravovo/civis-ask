@@ -1,12 +1,12 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useSurveyInfo from "../../hooks/useSurveyInfo";
 import { useSelector } from "react-redux";
 import Loader from "../../components/ui/Loader/Loader";
-import axios from "axios";
-import { SERVER_URL } from "../../config/env";
 import { useEffect, useState } from "react";
+import api from "../../api/api";
 
 function PassSurvey() {
+  const navigate = useNavigate();
   const { loading } = useSelector((state) => state.loader);
   const { surveyId } = useParams();
   const { survey } = useSurveyInfo(surveyId);
@@ -26,18 +26,9 @@ function PassSurvey() {
 
   const handlePassClick = async () => {
     try {
-      const response = await axios.post(
-        `${SERVER_URL}/surveys/survey/${surveyId}/pass`,
-        {
-          answers: surveyTake,
-        },
-        {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        },
-      );
+      const response = await api.post(`/surveys/survey/${surveyId}/pass`, {
+        answers: surveyTake,
+      });
 
       if (response.data.success) {
         console.log(response.data);
@@ -71,6 +62,9 @@ function PassSurvey() {
 
   return (
     <div>
+      <button onClick={() => navigate(-1)} className="w-20">
+        Назад
+      </button>
       {survey && (
         <div>
           <h1>{survey.title}</h1>
@@ -78,7 +72,7 @@ function PassSurvey() {
           {survey.questions &&
             survey.questions.map((q) => {
               const currentAnswer = surveyTake?.find(
-                (a) => a.questionId === q._id,
+                (a) => a.questionId === q._id
               );
               return (
                 <div key={q._id}>

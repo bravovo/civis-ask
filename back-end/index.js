@@ -23,7 +23,7 @@ const corsOptions = {
         if (!origin) return callback(null, true);
 
         const isMatch = origin === CLIENT_ORIGIN;
-        const isVercelPreview = origin.endsWith(".vercel.app");
+        const isVercelPreview = /\.vercel\.app$/.test(origin);
 
         if (isMatch || isVercelPreview) {
             callback(null, true);
@@ -35,32 +35,8 @@ const corsOptions = {
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["x-new-access-token"],
 };
-
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    console.log(origin);
-    if (
-        origin &&
-        (origin.endsWith(".vercel.app") || origin === CLIENT_ORIGIN)
-    ) {
-        res.setHeader("Access-Control-Allow-Origin", origin);
-    }
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader(
-        "Access-Control-Allow-Methods",
-        "GET,POST,PUT,DELETE,OPTIONS,PATCH"
-    );
-    res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Content-Type, Authorization"
-    );
-
-    if (req.method === "OPTIONS") {
-        return res.status(200).end();
-    }
-    next();
-});
 
 app.use(cors(corsOptions));
 

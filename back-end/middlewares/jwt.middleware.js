@@ -49,6 +49,8 @@ export const checkUserAccess = (req, res, next) => {
                 });
             }
 
+            res.setHeader("x-new-access-token", newAccessToken);
+
             req.user = { id: refreshResult.id, role: refreshResult.role };
             req.newToken = newAccessToken;
             return next();
