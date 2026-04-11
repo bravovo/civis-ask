@@ -1,7 +1,7 @@
 import { useState } from "react";
 import FormInput from "../../components/ui/FormInput/FormInput.jsx";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../../state/loaderSlice.js";
 import Popup from "../../components/ui/Popup/Popup.jsx";
 import api from "../../api/api.js";
@@ -15,6 +15,12 @@ function Register() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [error, setError] = useState("");
+
+  const { authChecked, token } = useSelector((state) => state.profile);
+
+  if (authChecked && token) {
+    return <Navigate to="/" replace />;
+  }
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();

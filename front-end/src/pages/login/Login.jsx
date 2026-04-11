@@ -1,7 +1,7 @@
 import { useState } from "react";
 import FormInput from "../../components/ui/FormInput/FormInput.jsx";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import Popup from "../../components/ui/Popup/Popup.jsx";
 import { setLoading } from "../../state/loaderSlice.js";
 import { setCreds } from "../../state/profileSlice.js";
@@ -15,6 +15,12 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  const { authChecked, token } = useSelector((state) => state.profile);
+
+  if (authChecked && token) {
+    return <Navigate to="/" replace />;
+  }
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();

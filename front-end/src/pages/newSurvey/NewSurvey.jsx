@@ -70,7 +70,7 @@ function NewSurvey() {
         </label>
         <div className="flex flex-col gap-4 items-center justify-center">
           {survey.questions.map((q) => {
-            return <Question key={q.id} id={q.id} />;
+            return <Question key={q._id} question={q} />;
           })}
         </div>
         <button onClick={() => dispatch(addQuestion())}>Додати питання</button>

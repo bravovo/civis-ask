@@ -1,6 +1,74 @@
 import Survey from "../models/survey.model.js";
 import SurveyTake from "../models/surveyTake.model.js";
 
+export const patchEditSurvey = async ({
+    surveyId,
+    userId,
+    title,
+    description,
+    questions,
+    status,
+}) => {
+    const survey = await Survey.findById(surveyId);
+    let error;
+
+    if (!survey) {
+        error = {
+            status: 404,
+            message: "Опитування не знайдено",
+        };
+        return { error, updatedSurvey: null };
+    }
+
+    if (!survey.author.equals(userId)) {
+        error = {
+            status: 403,
+            message: "Заборонено редагувати чужі опитування",
+        };
+        return { error, updatedSurvey: null };
+    }
+
+    if (survey.status === "published") {
+        error = {
+            status: 400,
+            message: "Не можна редагувати опубліковані опитування",
+        };
+        return { error, updatedSurvey: null };
+    }
+
+    console.log(questions[0].options);
+
+    const formattedQuestions = questions.map((q) => ({
+        title: q.title,
+        required: q.required,
+        type: q.type,
+        options: (q.options || []).map((opt) => ({
+            value: opt.value || opt.text,
+        })),
+    }));
+
+    const updatedSurvey = await Survey.findByIdAndUpdate(
+        surveyId,
+        {
+            title,
+            description,
+            status,
+            questions: formattedQuestions,
+        },
+        { new: true, runValidators: true }
+    );
+
+    if (!updatedSurvey) {
+        error = {
+            status: 500,
+            message: "Помилка створення опитування",
+        };
+        return { error, updatedSurvey: null };
+    }
+
+    return { error: null, updatedSurvey };
+};
+
 export const getUserSurveys = async (user) => {
     if (!user || !user.id) {
         throw new Error("Користувача не знайдено");

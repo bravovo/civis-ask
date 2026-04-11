@@ -64,12 +64,11 @@ app.use("/api/uploads", uploadsRoute);
 app.use("/api/surveys", surveysRoute);
 
 app.use((err, req, res, next) => {
+    console.log(err);
     if (err instanceof mongoose.Error.ValidationError) {
         const errMsg = err.message.split(":")[2];
         return res.status(400).json({ message: errMsg });
     }
-
-    console.log(err);
 
     res.status(500).json({ message: err.message });
 });

@@ -1,8 +1,10 @@
+import mongoose from "mongoose";
 import Survey from "../models/survey.model.js";
 import SurveyTake from "../models/surveyTake.model.js";
 import {
     getUserSurveys,
     getSurveysPassedByUser,
+    patchEditSurvey,
 } from "../services/survey.service.js";
 
 export const postSurvey = async (req, res, next) => {
@@ -14,7 +16,7 @@ export const postSurvey = async (req, res, next) => {
             title: q.title,
             required: q.required,
             type: q.type,
-            answerOptions: (q.options || []).map((opt) => ({
+            options: (q.options || []).map((opt) => ({
                 value: opt.text,
             })),
         }));
@@ -41,11 +43,45 @@ export const postSurvey = async (req, res, next) => {
     }
 };
 
+export const editSurvey = async (req, res, next) => {
+    try {
+        const { title, description, questions, status } = req.body;
+        const { surveyId } = req.params;
+
+        const { error, updatedSurvey } = await patchEditSurvey({
+            title,
+            description,
+            questions,
+            status,
+            surveyId,
+            userId: req.user.id,
+        });
+
+        if (error) {
+            return res.status(error.status).json({
+                success: false,
+                message: error.message,
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Опитування успішно відредаговано",
+            updatedSurvey,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getSurvey = async (req, res, next) => {
     try {
         const { surveyId } = req.params;
 
-        const survey = await Survey.findById(surveyId).populate("author");
+        const survey = await Survey.findById(surveyId).populate({
+            path: "author",
+            select: "firstName lastName",
+        });
 
         if (!survey) {
             return res.status(404).json({

@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import useSurveyInfo from "../../hooks/useSurveyInfo";
 import { useSelector } from "react-redux";
 import Loader from "../../components/ui/Loader/Loader";
@@ -15,6 +15,10 @@ function SurveyInfo() {
   };
 
   if (loading) return <Loader />;
+
+  if (survey && survey.status === "draft") {
+    return <Navigate to={`/${survey._id}/edit`} replace />;
+  }
 
   return (
     <div>
