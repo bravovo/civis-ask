@@ -1,21 +1,32 @@
 import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
-import axios from "axios";
-import { SERVER_URL } from "../config/env";
+import api from "../api/api";
 
 const localSurvey = localStorage.getItem("survey");
-const initialState = localSurvey
-  ? JSON.parse(localSurvey)
-  : {
-      status: "draft",
-      title: "",
-      description: "",
-      questions: [],
-    };
+const getInitialState = () => {
+  try {
+    if (localSurvey && localSurvey !== "undefined") {
+      return JSON.parse(localSurvey);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  return {
+    status: "draft",
+    title: "",
+    description: "",
+    questions: [],
+  };
+};
+
+const initialState = getInitialState();
 
 const surveySlice = createSlice({
   name: "survey",
   initialState,
   reducers: {
+    setSurvey: (_state, action) => {
+      return { ...action.payload };
+    },
     changeTitle: (state, action) => {
       state.title = action.payload;
     },
@@ -28,13 +39,13 @@ const surveySlice = createSlice({
       },
       prepare: () => ({
         payload: {
-          id: nanoid(),
+          _id: nanoid(),
           title: "",
           type: "radio",
           required: false,
           options: [
             {
-              id: nanoid(),
+              _id: nanoid(),
               text: "Варіант відповіді 1",
             },
           ],
@@ -44,7 +55,7 @@ const surveySlice = createSlice({
     addOption: {
       reducer: (state, action) => {
         const question = state.questions.find(
-          (q) => q.id === action.payload.questionId,
+          (q) => q._id === action.payload.questionId
         );
 
         question.options.push(action.payload.option);
@@ -53,7 +64,7 @@ const surveySlice = createSlice({
         payload: {
           questionId,
           option: {
-            id: nanoid(),
+            _id: nanoid(),
             text: "",
           },
         },
@@ -61,32 +72,32 @@ const surveySlice = createSlice({
     },
     editOption: (state, action) => {
       const question = state.questions.find(
-        (q) => q.id === action.payload.questionId,
+        (q) => q._id === action.payload.questionId
       );
 
       const option = question.options.find(
-        (opt) => opt.id === action.payload.optionId,
+        (opt) => opt._id === action.payload.optionId
       );
 
       option.text = action.payload.text;
     },
     removeOption: (state, action) => {
       const question = state.questions.find(
-        (q) => q.id === action.payload.questionId,
+        (q) => q._id === action.payload.questionId
       );
 
       question.options = question.options.filter(
-        (o) => o.id !== action.payload.optionId,
+        (o) => o._id !== action.payload.optionId
       );
     },
     editQuestion: (state, action) => {
-      const question = state.questions.find((q) => q.id === action.payload.id);
+      const question = state.questions.find((q) => q._id === action.payload.id);
 
       Object.assign(question, action.payload.changes);
     },
     removeQuestion: (state, action) => {
       const filtered = state.questions.filter(
-        (q) => q.id !== action.payload.id,
+        (q) => q._id !== action.payload.id
       );
 
       return { ...state, questions: filtered };
@@ -94,7 +105,10 @@ const surveySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(saveSurvey.fulfilled, () => {
-      return initialState;
+      return getInitialState();
+    });
+    builder.addCase(editSurvey.fulfilled, () => {
+      return getInitialState();
     });
   },
 });
@@ -106,26 +120,33 @@ export const saveSurvey = createAsyncThunk(
 
     console.log(action);
 
-    const response = await axios.post(
-      `${SERVER_URL}/surveys/survey`,
-      {
-        ...survey,
-        status: action.status === "publish" ? "published" : "draft",
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        withCredentials: true,
-      },
-    );
+    const response = await api.post(`/surveys/survey`, {
+      ...survey,
+      status: action.status === "publish" ? "published" : "draft",
+    });
 
     localStorage.removeItem("survey");
     return response.data;
-  },
+  }
+);
+
+export const editSurvey = createAsyncThunk(
+  "survey/editSurvey",
+  async (action, { getState }) => {
+    const survey = getState().survey;
+
+    const response = await api.patch(`/surveys/survey/${survey._id}/edit`, {
+      ...survey,
+      status: action.status === "publish" ? "published" : "draft",
+    });
+
+    localStorage.removeItem("survey");
+    return response.data;
+  }
 );
 
 export const {
+  setSurvey,
   changeTitle,
   changeDescription,
   addQuestion,

@@ -23,7 +23,8 @@ const corsOptions = {
         if (!origin) return callback(null, true);
 
         const isMatch = origin === CLIENT_ORIGIN;
-        const isVercelPreview = origin.endsWith(".vercel.app");
+        const isVercelPreview =
+            /^https:\/\/civis-ask(-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
 
         if (isMatch || isVercelPreview) {
             callback(null, true);
@@ -35,6 +36,7 @@ const corsOptions = {
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["x-new-access-token"],
 };
 
 app.use(cors(corsOptions));
@@ -50,31 +52,6 @@ app.use(async (req, res, next) => {
     }
 });
 
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    console.log(origin);
-    if (
-        origin &&
-        (origin.endsWith(".vercel.app") || origin === CLIENT_ORIGIN)
-    ) {
-        res.setHeader("Access-Control-Allow-Origin", origin);
-    }
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader(
-        "Access-Control-Allow-Methods",
-        "GET,POST,PUT,DELETE,OPTIONS,PATCH"
-    );
-    res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Content-Type, Authorization"
-    );
-
-    if (req.method === "OPTIONS") {
-        return res.status(200).end();
-    }
-    next();
-});
-
 app.get("/", (req, res, next) => {
     res.send("API is okay");
 });
@@ -88,12 +65,11 @@ app.use("/api/uploads", uploadsRoute);
 app.use("/api/surveys", surveysRoute);
 
 app.use((err, req, res, next) => {
+    console.log(err);
     if (err instanceof mongoose.Error.ValidationError) {
         const errMsg = err.message.split(":")[2];
         return res.status(400).json({ message: errMsg });
     }
-
-    console.log(err);
 
     res.status(500).json({ message: err.message });
 });

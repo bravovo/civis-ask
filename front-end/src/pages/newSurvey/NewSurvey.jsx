@@ -8,8 +8,10 @@ import {
   saveSurvey,
 } from "../../state/surveySlice";
 import Question from "../../components/Question/Question";
+import { useNavigate } from "react-router-dom";
 
 function NewSurvey() {
+  const navigate = useNavigate();
   const survey = useSelector((state) => state.survey);
   const dispatch = useDispatch();
   const textAreaRef = useRef(null);
@@ -35,8 +37,11 @@ function NewSurvey() {
 
   return (
     <div className="flex flex-col gap-3">
+      <button onClick={() => navigate(-1)} className="w-20">
+        Назад
+      </button>
       <h2>Створіть нове опитування</h2>
-      <div className="flex flex-col gap-2">
+      <div className="w-full flex flex-col gap-2">
         <FormInput
           title={"Назва"}
           type="text"
@@ -65,7 +70,7 @@ function NewSurvey() {
         </label>
         <div className="flex flex-col gap-4 items-center justify-center">
           {survey.questions.map((q) => {
-            return <Question key={q.id} id={q.id} />;
+            return <Question key={q._id} question={q} />;
           })}
         </div>
         <button onClick={() => dispatch(addQuestion())}>Додати питання</button>

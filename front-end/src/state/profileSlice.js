@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { SERVER_URL } from "../config/env";
+import api from "../api/api";
 
 const initialState = {
   firstName: "",
@@ -38,6 +37,9 @@ const profileSlice = createSlice({
 
       localStorage.setItem("token", action.payload.token);
       state.authChecked = true;
+    },
+    setTokenFromAxios: (state, action) => {
+      state.token = action.payload.token;
     },
   },
   extraReducers: (builder) => {
@@ -97,12 +99,7 @@ export const me = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       console.log("PROFILE FROM DB");
-      const response = await axios.get(`${SERVER_URL}/user/me`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        withCredentials: true,
-      });
+      const response = await api.get(`/user/me`);
 
       if (response.data.success) {
         return response.data.user;
@@ -130,12 +127,7 @@ export const getUserSurveys = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       console.log("USER SURVEYS FROM DB");
-      const response = await axios.get(`${SERVER_URL}/surveys/user-surveys`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        withCredentials: true,
-      });
+      const response = await api.get(`/surveys/user-surveys`);
 
       if (response.data.success) {
         return response.data.surveys;
@@ -165,15 +157,7 @@ export const getSurveysPassedByUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       console.log("SURVEYS PASSED BY USER FROM DB");
-      const response = await axios.get(
-        `${SERVER_URL}/surveys/user-passed-surveys`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await api.get(`/surveys/user-passed-surveys`);
 
       if (response.data.success) {
         return response.data.surveys;
@@ -198,5 +182,5 @@ export const getSurveysPassedByUser = createAsyncThunk(
   }
 );
 
-export const { logout, setCreds } = profileSlice.actions;
+export const { logout, setCreds, setTokenFromAxios } = profileSlice.actions;
 export default profileSlice.reducer;

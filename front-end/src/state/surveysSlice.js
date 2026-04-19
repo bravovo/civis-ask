@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-import { SERVER_URL } from "../config/env";
+import api from "../api/api";
 
 const initialState = {
   items: [],
@@ -32,12 +31,7 @@ export const getPublishedSurveys = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       console.log("FROM DB");
-      const response = await axios.get(`${SERVER_URL}/surveys`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        withCredentials: true,
-      });
+      const response = await api.get(`/surveys`);
 
       if (response.status === 200) {
         return response.data.surveys;
@@ -45,8 +39,8 @@ export const getPublishedSurveys = createAsyncThunk(
     } catch (error) {
       console.log(error);
       return rejectWithValue(
-        error.response?.message ||
-          "Помилка отримання опитувань. Будь ласка, спробуйте ще раз пізніше",
+        error.response?.data?.message ||
+          "Помилка отримання опитувань. Будь ласка, спробуйте ще раз пізніше"
       );
     }
   },
@@ -58,7 +52,7 @@ export const getPublishedSurveys = createAsyncThunk(
         return false;
       }
     },
-  },
+  }
 );
 
 export default surveysSlice.reducer;

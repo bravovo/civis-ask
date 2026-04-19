@@ -1,40 +1,112 @@
 import Survey from "../models/survey.model.js";
 import SurveyTake from "../models/surveyTake.model.js";
 
+export const patchEditSurvey = async ({
+    surveyId,
+    userId,
+    title,
+    description,
+    questions,
+    status,
+}) => {
+    const survey = await Survey.findById(surveyId);
+    let error;
+
+    if (!survey) {
+        error = {
+            status: 404,
+            message: "Опитування не знайдено",
+        };
+        return { error, updatedSurvey: null };
+    }
+
+    if (!survey.author.equals(userId)) {
+        error = {
+            status: 403,
+            message: "Заборонено редагувати чужі опитування",
+        };
+        return { error, updatedSurvey: null };
+    }
+
+    if (survey.status === "published") {
+        error = {
+            status: 400,
+            message: "Не можна редагувати опубліковані опитування",
+        };
+        return { error, updatedSurvey: null };
+    }
+
+    if (!Array.isArray(questions) || questions.length === 0) {
+        error = {
+            status: 400,
+            message: "Питання опитування не заповнені",
+        };
+        return { error, updatedSurvey: null };
+    }
+
+    const formattedQuestions = questions.map((q) => ({
+        title: q.title,
+        required: q.required,
+        type: q.type,
+        options: (q.options || []).map((opt) => ({
+            value: opt.value || opt.text,
+        })),
+    }));
+
+    const updatedSurvey = await Survey.findByIdAndUpdate(
+        surveyId,
+        {
+            title,
+            description,
+            status,
+            questions: formattedQuestions,
+        },
+        { new: true, runValidators: true }
+    );
+
+    if (!updatedSurvey) {
+        error = {
+            status: 500,
+            message: "Помилка редагування опитування",
+        };
+        return { error, updatedSurvey: null };
+    }
+
+    return { error: null, updatedSurvey };
+};
+
 export const getUserSurveys = async (user) => {
-  if (!user || !user.id) {
-    throw new Error("Користувача не знайдено");
-  }
+    if (!user || !user.id) {
+        throw new Error("Користувача не знайдено");
+    }
 
-  const userSurveys = await Survey.find({ author: user.id }).populate({
-    path: "author",
-    select: "firstName lastName",
-  });
+    const userSurveys = await Survey.find({ author: user.id }).populate({
+        path: "author",
+        select: "firstName lastName",
+    });
 
-  if (Array.isArray(userSurveys)) {
-    return userSurveys;
-  } else {
-    throw new Error("Помилка отримання опитувань користувача");
-  }
+    if (Array.isArray(userSurveys)) {
+        return userSurveys;
+    } else {
+        throw new Error("Помилка отримання опитувань користувача");
+    }
 };
 
 export const getSurveysPassedByUser = async (user) => {
-  if (!user || !user.id) {
-    throw new Error("Користувача не знайдено");
-  }
+    if (!user || !user.id) {
+        throw new Error("Користувача не знайдено");
+    }
 
-  const surveysPassedByUser = await SurveyTake.find({ user: user.id })
-    .populate({
-      path: "survey",
-      populate: { path: "author", select: "firstName lastName" },
-    })
-    .lean();
+    const surveysPassedByUser = await SurveyTake.find({ user: user.id })
+        .populate({
+            path: "survey",
+            populate: { path: "author", select: "firstName lastName" },
+        })
+        .lean();
 
-  console.log("SURVEYS", surveysPassedByUser[0].survey);
-
-  if (Array.isArray(surveysPassedByUser)) {
-    return surveysPassedByUser.filter((take) => take.survey !== null);
-  } else {
-    throw new Error("Помилка отримання пройдених користувачем опитувань");
-  }
+    if (Array.isArray(surveysPassedByUser)) {
+        return surveysPassedByUser.filter((take) => take.survey !== null);
+    } else {
+        throw new Error("Помилка отримання пройдених користувачем опитувань");
+    }
 };

@@ -1,14 +1,11 @@
 import { useState } from "react";
-
-import axios from "axios";
-
-import { SERVER_URL } from "../../config/env.js";
 import FormInput from "../../components/ui/FormInput/FormInput.jsx";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import Popup from "../../components/ui/Popup/Popup.jsx";
 import { setLoading } from "../../state/loaderSlice.js";
 import { setCreds } from "../../state/profileSlice.js";
+import api from "../../api/api";
 
 function Login() {
   const dispatch = useDispatch();
@@ -19,6 +16,12 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  const { authChecked, token } = useSelector((state) => state.profile);
+
+  if (authChecked && token) {
+    return <Navigate to="/" replace />;
+  }
+
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
 
@@ -26,16 +29,10 @@ function Login() {
       setError("");
       dispatch(setLoading(true));
       if (email && password) {
-        const response = await axios.post(
-          `${SERVER_URL}/auth/login`,
-          {
-            email,
-            password,
-          },
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await api.post(`/auth/login`, {
+          email,
+          password,
+        });
 
         if (response.status === 200) {
           dispatch(

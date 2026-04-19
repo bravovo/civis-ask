@@ -1,18 +1,25 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { addOption, editOption, editQuestion } from "../../state/surveySlice";
 
-function Question({ id }) {
+function Question({ question }) {
   const dispatch = useDispatch();
-  const question = useSelector((state) => state.survey).questions.find(
-    (q) => q.id === id,
-  );
 
   const changeQuestionType = (newType) => {
-    dispatch(editQuestion({ id: question.id, changes: { type: newType } }));
+    dispatch(
+      editQuestion({
+        id: question._id,
+        changes: { type: newType },
+      })
+    );
   };
 
   const editQuestionTitle = (newTitle) => {
-    dispatch(editQuestion({ id: question.id, changes: { title: newTitle } }));
+    dispatch(
+      editQuestion({
+        id: question._id,
+        changes: { title: newTitle },
+      })
+    );
   };
 
   return (
@@ -41,7 +48,7 @@ function Question({ id }) {
                 Одинарний вибір
                 <input
                   type="radio"
-                  name={`${question.id}-answer-type`}
+                  name={`${question._id}-answer-type`}
                   onChange={() => changeQuestionType("radio")}
                   checked={question.type === "radio"}
                   className="border-[1px] rounded-[4px] border-zinc-400 py-1.5 px-3"
@@ -51,7 +58,7 @@ function Question({ id }) {
                 Множинний вибір
                 <input
                   type="radio"
-                  name={`${question.id}-answer-type`}
+                  name={`${question._id}-answer-type`}
                   onChange={() => changeQuestionType("check")}
                   checked={question.type === "check"}
                   className="border-[1px] rounded-[4px] border-zinc-400 py-1.5 px-3"
@@ -71,20 +78,20 @@ function Question({ id }) {
                       <label
                         className="w-full"
                         htmlFor="answer-option"
-                        key={opt.id}
+                        key={opt._id}
                       >
                         <input
                           className="w-full"
                           type="text"
                           name="answer-option"
-                          value={opt.text}
+                          value={opt.text ?? opt.value ?? ""}
                           onChange={(e) => {
                             dispatch(
                               editOption({
-                                questionId: question.id,
-                                optionId: opt.id,
+                                questionId: question._id,
+                                optionId: opt._id,
                                 text: e.target.value,
-                              }),
+                              })
                             );
                           }}
                         />
@@ -94,7 +101,7 @@ function Question({ id }) {
               </div>
               <button
                 type="button"
-                onClick={() => dispatch(addOption(question.id))}
+                onClick={() => dispatch(addOption(question._id))}
               >
                 Додати ще
               </button>

@@ -6,6 +6,9 @@ export default function SurveyCard({
   isSurveyTake = false,
   fromProfile = false,
 }) {
+  const link =
+    data.status === "draft" ? `/${data._id}/edit` : `/survey-info/${data._id}`;
+
   return isSurveyTake ? (
     <Link
       to={`/survey-info/${data.survey._id}`}
@@ -37,7 +40,7 @@ export default function SurveyCard({
     </Link>
   ) : (
     <Link
-      to={`/survey-info/${data._id}`}
+      to={link}
       key={data._id}
       className={`${fromProfile ? "border-b-[1px] last:border-none rounded-none" : "border-[1px] rounded-2xl"} !font-normal border-zinc-400 py-6 px-5 w-full flex flex-col gap-2`}
     >

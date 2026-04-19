@@ -7,8 +7,10 @@ import {
 } from "../../state/profileSlice";
 import Loader from "../../components/ui/Loader/Loader";
 import SurveyCard from "../../components/SurveyCard/SurveyCard";
+import { useNavigate } from "react-router-dom";
 
 function Profile() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userSurveys, passedSurveys, ...profile } = useSelector(
     (state) => state.profile
@@ -76,34 +78,39 @@ function Profile() {
   }
 
   return (
-    <div className="border-[1px] !font-normal rounded-2xl rounded-b-none border-zinc-400 pt-6 px-5 w-full flex flex-col gap-2">
-      <div>
-        <h3>Електронна пошта: {profile.email}</h3>
-        <h3>
-          Повне ім'я:{" "}
-          {formatUserFullName({
-            firstName: profile.firstName,
-            lastName: profile.lastName,
-          })}
-        </h3>
-        {profile.role === "admin" ? <h3>Роль: Адмін</h3> : null}
-      </div>
+    <div className="flex flex-col gap-3">
+      <button onClick={() => navigate(-1)} className="w-20">
+        Назад
+      </button>
+      <div className="border-[1px] !font-normal rounded-2xl rounded-b-none border-zinc-400 pt-6 px-5 w-full flex flex-col gap-2">
+        <div>
+          <h3>Електронна пошта: {profile.email}</h3>
+          <h3>
+            Повне ім'я:{" "}
+            {formatUserFullName({
+              firstName: profile.firstName,
+              lastName: profile.lastName,
+            })}
+          </h3>
+          {profile.role === "admin" ? <h3>Роль: Адмін</h3> : null}
+        </div>
 
-      <div className="h-16 border-t-[1px] border-zinc-400 flex flex-row justify-between items-center-safe gap-2">
-        <button
-          className={`w-full !border-none hover:!shadow-none hover:!transform-none ${activeTab === "my_surveys" ? "!bg-gray-700 !text-white" : "hover:!bg-gray-400"}`}
-          onClick={() => handleTabChange("my_surveys")}
-        >
-          Мої опитування
-        </button>
-        <button
-          className={`w-full !border-none hover:!shadow-none hover:!transform-none ${activeTab === "passed_surveys" ? "!bg-gray-700 !text-white" : "hover:!bg-gray-400"}`}
-          onClick={() => handleTabChange("passed_surveys")}
-        >
-          Пройдені опитування
-        </button>
+        <div className="h-16 border-t-[1px] border-zinc-400 flex flex-row justify-between items-center-safe gap-2">
+          <button
+            className={`w-full !border-none hover:!shadow-none hover:!transform-none ${activeTab === "my_surveys" ? "!bg-gray-700 !text-white" : "hover:!bg-gray-400"}`}
+            onClick={() => handleTabChange("my_surveys")}
+          >
+            Мої опитування
+          </button>
+          <button
+            className={`w-full !border-none hover:!shadow-none hover:!transform-none ${activeTab === "passed_surveys" ? "!bg-gray-700 !text-white" : "hover:!bg-gray-400"}`}
+            onClick={() => handleTabChange("passed_surveys")}
+          >
+            Пройдені опитування
+          </button>
+        </div>
+        {renderTab()}
       </div>
-      {renderTab()}
     </div>
   );
 }

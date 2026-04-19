@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { SERVER_URL } from "../config/env";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../state/loaderSlice";
+import api from "../api/api";
 
 const useSurveyInfo = (surveyId) => {
   const cachedSurvey = useSelector((state) => state.surveyList.items).find(
-    (s) => s._id === surveyId,
+    (s) => s._id === surveyId
   );
   const [survey, setSurvey] = useState(cachedSurvey);
   const dispatch = useDispatch();
@@ -25,15 +24,7 @@ const useSurveyInfo = (surveyId) => {
     async function fetchSurvey() {
       dispatch(setLoading(true));
       try {
-        const response = await axios.get(
-          `${SERVER_URL}/surveys/survey/${surveyId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            withCredentials: true,
-          },
-        );
+        const response = await api.get(`/surveys/survey/${surveyId}`);
 
         if (response.data.success) {
           console.log(response.data.survey);
