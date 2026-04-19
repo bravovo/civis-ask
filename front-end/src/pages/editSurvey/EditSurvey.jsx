@@ -41,7 +41,7 @@ function EditSurvey() {
     if (survey.title && survey.description && survey.questions.length > 0) {
       dispatch(editSurvey({ status: type }));
     } else {
-      alert("Всі дані повинні бути заповненні");
+      alert("Всі дані повинні бути заповнені");
     }
   };
 

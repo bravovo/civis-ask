@@ -6,7 +6,7 @@ function Layout({ children, hasHeader = true }) {
     <div className="min-h-screen flex flex-col px-2 md:px-4">
       {hasHeader && <Header />}
       <main className="flex-1 flex justify-center m-0">
-        <div className="w-7xl mx-auto py-6">{children}</div>
+        <div className="max-w-7xl w-full mx-auto py-6">{children}</div>
       </main>
       <Footer />
     </div>

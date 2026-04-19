@@ -19,7 +19,7 @@ const surveySchema = mongoose.Schema(
             required: true,
             validate: {
                 validator: function (v) {
-                    return v.length < 500;
+                    return v.length <= 500;
                 },
                 message: (props) =>
                     `Опис опитування не може бути більше 500 символів`,
@@ -43,7 +43,7 @@ const surveySchema = mongoose.Schema(
                 type: {
                     type: String,
                     enum: ["radio", "check"],
-                    default: "text",
+                    default: "radio",
                 },
                 options: [
                     {

@@ -84,7 +84,7 @@ function Question({ question }) {
                           className="w-full"
                           type="text"
                           name="answer-option"
-                          value={opt.text || opt.value}
+                          value={opt.text ?? opt.value ?? ""}
                           onChange={(e) => {
                             dispatch(
                               editOption({

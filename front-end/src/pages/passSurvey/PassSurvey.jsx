@@ -78,7 +78,7 @@ function PassSurvey() {
                 <div key={q._id}>
                   <h2>{q.title}</h2>
                   <div className="flex flex-col justify-center items-center gap-2">
-                    {q.options.map((opt) => {
+                    {(q.options ?? []).map((opt) => {
                       return (
                         <label htmlFor={opt._id} key={opt._id}>
                           <input

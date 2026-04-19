@@ -36,7 +36,13 @@ export const patchEditSurvey = async ({
         return { error, updatedSurvey: null };
     }
 
-    console.log(questions[0].options);
+    if (!Array.isArray(questions) || questions.length === 0) {
+        error = {
+            status: 400,
+            message: "Питання опитування не заповнені",
+        };
+        return { error, updatedSurvey: null };
+    }
 
     const formattedQuestions = questions.map((q) => ({
         title: q.title,
@@ -61,7 +67,7 @@ export const patchEditSurvey = async ({
     if (!updatedSurvey) {
         error = {
             status: 500,
-            message: "Помилка створення опитування",
+            message: "Помилка редагування опитування",
         };
         return { error, updatedSurvey: null };
     }

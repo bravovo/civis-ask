@@ -23,7 +23,8 @@ const corsOptions = {
         if (!origin) return callback(null, true);
 
         const isMatch = origin === CLIENT_ORIGIN;
-        const isVercelPreview = /\.vercel\.app$/.test(origin);
+        const isVercelPreview =
+            /^https:\/\/civis-ask(-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
 
         if (isMatch || isVercelPreview) {
             callback(null, true);

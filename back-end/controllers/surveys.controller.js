@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import Survey from "../models/survey.model.js";
 import SurveyTake from "../models/surveyTake.model.js";
 import {
@@ -107,7 +106,7 @@ export const getPublishedSurveys = async (req, res, next) => {
         );
 
         if (surveys.length === 0) {
-            return res.status(204);
+            return res.sendStatus(204);
         }
 
         return res.status(200).json({
@@ -126,7 +125,7 @@ export const postSurveyPass = async (req, res, next) => {
     const { answers } = req.body;
 
     try {
-        if (answers.length === 0) {
+        if (!Array.isArray(answers) || answers.length === 0) {
             return res.status(400).json({
                 success: false,
                 message: "Відповіді на опитування порожні",

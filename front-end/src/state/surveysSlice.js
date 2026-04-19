@@ -39,7 +39,7 @@ export const getPublishedSurveys = createAsyncThunk(
     } catch (error) {
       console.log(error);
       return rejectWithValue(
-        error.response?.message ||
+        error.response?.data?.message ||
           "Помилка отримання опитувань. Будь ласка, спробуйте ще раз пізніше"
       );
     }

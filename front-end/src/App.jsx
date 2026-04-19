@@ -6,7 +6,12 @@ import { store } from "./state/store";
 import AuthProvider from "./features/auth/AuthProvider";
 import { setupAxios } from "./api/api";
 
-setupAxios(store);
+let axiosConfigured = false;
+
+if (!axiosConfigured) {
+  setupAxios(store);
+  axiosConfigured = true;
+}
 
 function App() {
   return (

@@ -105,10 +105,10 @@ const surveySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(saveSurvey.fulfilled, () => {
-      return initialState;
+      return getInitialState();
     });
     builder.addCase(editSurvey.fulfilled, () => {
-      return initialState;
+      return getInitialState();
     });
   },
 });
