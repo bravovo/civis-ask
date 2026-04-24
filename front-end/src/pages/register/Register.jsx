@@ -149,12 +149,12 @@ function Register() {
             type="number"
             value={age}
           />
-          <label
-            htmlFor={name}
-            className="w-full flex flex-col gap-1 justify-start m-0"
-          >
+          <div className="w-full flex flex-col gap-1 justify-start m-0">
             Стать
-            <button onClick={() => setGenderDropdownOpen((prev) => !prev)}>
+            <button
+              type="button"
+              onClick={() => setGenderDropdownOpen((prev) => !prev)}
+            >
               {selectedGender.label}
             </button>
             {genderDropdownOpen && (
@@ -166,13 +166,14 @@ function Register() {
                       setSelectedGender(option);
                       setGenderDropdownOpen(false);
                     }}
+                    type="button"
                   >
                     {option.label}
                   </button>
                 ))}
               </div>
             )}
-          </label>
+          </div>
           <div className="flex gap-2">
             <button type="button" onClick={() => setStage(1)}>
               Назад

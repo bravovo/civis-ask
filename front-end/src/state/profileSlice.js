@@ -34,8 +34,8 @@ const profileSlice = createSlice({
       state.lastName = lastName;
       state.email = email;
       state.role = role;
-      state.age = age;
-      state.gender = gender;
+      state.age = age ?? null;
+      state.gender = gender ?? "";
       state.token = action.payload.token;
 
       state.status = "success";
@@ -59,8 +59,8 @@ const profileSlice = createSlice({
         state.lastName = action.payload.lastName;
         state.email = action.payload.email;
         state.role = action.payload.role;
-        state.age = action.payload.age;
-        state.gender = action.payload.gender;
+        state.age = action.payload.age ?? null;
+        state.gender = action.payload.gender ?? "";
 
         if (action.payload.token) {
           state.token = action.payload.token;

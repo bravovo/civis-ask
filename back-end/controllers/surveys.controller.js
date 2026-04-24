@@ -133,13 +133,12 @@ export const postSurveyPass = async (req, res, next) => {
       });
     }
 
-    const userData = await User.findById(user.id);
+    const userData = await User.findById(user.id).select("age gender").lean();
 
-    if (!userData?.age || !userData?.gender) {
+    if (!userData) {
       return res.status(400).json({
         success: false,
-        message:
-          "Для проходження опитування необхідно вказати вік та стать у профілі",
+        message: "Демографічних даних користувача не знайдено",
       });
     }
 
