@@ -46,6 +46,14 @@ const userSchema = mongoose.Schema(
             enum: ["civis", "admin"],
             default: "civis",
         },
+        age: {
+            type: Number,
+            min: [16, "Вік користувача має бути не менше 16 років"],
+        },
+        gender: {
+            type: String,
+            enum: ["male", "female"],
+        },
     },
     { timestamps: true }
 );
