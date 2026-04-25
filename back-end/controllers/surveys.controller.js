@@ -4,6 +4,7 @@ import {
   getUserSurveys,
   getSurveysPassedByUser,
   patchEditSurvey,
+  getAnalyticsForSurvey,
 } from "../services/survey.service.js";
 import User from "../models/user.model.js";
 
@@ -135,7 +136,7 @@ export const postSurveyPass = async (req, res, next) => {
 
     const userData = await User.findById(user.id).select("age gender").lean();
 
-    if (!userData) {
+    if (!userData.age || !userData.gender) {
       return res.status(400).json({
         success: false,
         message: "Демографічних даних користувача не знайдено",
@@ -192,6 +193,21 @@ export const getCurrentUserPassedSurveys = async (req, res, next) => {
       success: true,
       message: "Опитування, пройдені користувачем успішно знайдено",
       surveys: surveysPassedByUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSurveyAnalytics = async (req, res, next) => {
+  try {
+    const { surveyId } = req.params;
+    const data = await getAnalyticsForSurvey(surveyId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Аналітика опитування успішно отримана",
+      data,
     });
   } catch (error) {
     next(error);
