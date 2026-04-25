@@ -136,7 +136,7 @@ export const postSurveyPass = async (req, res, next) => {
 
     const userData = await User.findById(user.id).select("age gender").lean();
 
-    if (!userData) {
+    if (!userData.age || !userData.gender) {
       return res.status(400).json({
         success: false,
         message: "Демографічних даних користувача не знайдено",

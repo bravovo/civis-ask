@@ -113,6 +113,9 @@ export const getSurveysPassedByUser = async (user) => {
 };
 
 export const getAnalyticsForSurvey = async (surveyId) => {
+  if (!mongoose.isValidObjectId(surveyId)) {
+    throw new Error("Ідентифікатор опитування недійсний");
+  }
   const id = new mongoose.Types.ObjectId(surveyId);
 
   const survey = await Survey.findById(id);
@@ -145,6 +148,23 @@ export const getAnalyticsForSurvey = async (surveyId) => {
         ],
         questionStats: [
           { $unwind: "$answers" },
+          {
+            $addFields: {
+              "answers.answer": {
+                $cond: {
+                  if: { $isArray: "$answers.answer" },
+                  then: "$answers.answer",
+                  else: {
+                    $cond: {
+                      if: { $eq: ["$answers.answer", null] },
+                      then: [],
+                      else: ["$answers.answer"],
+                    },
+                  },
+                },
+              },
+            },
+          },
           {
             $unwind: {
               path: "$answers.answer",
