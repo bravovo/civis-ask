@@ -8,6 +8,7 @@ import {
     getCurrentUserSurveys,
     getCurrentUserPassedSurveys,
     editSurvey,
+    getSurveyAnalytics,
 } from "../controllers/surveys.controller.js";
 
 const router = Router();
@@ -25,5 +26,7 @@ router.post("/survey/:surveyId/pass", postSurveyPass);
 router.get("/user-surveys", getCurrentUserSurveys);
 
 router.get("/user-passed-surveys", getCurrentUserPassedSurveys);
+
+router.get("/survey/:surveyId/analytics", getSurveyAnalytics);
 
 export default router;

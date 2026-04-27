@@ -93,6 +93,8 @@ function Profile() {
             })}
           </h3>
           {profile.role === "admin" ? <h3>Роль: Адмін</h3> : null}
+          {profile.age ? <h3>Вік: {profile.age}</h3> : null}
+          {profile.gender ? <h3>Стать: {profile.gender}</h3> : null}
         </div>
 
         <div className="h-16 border-t-[1px] border-zinc-400 flex flex-row justify-between items-center-safe gap-2">

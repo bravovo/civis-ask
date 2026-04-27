@@ -12,6 +12,18 @@ const surveyTake = mongoose.Schema(
       ref: "User",
       required: true,
     },
+    demographics: {
+      age: {
+        type: Number,
+        min: [16, "Вік має бути не менше 16 років"],
+        required: true,
+      },
+      gender: {
+        type: String,
+        enum: ["male", "female"],
+        required: true,
+      },
+    },
     answers: [
       {
         questionId: {
@@ -24,7 +36,7 @@ const surveyTake = mongoose.Schema(
       },
     ],
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const SurveyTake = mongoose.model("SurveyTake", surveyTake);

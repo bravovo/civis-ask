@@ -6,6 +6,8 @@ const initialState = {
   lastName: "",
   email: "",
   role: "",
+  age: null,
+  gender: "",
   userSurveys: [],
   passedSurveys: [],
   status: "none",
@@ -25,12 +27,15 @@ const profileSlice = createSlice({
       return initialState;
     },
     setCreds: (state, action) => {
-      const { firstName, lastName, email, role } = action.payload.user;
+      const { firstName, lastName, email, role, age, gender } =
+        action.payload.user;
 
       state.firstName = firstName;
       state.lastName = lastName;
       state.email = email;
       state.role = role;
+      state.age = age ?? null;
+      state.gender = gender ?? "";
       state.token = action.payload.token;
 
       state.status = "success";
@@ -54,6 +59,8 @@ const profileSlice = createSlice({
         state.lastName = action.payload.lastName;
         state.email = action.payload.email;
         state.role = action.payload.role;
+        state.age = action.payload.age ?? null;
+        state.gender = action.payload.gender ?? "";
 
         if (action.payload.token) {
           state.token = action.payload.token;
