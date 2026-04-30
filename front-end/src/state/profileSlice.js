@@ -14,6 +14,7 @@ const initialState = {
   surveysStatus: "none",
   passedSurveysStatus: "none",
   error: null,
+  message: null,
   token: localStorage.getItem("token") || null,
   authChecked: false,
 };
@@ -51,6 +52,7 @@ const profileSlice = createSlice({
     builder
       .addCase(me.pending, (state) => {
         state.status = "loading";
+        state.message = null;
       })
       .addCase(me.fulfilled, (state, action) => {
         state.status = "success";
@@ -76,6 +78,7 @@ const profileSlice = createSlice({
       })
 
       .addCase(getUserSurveys.pending, (state) => {
+        state.message = null;
         state.surveysStatus = "loading";
       })
       .addCase(getUserSurveys.fulfilled, (state, action) => {
@@ -88,6 +91,7 @@ const profileSlice = createSlice({
       })
 
       .addCase(getSurveysPassedByUser.pending, (state) => {
+        state.message = null;
         state.passedSurveysStatus = "loading";
       })
       .addCase(getSurveysPassedByUser.fulfilled, (state, action) => {
@@ -96,6 +100,49 @@ const profileSlice = createSlice({
       })
       .addCase(getSurveysPassedByUser.rejected, (state, action) => {
         state.passedSurveysStatus = "error";
+        state.error = action.payload;
+      })
+      .addCase(editProfile.pending, (state) => {
+        state.message = null;
+        state.status = "loading";
+      })
+      .addCase(editProfile.fulfilled, (state, action) => {
+        state.status = "success";
+        const { firstName, lastName, age, gender } = action.payload;
+        state.firstName = firstName;
+        state.lastName = lastName;
+        state.age = age ?? null;
+        state.gender = gender ?? "";
+        state.message = "Профіль успішно оновлено";
+      })
+      .addCase(editProfile.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action.payload;
+      })
+      .addCase(changePassword.pending, (state) => {
+        state.message = null;
+        state.status = "loading";
+      })
+      .addCase(changePassword.fulfilled, (state, action) => {
+        state.status = "success";
+        state.message = action.payload;
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action.payload;
+      })
+      .addCase(deleteAccount.pending, (state) => {
+        state.message = null;
+        state.status = "loading";
+      })
+      .addCase(deleteAccount.fulfilled, (state, action) => {
+        state.status = "success";
+        state.message = action.payload;
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      })
+      .addCase(deleteAccount.rejected, (state, action) => {
+        state.status = "error";
         state.error = action.payload;
       });
   },
@@ -186,6 +233,76 @@ export const getSurveysPassedByUser = createAsyncThunk(
         return false;
       }
     },
+  }
+);
+
+export const editProfile = createAsyncThunk(
+  "profile/editProfile",
+  async (updateData, { rejectWithValue }) => {
+    const { firstName, lastName, age, gender } = updateData;
+    try {
+      const response = await api.patch("/user/update", {
+        firstName,
+        lastName,
+        age,
+        gender,
+      });
+
+      if (response.status === 200) {
+        return response.data.user;
+      }
+    } catch (error) {
+      console.error(error);
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Неможливо зберегти профіль. Спробуйте ще раз."
+      );
+    }
+  }
+);
+
+export const changePassword = createAsyncThunk(
+  "profile/changePassword",
+  async (updateData, { rejectWithValue }) => {
+    const { currentPassword, newPassword } = updateData;
+    try {
+      const response = await api.put("/user/password", {
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      });
+
+      if (response.status === 200) {
+        return response.data.message;
+      }
+    } catch (error) {
+      console.error(error);
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Неможливо змінити пароль. Спробуйте ще раз."
+      );
+    }
+  }
+);
+
+export const deleteAccount = createAsyncThunk(
+  "profile/deleteAccount",
+  async (data, { rejectWithValue }) => {
+    const { password } = data;
+    try {
+      const response = await api.delete("/user", {
+        data: { password: password },
+      });
+
+      if (response.status === 200) {
+        return response.data.message;
+      }
+    } catch (error) {
+      console.error(error);
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Неможливо видалити акаунт. Спробуйте ще раз."
+      );
+    }
   }
 );
 

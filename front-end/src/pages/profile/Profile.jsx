@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { formatUserFullName } from "../../utils/utils";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import {
   getSurveysPassedByUser,
   getUserSurveys,
@@ -8,6 +8,15 @@ import {
 import Loader from "../../components/ui/Loader/Loader";
 import SurveyCard from "../../components/SurveyCard/SurveyCard";
 import { useNavigate } from "react-router-dom";
+import EditProfileDialog from "../../components/ui/dialogs/EditProfileDialog";
+import ChangePasswordDialog from "../../components/ui/dialogs/ChangePasswordDialog";
+import DeleteAccountDialog from "../../components/ui/dialogs/DeleteAccountDialog";
+import Popup from "../../components/ui/Popup/Popup";
+
+const genders = [
+  { value: "male", label: "Чоловік" },
+  { value: "female", label: "Жінка" },
+];
 
 function Profile() {
   const navigate = useNavigate();
@@ -17,6 +26,10 @@ function Profile() {
   );
 
   const [activeTab, setActiveTab] = useState("my_surveys");
+  const [editProfileDialogOpen, setEditProfileDialogOpen] = useState(false);
+  const [changePasswordDialogOpen, setChangePasswordDialogOpen] =
+    useState(false);
+  const [deleteAccountDialogOpen, setDeleteAccountDialogOpen] = useState(false);
 
   useEffect(() => {
     if (profile.passedSurveysStatus === "none") {
@@ -27,6 +40,22 @@ function Profile() {
       dispatch(getUserSurveys());
     }
   }, [profile.passedSurveysStatus, profile.surveysStatus]);
+
+  useEffect(() => {
+    if (
+      editProfileDialogOpen ||
+      changePasswordDialogOpen ||
+      deleteAccountDialogOpen
+    ) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [
+    editProfileDialogOpen,
+    changePasswordDialogOpen,
+    deleteAccountDialogOpen,
+  ]);
 
   const handleTabChange = (tabName) => {
     setActiveTab(tabName);
@@ -79,22 +108,40 @@ function Profile() {
 
   return (
     <div className="flex flex-col gap-3">
+      {profile.status !== "error" && profile.message && (
+        <div className="w-full flex justify-center">
+          <Popup text={profile.message} color="green" />
+        </div>
+      )}
       <button onClick={() => navigate(-1)} className="w-20">
         Назад
       </button>
       <div className="border-[1px] !font-normal rounded-2xl rounded-b-none border-zinc-400 pt-6 px-5 w-full flex flex-col gap-2">
-        <div>
-          <h3>Електронна пошта: {profile.email}</h3>
-          <h3>
-            Повне ім'я:{" "}
-            {formatUserFullName({
-              firstName: profile.firstName,
-              lastName: profile.lastName,
-            })}
-          </h3>
-          {profile.role === "admin" ? <h3>Роль: Адмін</h3> : null}
-          {profile.age ? <h3>Вік: {profile.age}</h3> : null}
-          {profile.gender ? <h3>Стать: {profile.gender}</h3> : null}
+        <div className="flex flex-row justify-between items-center">
+          <div>
+            <h3>Електронна пошта: {profile.email}</h3>
+            <h3>
+              Повне ім'я:{" "}
+              {formatUserFullName({
+                firstName: profile.firstName,
+                lastName: profile.lastName,
+              })}
+            </h3>
+            {profile.role === "admin" ? <h3>Роль: Адмін</h3> : null}
+            {profile.age ? <h3>Вік: {profile.age}</h3> : null}
+            {profile.gender ? <h3>Стать: {profile.gender}</h3> : null}
+          </div>
+          <div className="flex flex-col gap-4">
+            <button onClick={() => setEditProfileDialogOpen(true)}>
+              Змінити дані профілю
+            </button>
+            <button onClick={() => setChangePasswordDialogOpen(true)}>
+              Змінити пароль
+            </button>
+            <button onClick={() => setDeleteAccountDialogOpen(true)}>
+              Видалити акаунт
+            </button>
+          </div>
         </div>
 
         <div className="h-16 border-t-[1px] border-zinc-400 flex flex-row justify-between items-center-safe gap-2">
@@ -113,6 +160,21 @@ function Profile() {
         </div>
         {renderTab()}
       </div>
+      <EditProfileDialog
+        profile={profile}
+        open={editProfileDialogOpen}
+        onClose={() => setEditProfileDialogOpen(false)}
+      />
+      <ChangePasswordDialog
+        profile={profile}
+        open={changePasswordDialogOpen}
+        onClose={() => setChangePasswordDialogOpen(false)}
+      />
+      <DeleteAccountDialog
+        profile={profile}
+        open={deleteAccountDialogOpen}
+        onClose={() => setDeleteAccountDialogOpen(false)}
+      />
     </div>
   );
 }
