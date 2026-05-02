@@ -1,19 +1,21 @@
 import { useState } from "react";
-import api from "../../../api/api";
 import Dialog from "./Dialog";
 import FormInput from "../FormInput/FormInput";
 import { useDispatch } from "react-redux";
 import { deleteAccount } from "../../../state/profileSlice";
 import Loader from "../Loader/Loader";
+import { useNavigate } from "react-router-dom";
 
 function DeleteAccountDialog({ profile, open, onClose }) {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleClose = () => {
-    if (!profile.loading) {
+    if (profile.status !== "loading") {
       setError("");
+      setPassword("");
       onClose();
     }
   };
@@ -31,7 +33,7 @@ function DeleteAccountDialog({ profile, open, onClose }) {
     dispatch(deleteAccount({ password }))
       .unwrap()
       .then(() => {
-        handleClose();
+        navigate("/login", { state: { deletedAccount: true } });
       })
       .catch((err) => {
         setError(err);
@@ -44,7 +46,7 @@ function DeleteAccountDialog({ profile, open, onClose }) {
       open={open}
       onClose={handleClose}
     >
-      {profile.loading && <Loader />}
+      {profile.status === "loading" && <Loader />}
       <form
         onSubmit={handleDeleteAccount}
         className="w-full flex flex-col justify-center items-center gap-3"

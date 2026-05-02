@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import api from "../../../api/api";
+import { useState } from "react";
 import Dialog from "./Dialog";
 import FormInput from "../FormInput/FormInput";
 import { useDispatch } from "react-redux";
 import { editProfile } from "../../../state/profileSlice";
 import Loader from "../Loader/Loader";
+import { useEffect } from "react";
 
 const genders = [
   { value: "male", label: "Чоловік" },
@@ -13,23 +13,35 @@ const genders = [
 
 function EditProfileDialog({ profile, open, onClose }) {
   const dispatch = useDispatch();
+  const getSelectedGenderOption = (gender) =>
+    genders.find((g) => g.value === gender) || {
+      value: "placeholder",
+      label: "Оберіть стать",
+    };
   const [firstName, setFirstName] = useState(profile.firstName || "");
   const [lastName, setLastName] = useState(profile.lastName || "");
   const [age, setAge] = useState(profile.age || "");
   const [genderDropdownOpen, setGenderDropdownOpen] = useState(false);
   const [selectedGender, setSelectedGender] = useState(
-    profile.gender
-      ? genders.find((g) => g.value === profile.gender)
-      : {
-          value: "placeholder",
-          label: "Оберіть стать",
-        }
+    getSelectedGenderOption(profile.gender)
   );
   const [error, setError] = useState("");
 
-  const handleClose = () => {
-    if (!profile.loading) {
+  useEffect(() => {
+    if (open) {
+      setFirstName(profile.firstName || "");
+      setLastName(profile.lastName || "");
+      setAge(profile.age || "");
+      setSelectedGender(getSelectedGenderOption(profile.gender));
+      setGenderDropdownOpen(false);
       setError("");
+    }
+  }, [open, profile]);
+
+  const handleClose = () => {
+    if (profile.status !== "loading") {
+      setError("");
+      setGenderDropdownOpen(false);
       onClose();
     }
   };
@@ -66,7 +78,7 @@ function EditProfileDialog({ profile, open, onClose }) {
 
   return (
     <Dialog title={"Змінити дані профілю"} open={open} onClose={handleClose}>
-      {profile.loading && <Loader />}
+      {profile.status === "loading" && <Loader />}
       <form
         onSubmit={handleSaveEditedProfile}
         className="w-full flex flex-col justify-center items-center gap-3"

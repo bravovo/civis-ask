@@ -1,9 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
 import { formatUserFullName } from "../../utils/utils";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   getSurveysPassedByUser,
   getUserSurveys,
+  logout,
 } from "../../state/profileSlice";
 import Loader from "../../components/ui/Loader/Loader";
 import SurveyCard from "../../components/SurveyCard/SurveyCard";
@@ -12,11 +13,6 @@ import EditProfileDialog from "../../components/ui/dialogs/EditProfileDialog";
 import ChangePasswordDialog from "../../components/ui/dialogs/ChangePasswordDialog";
 import DeleteAccountDialog from "../../components/ui/dialogs/DeleteAccountDialog";
 import Popup from "../../components/ui/Popup/Popup";
-
-const genders = [
-  { value: "male", label: "Чоловік" },
-  { value: "female", label: "Жінка" },
-];
 
 function Profile() {
   const navigate = useNavigate();
@@ -42,15 +38,16 @@ function Profile() {
   }, [profile.passedSurveysStatus, profile.surveysStatus]);
 
   useEffect(() => {
-    if (
+    const previousOverflow = document.body.style.overflow;
+    const isAnyDialogOpen =
       editProfileDialogOpen ||
       changePasswordDialogOpen ||
-      deleteAccountDialogOpen
-    ) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
+      deleteAccountDialogOpen;
+    document.body.style.overflow = isAnyDialogOpen ? "hidden" : "auto";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
   }, [
     editProfileDialogOpen,
     changePasswordDialogOpen,
@@ -106,6 +103,17 @@ function Profile() {
     }
   }
 
+  const handleLogout = () => {
+    dispatch(logout())
+      .unwrap()
+      .then(() => {
+        navigate("/login", { state: { loggedOut: true } });
+      })
+      .catch((err) => {
+        window.alert(err);
+      });
+  };
+
   return (
     <div className="flex flex-col gap-3">
       {profile.status !== "error" && profile.message && (
@@ -141,6 +149,7 @@ function Profile() {
             <button onClick={() => setDeleteAccountDialogOpen(true)}>
               Видалити акаунт
             </button>
+            <button onClick={handleLogout}>Вийти</button>
           </div>
         </div>
 

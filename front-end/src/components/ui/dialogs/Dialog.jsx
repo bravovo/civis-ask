@@ -19,7 +19,7 @@ function Dialog({ title, children, open, onClose }) {
         {children}
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 w-[24px] h-[24px] p-0! border-none! bg-transparent! hover:transform-none! hover:shadow-none! flex items-center justify-center"
+          className="absolute top-2 right-2 w-[24px] h-[24px] !p-0 !border-none !bg-transparent hover:!transform-none hover:!shadow-none flex items-center justify-center"
         >
           <img
             src={closeIcon}

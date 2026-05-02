@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import api from "../../../api/api";
 import Dialog from "./Dialog";
 import FormInput from "../FormInput/FormInput";
 import { changePassword } from "../../../state/profileSlice";
@@ -14,8 +13,10 @@ function ChangePasswordDialog({ profile, open, onClose }) {
   const [error, setError] = useState("");
 
   const handleClose = () => {
-    if (!profile.loading) {
+    if (profile.status !== "loading") {
       setError("");
+      setCurrentPassword("");
+      setNewPassword("");
       onClose();
     }
   };
@@ -40,20 +41,20 @@ function ChangePasswordDialog({ profile, open, onClose }) {
 
   return (
     <Dialog title="Змінити пароль" open={open} onClose={handleClose}>
-      {profile.loading && <Loader />}
+      {profile.status === "loading" && <Loader />}
       <form
         onSubmit={handleChangePassword}
         className="w-full flex flex-col justify-center items-center gap-3"
       >
         <FormInput
-          title="Пароль"
+          title="Поточний пароль"
           name="userCurrentPassword"
           onChange={(e) => setCurrentPassword(e.target.value)}
           type="password"
           value={currentPassword}
         />
         <FormInput
-          title="Підтвердження паролю"
+          title="Новий пароль"
           name="userNewPassword"
           onChange={(e) => setNewPassword(e.target.value)}
           type="password"
