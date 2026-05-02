@@ -69,11 +69,13 @@ const profileSlice = createSlice({
         state.authChecked = true;
       })
       .addCase(me.rejected, (state, action) => {
-        state.status = "error";
-        state.error = action.payload;
-        state.token = null;
         localStorage.removeItem("token");
-        state.authChecked = true;
+        return {
+          ...createInitialState(),
+          status: "error",
+          error: action.payload,
+          authChecked: true,
+        };
       })
 
       .addCase(getUserSurveys.pending, (state) => {

@@ -28,15 +28,14 @@ function EditProfileDialog({ profile, open, onClose }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (open) {
-      setFirstName(profile.firstName || "");
-      setLastName(profile.lastName || "");
-      setAge(profile.age || "");
-      setSelectedGender(getSelectedGenderOption(profile.gender));
-      setGenderDropdownOpen(false);
-      setError("");
-    }
-  }, [open, profile]);
+    if (!open) return;
+    setFirstName(profile.firstName || "");
+    setLastName(profile.lastName || "");
+    setAge(profile.age || "");
+    setSelectedGender(getSelectedGenderOption(profile.gender));
+    setGenderDropdownOpen(false);
+    setError("");
+  }, [open, profile.firstName, profile.lastName, profile.age, profile.gender]);
 
   const handleClose = () => {
     if (profile.status !== "loading") {
