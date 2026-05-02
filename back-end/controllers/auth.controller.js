@@ -111,3 +111,17 @@ export const login = async (req, res, next) => {
     message: "Авторизація успішна",
   });
 };
+
+export const logout = async (req, res, next) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: NODE_ENV === "production",
+      sameSite: NODE_ENV === "production" ? "None" : "Strict",
+    });
+
+    return res.sendStatus(204);
+  } catch (err) {
+    next(err);
+  }
+};
