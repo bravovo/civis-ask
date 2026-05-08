@@ -140,8 +140,7 @@ export const getAnalyticsForSurvey = async (surveyId) => {
           {
             $bucket: {
               groupBy: "$demographics.age",
-              boundaries: [0, 18, 25, 35, 50, 100],
-              default: "Other",
+              boundaries: [16, 25, 35, 45, 55, 70, 85, 100],
               output: { count: { $sum: 1 } },
             },
           },
@@ -205,6 +204,64 @@ export const getAnalyticsForSurvey = async (surveyId) => {
       },
     },
   ]);
+
+  const finalAnalytics = analytics[0] || {};
+
+  if (finalAnalytics.questionStats) {
+    finalAnalytics.questionStats = finalAnalytics.questionStats.map((stat) => {
+      const questionDoc = survey.questions.id(stat._id);
+
+      return {
+        ...stat,
+        title: questionDoc ? questionDoc.title : "Назва відсутня",
+      };
+    });
+  }
+
+  if (finalAnalytics.ageStats) {
+    finalAnalytics.ageStats = finalAnalytics.ageStats.map((bucket) => {
+      let label;
+      switch (bucket._id) {
+        case 16:
+          label = "16-24";
+          break;
+        case 25:
+          label = "25-34";
+          break;
+        case 35:
+          label = "35-44";
+          break;
+        case 45:
+          label = "45-54";
+          break;
+        case 55:
+          label = "55-69";
+          break;
+        case 70:
+          label = "70-84";
+          break;
+        case 85:
+          label = "85+";
+          break;
+      }
+      return { ...bucket, label };
+    });
+  }
+
+  if (finalAnalytics.genderStats) {
+    finalAnalytics.genderStats = finalAnalytics.genderStats.map((bucket) => {
+      let label;
+      switch (bucket._id) {
+        case "male":
+          label = "Чоловік";
+          break;
+        case "female":
+          label = "Жінка";
+          break;
+      }
+      return { ...bucket, label };
+    });
+  }
 
   return { survey, analytics: analytics[0] || {} };
 };
