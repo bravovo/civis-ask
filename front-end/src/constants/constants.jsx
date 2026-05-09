@@ -12,4 +12,16 @@ export const chartColors = {
     "70-84": "#c49c94",
     "85+": "#9c755f",
   },
+  general: [
+    "#4e79a7",
+    "#f28e2b",
+    "#e15759",
+    "#76b7b2",
+    "#59a14f",
+    "#edc949",
+    "#af7aa1",
+    "#ff9da7",
+    "#9c755f",
+    "#bab0ac",
+  ],
 };

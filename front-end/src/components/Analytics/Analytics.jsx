@@ -112,6 +112,8 @@ function Analytics({ surveyId }) {
       (question) => {
         const optionLabels = (question.results || []).map((res) => res.option);
 
+        const availableColors = [...chartColors.general];
+
         return {
           title: question.title,
           data: {
@@ -120,10 +122,9 @@ function Analytics({ surveyId }) {
               {
                 label: "Кількість користувачів",
                 data: question.results.map((r) => r.count),
-                backgroundColor: genderLabels.map(
-                  () =>
-                    `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`
-                ),
+                backgroundColor: optionLabels.map((_, index) => {
+                  return availableColors[index % availableColors.length];
+                }),
                 borderColor: "transparent",
                 borderWidth: 1,
               },
