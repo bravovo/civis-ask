@@ -36,7 +36,8 @@ function Main() {
         Створити опитування
       </button>
       <div className="flex flex-col items-center justify-center gap-2">
-        {surveys.status === "success" && surveys.items.length === 0 ? (
+        {surveys.status === "success" &&
+        (!surveys.items || surveys.items.length === 0) ? (
           <h2>Опитувань не знайдено</h2>
         ) : (
           surveys.items.map((s) => {

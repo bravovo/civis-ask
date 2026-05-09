@@ -140,8 +140,7 @@ export const getAnalyticsForSurvey = async (surveyId) => {
           {
             $bucket: {
               groupBy: "$demographics.age",
-              boundaries: [0, 18, 25, 35, 50, 100],
-              default: "Other",
+              boundaries: [16, 25, 35, 45, 55, 70, 85, 100],
               output: { count: { $sum: 1 } },
             },
           },
@@ -176,8 +175,25 @@ export const getAnalyticsForSurvey = async (surveyId) => {
               _id: {
                 questionId: "$answers.questionId",
                 option: "$answers.answer",
+                gender: "$demographics.gender",
+                age: "$demographics.age",
               },
               count: { $sum: 1 },
+            },
+          },
+          {
+            $group: {
+              _id: {
+                questionId: "$_id.questionId",
+                option: "$_id.option",
+              },
+              count: { $sum: "$count" },
+              genders: {
+                $push: { gender: "$_id.gender", count: "$count" },
+              },
+              ages: {
+                $push: { age: "$_id.age", count: "$count" },
+              },
             },
           },
           {
@@ -187,6 +203,8 @@ export const getAnalyticsForSurvey = async (surveyId) => {
                 $push: {
                   option: "$_id.option",
                   count: "$count",
+                  genders: "$genders",
+                  ages: "$ages",
                 },
               },
             },
@@ -206,5 +224,104 @@ export const getAnalyticsForSurvey = async (surveyId) => {
     },
   ]);
 
-  return { survey, analytics: analytics[0] || {} };
+  const finalAnalytics = analytics[0] || {};
+
+  const getAgeLabel = (age) => {
+    if (!age) return "Не вказано";
+    if (age >= 85) return "85+";
+    if (age >= 70) return "70-84";
+    if (age >= 55) return "55-69";
+    if (age >= 45) return "45-54";
+    if (age >= 35) return "35-44";
+    if (age >= 25) return "25-34";
+    if (age >= 16) return "16-24";
+  };
+
+  if (finalAnalytics.questionStats) {
+    console.log(finalAnalytics.questionStats);
+
+    finalAnalytics.questionStats = finalAnalytics.questionStats.map((stat) => {
+      const questionDoc = survey.questions.id(stat._id);
+
+      const processedResults = stat.results.map((res) => {
+        const genders = res.genders.reduce((acc, curr) => {
+          const label = curr.gender === "male" ? "Чоловік" : "Жінка";
+          acc[label] = (acc[label] || 0) + curr.count;
+          return acc;
+        }, {});
+
+        const ages = res.ages.reduce((acc, curr) => {
+          const label = getAgeLabel(curr.age);
+          acc[label] = (acc[label] || 0) + curr.count;
+          return acc;
+        }, {});
+
+        return {
+          option: res.option,
+          count: res.count,
+          genderBreakdown: Object.entries(genders).map(([label, count]) => ({
+            label,
+            count,
+          })),
+          ageBreakdown: Object.entries(ages).map(([label, count]) => ({
+            label,
+            count,
+          })),
+        };
+      });
+
+      return {
+        ...stat,
+        title: questionDoc ? questionDoc.title : "Назва відсутня",
+        results: processedResults,
+      };
+    });
+  }
+
+  if (finalAnalytics.ageStats) {
+    finalAnalytics.ageStats = finalAnalytics.ageStats.map((bucket) => {
+      let label;
+      switch (bucket._id) {
+        case 16:
+          label = "16-24";
+          break;
+        case 25:
+          label = "25-34";
+          break;
+        case 35:
+          label = "35-44";
+          break;
+        case 45:
+          label = "45-54";
+          break;
+        case 55:
+          label = "55-69";
+          break;
+        case 70:
+          label = "70-84";
+          break;
+        case 85:
+          label = "85+";
+          break;
+      }
+      return { ...bucket, label };
+    });
+  }
+
+  if (finalAnalytics.genderStats) {
+    finalAnalytics.genderStats = finalAnalytics.genderStats.map((bucket) => {
+      let label;
+      switch (bucket._id) {
+        case "male":
+          label = "Чоловік";
+          break;
+        case "female":
+          label = "Жінка";
+          break;
+      }
+      return { ...bucket, label };
+    });
+  }
+
+  return { survey, analytics: finalAnalytics || {} };
 };

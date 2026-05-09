@@ -13,6 +13,7 @@ import EditProfileDialog from "../../components/ui/dialogs/EditProfileDialog";
 import ChangePasswordDialog from "../../components/ui/dialogs/ChangePasswordDialog";
 import DeleteAccountDialog from "../../components/ui/dialogs/DeleteAccountDialog";
 import Popup from "../../components/ui/Popup/Popup";
+import Tabs from "../../components/Tabs/Tabs";
 
 function Profile() {
   const navigate = useNavigate();
@@ -21,7 +22,6 @@ function Profile() {
     (state) => state.profile
   );
 
-  const [activeTab, setActiveTab] = useState("my_surveys");
   const [editProfileDialogOpen, setEditProfileDialogOpen] = useState(false);
   const [changePasswordDialogOpen, setChangePasswordDialogOpen] =
     useState(false);
@@ -54,54 +54,59 @@ function Profile() {
     deleteAccountDialogOpen,
   ]);
 
-  const handleTabChange = (tabName) => {
-    setActiveTab(tabName);
-  };
-
-  function renderTab() {
-    if (activeTab === "my_surveys") {
-      switch (profile.surveysStatus) {
-        case "loading":
-          return <Loader />;
-        case "error":
-          return <h3>{profile.error}</h3>;
-        case "success":
-          if (userSurveys.length === 0) {
-            return <h3>У вас ще немає створених опитувань</h3>;
-          }
-          return (
-            <div className="flex flex-col gap-2">
-              {userSurveys.map((s) => (
-                <SurveyCard key={s._id} data={s} fromProfile={true} />
-              ))}
-            </div>
-          );
-      }
-    } else {
-      switch (profile.passedSurveysStatus) {
-        case "loading":
-          return <Loader />;
-        case "error":
-          return <h3>{profile.error}</h3>;
-        case "success":
-          if (passedSurveys.length === 0) {
-            return <h3>У вас ще немає пройдених опитувань</h3>;
-          }
-          return (
-            <div className="flex flex-col gap-2">
-              {passedSurveys.map((s) => (
-                <SurveyCard
-                  key={s._id}
-                  data={s}
-                  isSurveyTake={true}
-                  fromProfile={true}
-                />
-              ))}
-            </div>
-          );
-      }
-    }
-  }
+  const tabs = [
+    {
+      id: "my_surveys",
+      label: "Мої опитування",
+      children: (() => {
+        switch (profile.surveysStatus) {
+          case "loading":
+            return <Loader />;
+          case "error":
+            return <h3>{profile.error}</h3>;
+          case "success":
+            if (userSurveys.length === 0) {
+              return <h3>У вас ще немає створених опитувань</h3>;
+            }
+            return (
+              <div className="flex flex-col gap-2">
+                {userSurveys.map((s) => (
+                  <SurveyCard key={s._id} data={s} fromProfile={true} />
+                ))}
+              </div>
+            );
+        }
+      })(),
+    },
+    {
+      id: "passed_surveys",
+      label: "Пройдені опитування",
+      children: (() => {
+        switch (profile.passedSurveysStatus) {
+          case "loading":
+            return <Loader />;
+          case "error":
+            return <h3>{profile.error}</h3>;
+          case "success":
+            if (passedSurveys.length === 0) {
+              return <h3>У вас ще немає пройдених опитувань</h3>;
+            }
+            return (
+              <div className="flex flex-col gap-2">
+                {passedSurveys.map((s) => (
+                  <SurveyCard
+                    key={s._id}
+                    data={s}
+                    isSurveyTake={true}
+                    fromProfile={true}
+                  />
+                ))}
+              </div>
+            );
+        }
+      })(),
+    },
+  ];
 
   const handleLogout = () => {
     dispatch(logout())
@@ -152,22 +157,7 @@ function Profile() {
             <button onClick={handleLogout}>Вийти</button>
           </div>
         </div>
-
-        <div className="h-16 border-t-[1px] border-zinc-400 flex flex-row justify-between items-center-safe gap-2">
-          <button
-            className={`w-full !border-none hover:!shadow-none hover:!transform-none ${activeTab === "my_surveys" ? "!bg-gray-700 !text-white" : "hover:!bg-gray-400"}`}
-            onClick={() => handleTabChange("my_surveys")}
-          >
-            Мої опитування
-          </button>
-          <button
-            className={`w-full !border-none hover:!shadow-none hover:!transform-none ${activeTab === "passed_surveys" ? "!bg-gray-700 !text-white" : "hover:!bg-gray-400"}`}
-            onClick={() => handleTabChange("passed_surveys")}
-          >
-            Пройдені опитування
-          </button>
-        </div>
-        {renderTab()}
+        <Tabs tabs={tabs} />
       </div>
       <EditProfileDialog
         profile={profile}
