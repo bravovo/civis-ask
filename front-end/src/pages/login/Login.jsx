@@ -11,12 +11,14 @@ function Login() {
   const dispatch = useDispatch();
   const location = useLocation();
   const isRegistered = location.state?.registered;
+  const isLoggedOut = location.state?.loggedOut;
+  const accountDeleted = location.state?.deletedAccount;
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const { authChecked, token } = useSelector((state) => state.profile);
+  const { authChecked, token, message } = useSelector((state) => state.profile);
 
   if (authChecked && token) {
     return <Navigate to="/" replace />;
@@ -59,6 +61,8 @@ function Login() {
   return (
     <div className="w-full h-full flex flex-col justify-center items-center gap-6">
       {isRegistered && <Popup text="Користувача створено успішно!" />}
+      {isLoggedOut && <Popup text="Ви успішно вийшли з акаунта" />}
+      {accountDeleted && <Popup text="Ваш акаунт успішно видалено" />}
       {error && <Popup text={error} color="red" />}
       <h2 className="font-bold text-2xl md:text-4xl">Авторизація</h2>
       <form

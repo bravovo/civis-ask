@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api/api";
 
-const initialState = {
+const createInitialState = () => ({
   firstName: "",
   lastName: "",
   email: "",
@@ -14,18 +14,17 @@ const initialState = {
   surveysStatus: "none",
   passedSurveysStatus: "none",
   error: null,
+  message: null,
   token: localStorage.getItem("token") || null,
   authChecked: false,
-};
+});
+
+const initialState = createInitialState();
 
 const profileSlice = createSlice({
   name: "profile",
   initialState,
   reducers: {
-    logout: (_state) => {
-      localStorage.removeItem("token");
-      return initialState;
-    },
     setCreds: (state, action) => {
       const { firstName, lastName, email, role, age, gender } =
         action.payload.user;
@@ -51,6 +50,7 @@ const profileSlice = createSlice({
     builder
       .addCase(me.pending, (state) => {
         state.status = "loading";
+        state.message = null;
       })
       .addCase(me.fulfilled, (state, action) => {
         state.status = "success";
@@ -69,13 +69,17 @@ const profileSlice = createSlice({
         state.authChecked = true;
       })
       .addCase(me.rejected, (state, action) => {
-        state.status = "error";
-        state.error = action.payload;
         localStorage.removeItem("token");
-        state.authChecked = true;
+        return {
+          ...createInitialState(),
+          status: "error",
+          error: action.payload,
+          authChecked: true,
+        };
       })
 
       .addCase(getUserSurveys.pending, (state) => {
+        state.message = null;
         state.surveysStatus = "loading";
       })
       .addCase(getUserSurveys.fulfilled, (state, action) => {
@@ -88,6 +92,7 @@ const profileSlice = createSlice({
       })
 
       .addCase(getSurveysPassedByUser.pending, (state) => {
+        state.message = null;
         state.passedSurveysStatus = "loading";
       })
       .addCase(getSurveysPassedByUser.fulfilled, (state, action) => {
@@ -96,6 +101,57 @@ const profileSlice = createSlice({
       })
       .addCase(getSurveysPassedByUser.rejected, (state, action) => {
         state.passedSurveysStatus = "error";
+        state.error = action.payload;
+      })
+      .addCase(editProfile.pending, (state) => {
+        state.message = null;
+        state.status = "loading";
+      })
+      .addCase(editProfile.fulfilled, (state, action) => {
+        state.status = "success";
+        const { firstName, lastName, age, gender } = action.payload;
+        state.firstName = firstName;
+        state.lastName = lastName;
+        state.age = age ?? null;
+        state.gender = gender ?? "";
+        state.message = "Профіль успішно оновлено";
+      })
+      .addCase(editProfile.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action.payload;
+      })
+      .addCase(changePassword.pending, (state) => {
+        state.message = null;
+        state.status = "loading";
+      })
+      .addCase(changePassword.fulfilled, (state, action) => {
+        state.status = "success";
+        state.message = action.payload;
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action.payload;
+      })
+      .addCase(deleteAccount.pending, (state) => {
+        state.message = null;
+        state.status = "loading";
+      })
+      .addCase(deleteAccount.fulfilled, (state, action) => {
+        return createInitialState();
+      })
+      .addCase(deleteAccount.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action.payload;
+      })
+      .addCase(logout.pending, (state) => {
+        state.message = null;
+        state.status = "loading";
+      })
+      .addCase(logout.fulfilled, (state, action) => {
+        return createInitialState();
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.status = "error";
         state.error = action.payload;
       });
   },
@@ -189,5 +245,95 @@ export const getSurveysPassedByUser = createAsyncThunk(
   }
 );
 
-export const { logout, setCreds, setTokenFromAxios } = profileSlice.actions;
+export const editProfile = createAsyncThunk(
+  "profile/editProfile",
+  async (updateData, { rejectWithValue }) => {
+    const { firstName, lastName, age, gender } = updateData;
+    try {
+      const response = await api.patch("/user/update", {
+        firstName,
+        lastName,
+        age,
+        gender,
+      });
+
+      if (response.data.success) {
+        return response.data.user;
+      }
+    } catch (error) {
+      console.error(error);
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Неможливо зберегти профіль. Спробуйте ще раз."
+      );
+    }
+  }
+);
+
+export const changePassword = createAsyncThunk(
+  "profile/changePassword",
+  async (updateData, { rejectWithValue }) => {
+    const { currentPassword, newPassword } = updateData;
+    try {
+      const response = await api.put("/user/password", {
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      });
+
+      if (response.data.success) {
+        return response.data.message;
+      }
+    } catch (error) {
+      console.error(error);
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Неможливо змінити пароль. Спробуйте ще раз."
+      );
+    }
+  }
+);
+
+export const deleteAccount = createAsyncThunk(
+  "profile/deleteAccount",
+  async (data, { rejectWithValue }) => {
+    const { password } = data;
+    try {
+      const response = await api.delete("/user", {
+        data: { password: password },
+      });
+
+      if (response.data.success) {
+        localStorage.removeItem("token");
+        return "Акаунт успішно видалено";
+      }
+    } catch (error) {
+      console.error(error);
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Неможливо видалити акаунт. Спробуйте ще раз."
+      );
+    }
+  }
+);
+
+export const logout = createAsyncThunk(
+  "profile/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/auth/logout");
+
+      if (response.status === 204) {
+        localStorage.removeItem("token");
+        return "Ви успішно вийшли з акаунта";
+      }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Неможливо вийти з акаунта. Спробуйте ще раз."
+      );
+    }
+  }
+);
+
+export const { setCreds, setTokenFromAxios } = profileSlice.actions;
 export default profileSlice.reducer;
