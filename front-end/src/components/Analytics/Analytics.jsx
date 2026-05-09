@@ -5,6 +5,7 @@ import { Bar, Pie } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
 import SurveyChart from "./SurveyChart";
 import Loader from "../../components/ui/Loader/Loader";
+import { chartColors } from "../../constants/constants";
 
 ChartJS.register(...registerables);
 
@@ -90,10 +91,7 @@ function Analytics({ surveyId }) {
         {
           label: "Кількість користувачів",
           data: ageCounts,
-          backgroundColor: genderLabels.map(
-            () =>
-              `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`
-          ),
+          backgroundColor: ageLabels.map((label) => chartColors.age[label]),
           borderColor: "transparent",
           borderWidth: 1,
         },
@@ -106,9 +104,10 @@ function Analytics({ surveyId }) {
         {
           label: "Кількість користувачів",
           data: genderCounts,
-          backgroundColor: genderLabels.map(
-            () =>
-              `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`
+          backgroundColor: genderLabels.map((label) =>
+            label === "Чоловік"
+              ? chartColors.gender.male
+              : chartColors.gender.female
           ),
           borderColor: "transparent",
           borderWidth: 1,
@@ -147,7 +146,7 @@ function Analytics({ surveyId }) {
                     res.genderBreakdown.find((g) => g.label === "Чоловік")
                       ?.count || 0
                 ),
-                backgroundColor: "rgba(54, 162, 235, 0.5)",
+                backgroundColor: chartColors.gender.male,
                 borderColor: "transparent",
                 borderWidth: 1,
               },
@@ -158,7 +157,7 @@ function Analytics({ surveyId }) {
                     res.genderBreakdown.find((g) => g.label === "Жінка")
                       ?.count || 0
                 ),
-                backgroundColor: "rgba(255, 99, 132, 0.5)",
+                backgroundColor: chartColors.gender.female,
                 borderColor: "transparent",
                 borderWidth: 1,
               },
@@ -178,7 +177,7 @@ function Analytics({ surveyId }) {
                 (res) =>
                   res.ageBreakdown.find((a) => a.label === ageLabel)?.count || 0
               ),
-              backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 255, 0.5)`,
+              backgroundColor: chartColors.age[ageLabel],
               borderColor: "transparent",
               borderWidth: 1,
             })),
