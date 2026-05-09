@@ -323,5 +323,5 @@ export const getAnalyticsForSurvey = async (surveyId) => {
     });
   }
 
-  return { survey, analytics: analytics[0] || {} };
+  return { survey, analytics: finalAnalytics || {} };
 };

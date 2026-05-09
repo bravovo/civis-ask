@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
 import api from "../../api/api";
-import { Bar, Pie } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
 import SurveyChart from "./SurveyChart";
 import Loader from "../../components/ui/Loader/Loader";
@@ -44,20 +43,14 @@ const diagramTypes = [
 ];
 
 function Analytics({ surveyId }) {
-  const dispatch = useDispatch();
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const [selectedDiagramType, setSelectedDiagramType] = useState(
-    diagramTypes[0]
-  );
-  const [diagramDropdownOpen, setDiagramDropdownOpen] = useState(false);
 
   useEffect(() => {
     async function getSurveyAnalytics() {
       try {
         setLoading(true);
-        const response = await api.get(`surveys/survey/${surveyId}/analytics`);
+        const response = await api.get(`/surveys/survey/${surveyId}/analytics`);
 
         if (response.status === 200 && response.data.data.analytics) {
           console.log("ANALYTICS FOUND", response.data.data);
@@ -129,7 +122,7 @@ function Analytics({ surveyId }) {
                 data: question.results.map((r) => r.count),
                 backgroundColor: genderLabels.map(
                   () =>
-                    `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`
+                    `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`
                 ),
                 borderColor: "transparent",
                 borderWidth: 1,

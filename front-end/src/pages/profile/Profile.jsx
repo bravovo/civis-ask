@@ -22,7 +22,6 @@ function Profile() {
     (state) => state.profile
   );
 
-  const [activeTab, setActiveTab] = useState("my_surveys");
   const [editProfileDialogOpen, setEditProfileDialogOpen] = useState(false);
   const [changePasswordDialogOpen, setChangePasswordDialogOpen] =
     useState(false);
@@ -55,54 +54,6 @@ function Profile() {
     deleteAccountDialogOpen,
   ]);
 
-  const handleTabChange = (tabName) => {
-    setActiveTab(tabName);
-  };
-
-  function renderTab() {
-    if (activeTab === "my_surveys") {
-      switch (profile.surveysStatus) {
-        case "loading":
-          return <Loader />;
-        case "error":
-          return <h3>{profile.error}</h3>;
-        case "success":
-          if (userSurveys.length === 0) {
-            return <h3>У вас ще немає створених опитувань</h3>;
-          }
-          return (
-            <div className="flex flex-col gap-2">
-              {userSurveys.map((s) => (
-                <SurveyCard key={s._id} data={s} fromProfile={true} />
-              ))}
-            </div>
-          );
-      }
-    } else {
-      switch (profile.passedSurveysStatus) {
-        case "loading":
-          return <Loader />;
-        case "error":
-          return <h3>{profile.error}</h3>;
-        case "success":
-          if (passedSurveys.length === 0) {
-            return <h3>У вас ще немає пройдених опитувань</h3>;
-          }
-          return (
-            <div className="flex flex-col gap-2">
-              {passedSurveys.map((s) => (
-                <SurveyCard
-                  key={s._id}
-                  data={s}
-                  isSurveyTake={true}
-                  fromProfile={true}
-                />
-              ))}
-            </div>
-          );
-      }
-    }
-  }
   const tabs = [
     {
       id: "my_surveys",

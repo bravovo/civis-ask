@@ -1,7 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setLoading } from "../../state/loaderSlice";
-import api from "../../api/api";
 import { Bar, Pie } from "react-chartjs-2";
 
 const options = {
@@ -54,7 +52,6 @@ function SurveyChart({ data, title }) {
   const [diagramDropdownOpen, setDiagramDropdownOpen] = useState(false);
 
   const chartData = useMemo(() => {
-    console.log("Формування даних для діаграми з даних:", data);
     if (!data) return null;
     return data[selectedDataType.value] || null;
   }, [data, selectedDataType.value]);
@@ -70,66 +67,68 @@ function SurveyChart({ data, title }) {
   return (
     data && (
       <div>
-        <div className="w-full flex flex-col gap-1 justify-start m-0">
-          Вид діаграми
-          <button
-            type="button"
-            onClick={() => setDiagramDropdownOpen((prev) => !prev)}
-            disabled={selectedDataType.value !== "data"}
-          >
-            {selectedDiagramType.label}
-          </button>
-          {diagramDropdownOpen && (
-            <div className="flex flex-col gap-1">
-              {diagramTypes.map((option) => {
-                if (option.value === selectedDiagramType.value) {
-                  return null;
-                }
-                return (
-                  <button
-                    key={option.value}
-                    onClick={() => {
-                      setSelectedDiagramType(option);
-                      setDiagramDropdownOpen(false);
-                    }}
-                    type="button"
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-        <div className="w-full flex flex-col gap-1 justify-start m-0">
-          Дані діаграми
-          <button
-            type="button"
-            onClick={() => setDataDropdownOpen((prev) => !prev)}
-          >
-            {selectedDataType.label}
-          </button>
-          {dataDropdownOpen && (
-            <div className="flex flex-col gap-1">
-              {dataTypes.map((option) => {
-                return (
-                  <button
-                    key={option.value}
-                    className="block w-full px-4 py-2 text-left hover:bg-gray-100"
-                    onClick={() => {
-                      setSelectedDataType(option);
-                      setDataDropdownOpen(false);
-                      if (option.value !== "data") {
-                        setSelectedDiagramType(diagramTypes[0]);
-                      }
-                    }}
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+        <div className="w-full flex gap-4 justify-center mb-4">
+          <div className="w-full flex flex-col gap-1 justify-start m-0">
+            Вид діаграми
+            <button
+              type="button"
+              onClick={() => setDiagramDropdownOpen((prev) => !prev)}
+              disabled={selectedDataType.value !== "data"}
+            >
+              {selectedDiagramType.label}
+            </button>
+            {diagramDropdownOpen && (
+              <div className="flex flex-col gap-1">
+                {diagramTypes.map((option) => {
+                  if (option.value === selectedDiagramType.value) {
+                    return null;
+                  }
+                  return (
+                    <button
+                      key={option.value}
+                      onClick={() => {
+                        setSelectedDiagramType(option);
+                        setDiagramDropdownOpen(false);
+                      }}
+                      type="button"
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          <div className="w-full flex flex-col gap-1 justify-start m-0">
+            Дані діаграми
+            <button
+              type="button"
+              onClick={() => setDataDropdownOpen((prev) => !prev)}
+            >
+              {selectedDataType.label}
+            </button>
+            {dataDropdownOpen && (
+              <div className="flex flex-col gap-1">
+                {dataTypes.map((option) => {
+                  return (
+                    <button
+                      key={option.value}
+                      className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                      onClick={() => {
+                        setSelectedDataType(option);
+                        setDataDropdownOpen(false);
+                        if (option.value !== "data") {
+                          setSelectedDiagramType(diagramTypes[0]);
+                        }
+                      }}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
         {selectedDiagramType.value === "bar" ? (
           <div className="w-full flex justify-center h-[400px]">
