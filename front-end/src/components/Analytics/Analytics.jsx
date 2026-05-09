@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setLoading } from "../../state/loaderSlice";
 import api from "../../api/api";
 import { Bar, Pie } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
 import SurveyChart from "./SurveyChart";
+import Loader from "../../components/ui/Loader/Loader";
 
 ChartJS.register(...registerables);
 
@@ -45,6 +45,7 @@ const diagramTypes = [
 function Analytics({ surveyId }) {
   const dispatch = useDispatch();
   const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const [selectedDiagramType, setSelectedDiagramType] = useState(
     diagramTypes[0]
@@ -54,6 +55,7 @@ function Analytics({ surveyId }) {
   useEffect(() => {
     async function getSurveyAnalytics() {
       try {
+        setLoading(true);
         const response = await api.get(`surveys/survey/${surveyId}/analytics`);
 
         if (response.status === 200 && response.data.data.analytics) {
@@ -63,6 +65,8 @@ function Analytics({ surveyId }) {
       } catch (error) {
         console.log(error);
         return "Аналітика опитування недоступна";
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -71,20 +75,22 @@ function Analytics({ surveyId }) {
     }
   }, [surveyId, analytics]);
 
-  let ageData = {};
-  let genderData = {};
-  let questionsData = [];
-  if (analytics) {
-    const ageLabels = analytics.ageStats.map((question) => question.label);
-    const ageCounts = analytics.ageStats.map((question) => question.count);
+  const formattedData = useMemo(() => {
+    if (!analytics) return null;
 
-    ageData = {
+    const ageLabels = analytics.ageStats.map((s) => s.label);
+    const ageCounts = analytics.ageStats.map((s) => s.count);
+
+    const genderLabels = analytics.genderStats.map((s) => s.label);
+    const genderCounts = analytics.genderStats.map((s) => s.count);
+
+    const ageChartData = {
       labels: ageLabels,
       datasets: [
         {
           label: "Кількість користувачів",
           data: ageCounts,
-          backgroundColor: ageLabels.map(
+          backgroundColor: genderLabels.map(
             () =>
               `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`
           ),
@@ -94,14 +100,7 @@ function Analytics({ surveyId }) {
       ],
     };
 
-    const genderLabels = analytics.genderStats.map(
-      (question) => question.label
-    );
-    const genderCounts = analytics.genderStats.map(
-      (question) => question.count
-    );
-
-    genderData = {
+    const genderChartData = {
       labels: genderLabels,
       datasets: [
         {
@@ -117,89 +116,137 @@ function Analytics({ surveyId }) {
       ],
     };
 
-    questionsData = analytics.questionStats.map((question) => {
-      const optionLabels = question.results.map((res) => res.option);
-      const optionCounts = question.results.map((res) => res.count);
+    const questionsChartData = (analytics.questionStats || []).map(
+      (question) => {
+        const optionLabels = (question.results || []).map((res) => res.option);
 
-      const questionData = {
-        labels: optionLabels,
-        datasets: [
-          {
-            label: "Кількість користувачів",
-            data: optionCounts,
-            backgroundColor: optionLabels.map(
-              () =>
-                `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`
-            ),
-            borderColor: "transparent",
-            borderWidth: 1,
+        return {
+          title: question.title,
+          data: {
+            labels: optionLabels,
+            datasets: [
+              {
+                label: "Кількість користувачів",
+                data: question.results.map((r) => r.count),
+                backgroundColor: genderLabels.map(
+                  () =>
+                    `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`
+                ),
+                borderColor: "transparent",
+                borderWidth: 1,
+              },
+            ],
           },
-        ],
-      };
-      return { data: questionData, title: question.title };
-    });
-  } else {
-    return <h4>Дані аналітики недоступні</h4>;
-  }
+          genderData: {
+            labels: optionLabels,
+            datasets: [
+              {
+                label: "Чоловік",
+                data: question.results.map(
+                  (res) =>
+                    res.genderBreakdown.find((g) => g.label === "Чоловік")
+                      ?.count || 0
+                ),
+                backgroundColor: "rgba(54, 162, 235, 0.5)",
+                borderColor: "transparent",
+                borderWidth: 1,
+              },
+              {
+                label: "Жінка",
+                data: question.results.map(
+                  (res) =>
+                    res.genderBreakdown.find((g) => g.label === "Жінка")
+                      ?.count || 0
+                ),
+                backgroundColor: "rgba(255, 99, 132, 0.5)",
+                borderColor: "transparent",
+                borderWidth: 1,
+              },
+            ],
+          },
+          ageData: {
+            labels: optionLabels,
+            datasets: [
+              ...new Set(
+                question.results.flatMap((r) =>
+                  r.ageBreakdown.map((a) => a.label)
+                )
+              ),
+            ].map((ageLabel) => ({
+              label: ageLabel,
+              data: question.results.map(
+                (res) =>
+                  res.ageBreakdown.find((a) => a.label === ageLabel)?.count || 0
+              ),
+              backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 255, 0.5)`,
+              borderColor: "transparent",
+              borderWidth: 1,
+            })),
+          },
+        };
+      }
+    );
+
+    return { ageChartData, genderChartData, questionsChartData };
+  }, [analytics]);
+
+  if (loading) return <Loader />;
+  if (!analytics) return <h4>Дані аналітики недоступні</h4>;
 
   return (
-    analytics && (
-      <div>
-        <h3>
-          Загальна кількість опитаних користувачів:{" "}
-          {analytics.totalParticipants}
-        </h3>
-        <div className="flex flex-row gap-4">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "300px",
-              width: "100%",
-              maxWidth: "800px",
-              margin: "20px auto",
-            }}
-          >
-            <Bar options={options} data={ageData} />
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "300px",
-              width: "100%",
-              maxWidth: "800px",
-              margin: "20px auto",
-            }}
-          >
-            <Bar
-              options={{
-                ...options,
-                plugins: {
-                  ...options.plugins,
-                  title: {
-                    ...options.plugins.title,
-                    text: "Кількість опитаних користувачів за статтю",
-                  },
-                },
-              }}
-              data={genderData}
-            />
-          </div>
+    <div>
+      <h3>
+        Загальна кількість опитаних користувачів: {analytics.totalParticipants}
+      </h3>
+      <div className="flex flex-row gap-4">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "300px",
+            width: "100%",
+            maxWidth: "800px",
+            margin: "20px auto",
+          }}
+        >
+          <Bar options={options} data={formattedData.ageChartData} />
         </div>
-        <h3>Статистика по питанням:</h3>
-        {questionsData &&
-          questionsData.map((questionData, index) => (
-            <SurveyChart
-              key={index}
-              data={questionData.data}
-              title={questionData.title}
-            />
-          ))}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "300px",
+            width: "100%",
+            maxWidth: "800px",
+            margin: "20px auto",
+          }}
+        >
+          <Bar
+            options={{
+              ...options,
+              plugins: {
+                ...options.plugins,
+                title: {
+                  ...options.plugins.title,
+                  text: "Кількість опитаних користувачів за статтю",
+                },
+              },
+            }}
+            data={formattedData.genderChartData}
+          />
+        </div>
       </div>
-    )
+      <h3>Статистика по питанням:</h3>
+      {formattedData.questionsChartData.map((questionData, index) => (
+        <SurveyChart
+          key={index}
+          data={questionData}
+          title={questionData.title}
+        />
+      ))}
+    </div>
   );
 }
 

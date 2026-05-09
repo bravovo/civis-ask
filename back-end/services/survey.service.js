@@ -175,8 +175,25 @@ export const getAnalyticsForSurvey = async (surveyId) => {
               _id: {
                 questionId: "$answers.questionId",
                 option: "$answers.answer",
+                gender: "$demographics.gender",
+                age: "$demographics.age",
               },
               count: { $sum: 1 },
+            },
+          },
+          {
+            $group: {
+              _id: {
+                questionId: "$_id.questionId",
+                option: "$_id.option",
+              },
+              count: { $sum: "$count" },
+              genders: {
+                $push: { gender: "$_id.gender", count: "$count" },
+              },
+              ages: {
+                $push: { age: "$_id.age", count: "$count" },
+              },
             },
           },
           {
@@ -186,6 +203,8 @@ export const getAnalyticsForSurvey = async (surveyId) => {
                 $push: {
                   option: "$_id.option",
                   count: "$count",
+                  genders: "$genders",
+                  ages: "$ages",
                 },
               },
             },
@@ -207,13 +226,54 @@ export const getAnalyticsForSurvey = async (surveyId) => {
 
   const finalAnalytics = analytics[0] || {};
 
+  const getAgeLabel = (age) => {
+    if (!age) return "Не вказано";
+    if (age >= 85) return "85+";
+    if (age >= 70) return "70-84";
+    if (age >= 55) return "55-69";
+    if (age >= 45) return "45-54";
+    if (age >= 35) return "35-44";
+    if (age >= 25) return "25-34";
+    if (age >= 16) return "16-24";
+  };
+
   if (finalAnalytics.questionStats) {
+    console.log(finalAnalytics.questionStats);
+
     finalAnalytics.questionStats = finalAnalytics.questionStats.map((stat) => {
       const questionDoc = survey.questions.id(stat._id);
+
+      const processedResults = stat.results.map((res) => {
+        const genders = res.genders.reduce((acc, curr) => {
+          const label = curr.gender === "male" ? "Чоловік" : "Жінка";
+          acc[label] = (acc[label] || 0) + curr.count;
+          return acc;
+        }, {});
+
+        const ages = res.ages.reduce((acc, curr) => {
+          const label = getAgeLabel(curr.age);
+          acc[label] = (acc[label] || 0) + curr.count;
+          return acc;
+        }, {});
+
+        return {
+          option: res.option,
+          count: res.count,
+          genderBreakdown: Object.entries(genders).map(([label, count]) => ({
+            label,
+            count,
+          })),
+          ageBreakdown: Object.entries(ages).map(([label, count]) => ({
+            label,
+            count,
+          })),
+        };
+      });
 
       return {
         ...stat,
         title: questionDoc ? questionDoc.title : "Назва відсутня",
+        results: processedResults,
       };
     });
   }

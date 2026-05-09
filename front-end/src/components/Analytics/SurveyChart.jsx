@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setLoading } from "../../state/loaderSlice";
 import api from "../../api/api";
@@ -38,14 +38,33 @@ const diagramTypes = [
   { value: "pie", label: "Кругова діаграма" },
 ];
 
+const dataTypes = [
+  { value: "data", label: "Загальні дані" },
+  { value: "genderData", label: "За статтю" },
+  { value: "ageData", label: "За віком" },
+];
+
 function SurveyChart({ data, title }) {
+  const [selectedDataType, setSelectedDataType] = useState(dataTypes[0]);
+  const [dataDropdownOpen, setDataDropdownOpen] = useState(false);
+
   const [selectedDiagramType, setSelectedDiagramType] = useState(
     diagramTypes[0]
   );
   const [diagramDropdownOpen, setDiagramDropdownOpen] = useState(false);
 
+  const chartData = useMemo(() => {
+    console.log("Формування даних для діаграми з даних:", data);
+    if (!data) return null;
+    return data[selectedDataType.value] || null;
+  }, [data, selectedDataType.value]);
+
   if (!data) {
-    return <h4>Дані аналітики недоступні</h4>;
+    return (
+      <h4 className="text-center p-4">
+        Дані аналітики недоступні або завантажуються...
+      </h4>
+    );
   }
 
   return (
@@ -56,6 +75,7 @@ function SurveyChart({ data, title }) {
           <button
             type="button"
             onClick={() => setDiagramDropdownOpen((prev) => !prev)}
+            disabled={selectedDataType.value !== "data"}
           >
             {selectedDiagramType.label}
           </button>
@@ -81,6 +101,36 @@ function SurveyChart({ data, title }) {
             </div>
           )}
         </div>
+        <div className="w-full flex flex-col gap-1 justify-start m-0">
+          Дані діаграми
+          <button
+            type="button"
+            onClick={() => setDataDropdownOpen((prev) => !prev)}
+          >
+            {selectedDataType.label}
+          </button>
+          {dataDropdownOpen && (
+            <div className="flex flex-col gap-1">
+              {dataTypes.map((option) => {
+                return (
+                  <button
+                    key={option.value}
+                    className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                    onClick={() => {
+                      setSelectedDataType(option);
+                      setDataDropdownOpen(false);
+                      if (option.value !== "data") {
+                        setSelectedDiagramType(diagramTypes[0]);
+                      }
+                    }}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
         {selectedDiagramType.value === "bar" ? (
           <div className="w-full flex justify-center h-[400px]">
             <Bar
@@ -90,7 +140,7 @@ function SurveyChart({ data, title }) {
                   ...options.plugins,
                   legend: {
                     ...options.plugins.legend,
-                    display: false,
+                    display: selectedDataType.value !== "data",
                   },
                   title: {
                     ...options.plugins.title,
@@ -98,7 +148,7 @@ function SurveyChart({ data, title }) {
                   },
                 },
               }}
-              data={data}
+              data={chartData}
             />
           </div>
         ) : (
@@ -118,7 +168,7 @@ function SurveyChart({ data, title }) {
                   },
                 },
               }}
-              data={data}
+              data={chartData}
             />
           </div>
         )}
