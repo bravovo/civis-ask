@@ -4,6 +4,7 @@ import { setLoading } from "../../state/loaderSlice";
 import api from "../../api/api";
 import { Bar, Pie } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
+import SurveyChart from "./SurveyChart";
 
 ChartJS.register(...registerables);
 
@@ -137,153 +138,66 @@ function Analytics({ surveyId }) {
       };
       return { data: questionData, title: question.title };
     });
+  } else {
+    return <h4>Дані аналітики недоступні</h4>;
   }
 
   return (
     analytics && (
       <div>
-        <h4>
+        <h3>
           Загальна кількість опитаних користувачів:{" "}
           {analytics.totalParticipants}
-        </h4>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "300px",
-            width: "100%",
-            maxWidth: "800px",
-            margin: "20px auto",
-          }}
-        >
-          <Bar options={options} data={ageData} />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "300px",
-            width: "100%",
-            maxWidth: "800px",
-            margin: "20px auto",
-          }}
-        >
-          <Bar
-            options={{
-              ...options,
-              plugins: {
-                ...options.plugins,
-                title: {
-                  ...options.plugins.title,
-                  text: "Кількість опитаних користувачів за статтю",
-                },
-              },
+        </h3>
+        <div className="flex flex-row gap-4">
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "300px",
+              width: "100%",
+              maxWidth: "800px",
+              margin: "20px auto",
             }}
-            data={genderData}
-          />
-        </div>
-        <h4>Статистика по питанням:</h4>
-        <div className="w-full flex flex-col gap-1 justify-start m-0">
-          Вид діаграми
-          <button
-            type="button"
-            onClick={() => setDiagramDropdownOpen((prev) => !prev)}
           >
-            {selectedDiagramType.label}
-          </button>
-          {diagramDropdownOpen && (
-            <div className="flex flex-col gap-1">
-              {diagramTypes.map((option) => {
-                if (option.value === selectedDiagramType.value) {
-                  return null;
-                }
-                return (
-                  <button
-                    key={option.value}
-                    onClick={() => {
-                      setSelectedDiagramType(option);
-                      setDiagramDropdownOpen(false);
-                    }}
-                    type="button"
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+            <Bar options={options} data={ageData} />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "300px",
+              width: "100%",
+              maxWidth: "800px",
+              margin: "20px auto",
+            }}
+          >
+            <Bar
+              options={{
+                ...options,
+                plugins: {
+                  ...options.plugins,
+                  title: {
+                    ...options.plugins.title,
+                    text: "Кількість опитаних користувачів за статтю",
+                  },
+                },
+              }}
+              data={genderData}
+            />
+          </div>
         </div>
+        <h3>Статистика по питанням:</h3>
         {questionsData &&
           questionsData.map((questionData, index) => (
-            <div
+            <SurveyChart
               key={index}
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "300px",
-                width: "100%",
-                maxWidth: "800px",
-                margin: "20px auto",
-              }}
-            >
-              {selectedDiagramType.value === "bar" ? (
-                <Bar
-                  options={{
-                    ...options,
-                    plugins: {
-                      ...options.plugins,
-                      legend: {
-                        ...options.plugins.legend,
-                        display: false,
-                      },
-                      title: {
-                        ...options.plugins.title,
-                        text: questionData.title,
-                      },
-                    },
-                  }}
-                  data={questionData.data}
-                />
-              ) : (
-                <Pie
-                  options={{
-                    ...options,
-                    plugins: {
-                      ...options.plugins,
-                      legend: {
-                        ...options.plugins.legend,
-                        display: true,
-                      },
-                      title: {
-                        ...options.plugins.title,
-                        text: questionData.title,
-                      },
-                    },
-                  }}
-                  data={questionData.data}
-                />
-              )}
-            </div>
+              data={questionData.data}
+              title={questionData.title}
+            />
           ))}
-        {analytics.questionStats.map((question) => {
-          return (
-            <div key={question._id}>
-              <h3>{question.title}</h3>
-              {question.results.map((res) => {
-                return (
-                  <div key={res.option}>
-                    <h3>
-                      {res.count} {"->"} {res.option}
-                    </h3>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
       </div>
     )
   );
