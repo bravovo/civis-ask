@@ -50,7 +50,9 @@ app.use(async (req, res, next) => {
     await connectDB();
     next();
   } catch (err) {
-    res.status(500).json({ message: "Помилка підключення до бази даних" });
+    res
+      .status(500)
+      .json({ status: false, message: "Помилка підключення до бази даних" });
   }
 });
 

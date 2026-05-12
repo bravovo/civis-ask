@@ -20,7 +20,7 @@ export const postSurvey = async (req, res, next) => {
       });
     }
 
-    if (!title || !description || !questions || !questions.length || !status) {
+    if (!title || !description || !questions || !questions.length) {
       return res.status(400).json({
         success: false,
         message: "Усі поля для створення опитування є обов'язковими",
