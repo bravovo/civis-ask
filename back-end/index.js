@@ -19,24 +19,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
-    origin: function (origin, callback) {
-        if (!origin) return callback(null, true);
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
 
-        const isMatch = origin === CLIENT_ORIGIN;
-        const isVercelPreview =
-            /^https:\/\/civis-ask(-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
+    const isMatch = origin === CLIENT_ORIGIN;
+    const isVercelPreview =
+      /^https:\/\/civis-ask(-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
 
-        if (isMatch || isVercelPreview) {
-            callback(null, true);
-        } else {
-            console.log(origin);
-            callback(new Error("Заблоковано CORS"));
-        }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    exposedHeaders: ["x-new-access-token"],
+    if (isMatch || isVercelPreview) {
+      callback(null, true);
+    } else {
+      console.log(origin);
+      callback(new Error("Заблоковано CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["x-new-access-token"],
 };
 
 app.use(cors(corsOptions));
@@ -44,16 +44,16 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 
 app.use(async (req, res, next) => {
-    try {
-        await connectDB();
-        next();
-    } catch (err) {
-        res.status(500).json({ message: "Помилка підключення до бази даних" });
-    }
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ message: "Помилка підключення до бази даних" });
+  }
 });
 
 app.get("/", (req, res, next) => {
-    res.send("API is okay");
+  res.send("API is okay");
 });
 
 app.use("/api/auth", authRoute);
@@ -65,18 +65,20 @@ app.use("/api/uploads", uploadsRoute);
 app.use("/api/surveys", surveysRoute);
 
 app.use((err, req, res, next) => {
-    console.log(err);
-    if (err instanceof mongoose.Error.ValidationError) {
-        const errMsg = err.message.split(":")[2];
-        return res.status(400).json({ message: errMsg });
-    }
+  console.log(err);
+  if (err instanceof mongoose.Error.ValidationError) {
+    const errMsg = err.message.split(":")[2];
+    return res.status(400).json({ message: errMsg });
+  }
 
-    res.status(500).json({ message: err.message });
+  const status = err.status || 500;
+
+  return res.status(status).json({ success: false, message: err.message });
 });
 
 app.listen(PORT, () => {
-    console.log(NODE_ENV, "ENV");
-    console.log("LISTENING ON PORT", PORT);
+  console.log(NODE_ENV, "ENV");
+  console.log("LISTENING ON PORT", PORT);
 });
 
 export default app;
