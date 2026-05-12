@@ -43,10 +43,7 @@ export const patchUser = async (req, res, next) => {
     });
 
     if (!updatedUser) {
-      return res.status(404).json({
-        success: false,
-        message: "Користувача для оновлення не знайдено",
-      });
+      throw new Error("Невдалось оновити дані користувача");
     }
 
     return res.status(200).json({
@@ -87,10 +84,7 @@ export const deleteUser = async (req, res, next) => {
 
     const result = await deleteUserData(id, password);
     if (!result) {
-      return res.status(400).json({
-        success: false,
-        message: "Не вдалося видалити користувача",
-      });
+      throw new Error("Не вдалося видалити користувача");
     }
 
     res.clearCookie("token", {
