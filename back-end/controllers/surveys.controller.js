@@ -13,6 +13,13 @@ export const postSurvey = async (req, res, next) => {
     const { title, description, questions, status } = req.body;
     console.log(status);
 
+    if (!Array.isArray(questions)) {
+      return res.status(400).json({
+        success: false,
+        message: "Поле questions має бути масивом",
+      });
+    }
+
     if (!title || !description || !questions || !questions.length || !status) {
       return res.status(400).json({
         success: false,

@@ -30,7 +30,9 @@ const corsOptions = {
       callback(null, true);
     } else {
       console.log(origin);
-      callback(new Error("Заблоковано CORS"));
+      const error = new Error("Заблоковано CORS");
+      error.status = 403;
+      callback(error);
     }
   },
   credentials: true,
@@ -67,8 +69,8 @@ app.use("/api/surveys", surveysRoute);
 app.use((err, req, res, next) => {
   console.log(err);
   if (err instanceof mongoose.Error.ValidationError) {
-    const errMsg = err.message.split(":")[2];
-    return res.status(400).json({ message: errMsg });
+    const errMsg = (err.message.split(":")[2] || err.message).trim();
+    return res.status(400).json({ success: false, message: errMsg });
   }
 
   const status = err.status || 500;
