@@ -11,13 +11,17 @@ export const updateUser = async (id, updateData) => {
   );
 
   if (!hasUpdateData) {
-    throw new Error("Немає даних для оновлення");
+    const error = new Error("Немає даних для оновлення");
+    error.status = 400;
+    throw error;
   }
 
   if (updateData.password || updateData.role) {
-    throw new Error(
+    const error = new Error(
       "Неможливо оновити пароль або роль з допомогою цього запиту"
     );
+    error.status = 400;
+    throw error;
   }
 
   const updatedUser = await User.findByIdAndUpdate(id, updateData, {
@@ -31,23 +35,35 @@ export const updateUser = async (id, updateData) => {
 
 export const updatePassword = async (id, currentPassword, newPassword) => {
   if (!currentPassword || !newPassword) {
-    throw new Error("Поточний та новий паролі обов'язкові для оновлення");
+    const error = new Error(
+      "Поточний та новий паролі обов'язкові для оновлення"
+    );
+    error.status = 400;
+    throw error;
   }
 
   const user = await User.findById(id);
 
   if (!user) {
-    throw new Error("Користувача не знайдено");
+    const error = new Error("Користувача не знайдено");
+    error.status = 404;
+    throw error;
   }
 
   const isMatch = await user.comparePasswords(currentPassword);
 
   if (!isMatch) {
-    throw new Error("Невірний пароль");
+    const error = new Error("Невірний поточний пароль");
+    error.status = 400;
+    throw error;
   }
 
-  if (newPassword.length < 8) {
-    throw new Error("Новий пароль повинен містити не менше 8 символів");
+  if (newPassword.length < 8 || newPassword.length > 64) {
+    const error = new Error(
+      "Новий пароль повинен містити не менше 8 та не більше 64 символів"
+    );
+    error.status = 400;
+    throw error;
   }
 
   user.password = newPassword;
@@ -58,18 +74,24 @@ export const updatePassword = async (id, currentPassword, newPassword) => {
 export const deleteUserData = async (id, password) => {
   try {
     if (!password) {
-      throw new Error("Пароль обов'язковий для видалення акаунта");
+      const error = new Error("Пароль обов'язковий для видалення акаунта");
+      error.status = 400;
+      throw error;
     }
 
     const user = await User.findById(id);
 
     if (!user) {
-      throw new Error("Користувача не знайдено");
+      const error = new Error("Користувача не знайдено");
+      error.status = 404;
+      throw error;
     }
 
     const isMatch = await user.comparePasswords(password);
     if (!isMatch) {
-      throw new Error("Невірний пароль");
+      const error = new Error("Невірний пароль");
+      error.status = 400;
+      throw error;
     }
 
     await Survey.deleteMany({ author: id });

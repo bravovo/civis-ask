@@ -11,38 +11,29 @@ export const patchEditSurvey = async ({
   status,
 }) => {
   const survey = await Survey.findById(surveyId);
-  let error;
 
   if (!survey) {
-    error = {
-      status: 404,
-      message: "Опитування не знайдено",
-    };
-    return { error, updatedSurvey: null };
+    const error = new Error("Опитування не знайдено");
+    error.status = 404;
+    throw error;
   }
 
   if (!survey.author.equals(userId)) {
-    error = {
-      status: 403,
-      message: "Заборонено редагувати чужі опитування",
-    };
-    return { error, updatedSurvey: null };
+    const error = new Error("Заборонено редагувати чужі опитування");
+    error.status = 403;
+    throw error;
   }
 
   if (survey.status === "published") {
-    error = {
-      status: 400,
-      message: "Не можна редагувати опубліковані опитування",
-    };
-    return { error, updatedSurvey: null };
+    const error = new Error("Не можна редагувати опубліковані опитування");
+    error.status = 400;
+    throw error;
   }
 
   if (!Array.isArray(questions) || questions.length === 0) {
-    error = {
-      status: 400,
-      message: "Питання опитування не заповнені",
-    };
-    return { error, updatedSurvey: null };
+    const error = new Error("Питання опитування не заповнені");
+    error.status = 400;
+    throw error;
   }
 
   const formattedQuestions = questions.map((q) => ({
@@ -66,19 +57,17 @@ export const patchEditSurvey = async ({
   );
 
   if (!updatedSurvey) {
-    error = {
-      status: 500,
-      message: "Помилка редагування опитування",
-    };
-    return { error, updatedSurvey: null };
+    throw new Error("Помилка редагування опитування");
   }
 
-  return { error: null, updatedSurvey };
+  return updatedSurvey;
 };
 
 export const getUserSurveys = async (user) => {
   if (!user || !user.id) {
-    throw new Error("Користувача не знайдено");
+    const error = new Error("Користувача не знайдено");
+    error.status = 404;
+    throw error;
   }
 
   const userSurveys = await Survey.find({ author: user.id }).populate({
@@ -95,7 +84,9 @@ export const getUserSurveys = async (user) => {
 
 export const getSurveysPassedByUser = async (user) => {
   if (!user || !user.id) {
-    throw new Error("Користувача не знайдено");
+    const error = new Error("Користувача не знайдено");
+    error.status = 404;
+    throw error;
   }
 
   const surveysPassedByUser = await SurveyTake.find({ user: user.id })
@@ -114,13 +105,17 @@ export const getSurveysPassedByUser = async (user) => {
 
 export const getAnalyticsForSurvey = async (surveyId) => {
   if (!mongoose.isValidObjectId(surveyId)) {
-    throw new Error("Ідентифікатор опитування недійсний");
+    const error = new Error("Ідентифікатор опитування недійсний");
+    error.status = 400;
+    throw error;
   }
   const id = new mongoose.Types.ObjectId(surveyId);
 
   const survey = await Survey.findById(id);
   if (!survey) {
-    throw new Error("Опитування не знайдено");
+    const error = new Error("Опитування не знайдено");
+    error.status = 404;
+    throw error;
   }
 
   const analytics = await SurveyTake.aggregate([

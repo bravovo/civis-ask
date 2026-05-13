@@ -13,6 +13,20 @@ export const postSurvey = async (req, res, next) => {
     const { title, description, questions, status } = req.body;
     console.log(status);
 
+    if (!Array.isArray(questions)) {
+      return res.status(400).json({
+        success: false,
+        message: "Поле questions має бути масивом",
+      });
+    }
+
+    if (!title || !description || !questions || !questions.length) {
+      return res.status(400).json({
+        success: false,
+        message: "Усі поля для створення опитування є обов'язковими",
+      });
+    }
+
     const formattedQuestions = questions.map((q) => ({
       title: q.title,
       required: q.required,
@@ -49,7 +63,7 @@ export const editSurvey = async (req, res, next) => {
     const { title, description, questions, status } = req.body;
     const { surveyId } = req.params;
 
-    const { error, updatedSurvey } = await patchEditSurvey({
+    const updatedSurvey = await patchEditSurvey({
       title,
       description,
       questions,
@@ -58,11 +72,8 @@ export const editSurvey = async (req, res, next) => {
       userId: req.user.id,
     });
 
-    if (error) {
-      return res.status(error.status).json({
-        success: false,
-        message: error.message,
-      });
+    if (!updatedSurvey) {
+      throw new Error("Помилка редагування опитування");
     }
 
     return res.status(200).json({
