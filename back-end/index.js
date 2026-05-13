@@ -52,7 +52,7 @@ app.use(async (req, res, next) => {
   } catch (err) {
     res
       .status(500)
-      .json({ status: false, message: "Помилка підключення до бази даних" });
+      .json({ success: false, message: "Помилка підключення до бази даних" });
   }
 });
 
