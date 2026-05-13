@@ -89,6 +89,8 @@ export const editSurvey = async (req, res, next) => {
 export const getSurvey = async (req, res, next) => {
   try {
     const { surveyId } = req.params;
+    const user = req.user;
+    let isPassed = false;
 
     const survey = await Survey.findById(surveyId).populate({
       path: "author",
@@ -102,10 +104,22 @@ export const getSurvey = async (req, res, next) => {
       });
     }
 
+    const hasPassed = await SurveyTake.findOne({
+      survey: surveyId,
+      user: user.id,
+    });
+
+    if (hasPassed) {
+      isPassed = true;
+    }
+
     return res.status(200).json({
       success: true,
       message: "Опитування знайдено",
-      survey,
+      survey: {
+        ...survey.toObject(),
+        isPassed,
+      },
     });
   } catch (error) {
     next(error);
@@ -138,6 +152,18 @@ export const postSurveyPass = async (req, res, next) => {
   const { answers } = req.body;
 
   try {
+    const hasPassed = await SurveyTake.findOne({
+      survey: surveyId,
+      user: user.id,
+    });
+
+    if (hasPassed) {
+      return res.status(400).json({
+        success: false,
+        message: "Ви вже проходили це опитування",
+      });
+    }
+
     if (!Array.isArray(answers) || answers.length === 0) {
       return res.status(400).json({
         success: false,

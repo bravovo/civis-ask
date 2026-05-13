@@ -14,7 +14,9 @@ function Main() {
   const surveys = useSelector((state) => state.surveyList);
 
   useEffect(() => {
-    dispatch(getPublishedSurveys());
+    if (!surveys.items || surveys.items.length === 0) {
+      dispatch(getPublishedSurveys());
+    }
   }, [dispatch]);
 
   if (surveys.status === "loading") {

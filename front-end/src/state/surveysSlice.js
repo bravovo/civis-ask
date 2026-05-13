@@ -30,7 +30,6 @@ export const getPublishedSurveys = createAsyncThunk(
   "surveyList/getPublishedSurveys",
   async (_, { rejectWithValue }) => {
     try {
-      console.log("FROM DB");
       const response = await api.get(`/surveys`);
 
       if (response.status === 200) {
@@ -43,15 +42,6 @@ export const getPublishedSurveys = createAsyncThunk(
           "Помилка отримання опитувань. Будь ласка, спробуйте ще раз пізніше"
       );
     }
-  },
-  {
-    condition: (_, { getState }) => {
-      const { surveyList } = getState();
-      if (surveyList.status === "loading" || surveyList.items.length > 0) {
-        console.log("FROM CACHE");
-        return false;
-      }
-    },
   }
 );
 

@@ -24,46 +24,41 @@ function SurveyInfo() {
     return <Navigate to={`/${survey._id}/edit`} replace />;
   }
 
+  const surveyInfo = survey ? (
+    <>
+      <div className="text-zinc-400 flex flex-col justify-start items-start">
+        <p className={`${survey.verified ? "text-[green]" : "text-[red]"}`}>
+          {survey.verified ? "Перевірене" : "Не перевірене"}
+        </p>
+        <h3>Автор: {survey.author.firstName}</h3>
+      </div>
+      <div className="flex flex-col gap-3 justify-start items-start">
+        <p>{survey.title}</p>
+        <p>{survey.description}</p>
+        <p>Кількість питань: {survey.questions.length}</p>
+        <p>
+          Дата створення:{" "}
+          {new Date(survey.createdAt).toLocaleDateString("en-GB")}
+        </p>
+      </div>
+      <div>
+        <button onClick={onPassSurveyClick}>Пройти опитування</button>
+      </div>
+    </>
+  ) : null;
+
+  const surveyAnalytics = <Analytics surveyId={surveyId} />;
+
   const tabs = [
     {
       id: "survey_data",
       label: "Інформація про опитування",
-      children: (() => {
-        if (!survey) {
-          return null;
-        }
-        return (
-          <>
-            <div className="text-zinc-400 flex flex-col justify-start items-start">
-              <p
-                className={`${survey.verified ? "text-[green]" : "text-[red]"}`}
-              >
-                {survey.verified ? "Перевірене" : "Не перевірене"}
-              </p>
-              <h3>Автор: {survey.author.firstName}</h3>
-            </div>
-            <div className="flex flex-col gap-3 justify-start items-start">
-              <p>{survey.title}</p>
-              <p>{survey.description}</p>
-              <p>Кількість питань: {survey.questions.length}</p>
-              <p>
-                Дата створення:{" "}
-                {new Date(survey.createdAt).toLocaleDateString("en-GB")}
-              </p>
-            </div>
-            <div>
-              <button onClick={onPassSurveyClick}>Пройти опитування</button>
-            </div>
-          </>
-        );
-      })(),
+      children: surveyInfo,
     },
     {
       id: "survey_analytics",
       label: "Аналітика",
-      children: (() => {
-        return <Analytics surveyId={surveyId} />;
-      })(),
+      children: surveyAnalytics,
     },
   ];
 
