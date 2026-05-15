@@ -7,6 +7,7 @@ import {
   getAnalyticsForSurvey,
 } from "../services/survey.service.js";
 import User from "../models/user.model.js";
+import mongoose from "mongoose";
 
 export const postSurvey = async (req, res, next) => {
   try {
@@ -152,18 +153,6 @@ export const postSurveyPass = async (req, res, next) => {
   const { answers } = req.body;
 
   try {
-    const hasPassed = await SurveyTake.findOne({
-      survey: surveyId,
-      user: user.id,
-    });
-
-    if (hasPassed) {
-      return res.status(400).json({
-        success: false,
-        message: "Ви вже проходили це опитування",
-      });
-    }
-
     if (!Array.isArray(answers) || answers.length === 0) {
       return res.status(400).json({
         success: false,
@@ -187,15 +176,28 @@ export const postSurveyPass = async (req, res, next) => {
       });
     }
 
-    const surveyTake = await SurveyTake.create({
-      survey: surveyId,
-      user: user.id,
-      demographics: {
-        age: userData.age,
-        gender: userData.gender,
-      },
-      answers,
-    });
+    let surveyTake;
+    try {
+      console.log("here");
+      surveyTake = await SurveyTake.create({
+        survey: new mongoose.Types.ObjectId(surveyId),
+        user: new mongoose.Types.ObjectId(user.id),
+        demographics: {
+          age: userData.age,
+          gender: userData.gender,
+        },
+        answers,
+      });
+    } catch (err) {
+      console.log(err);
+      if (err?.code === 11000) {
+        return res.status(400).json({
+          success: false,
+          message: "Неможливо пройти опитування більше одного разу",
+        });
+      }
+      throw err;
+    }
 
     if (!surveyTake) {
       throw new Error("Помилка проходження опитування");

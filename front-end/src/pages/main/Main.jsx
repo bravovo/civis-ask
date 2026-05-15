@@ -17,7 +17,7 @@ function Main() {
     if (!surveys.items || surveys.items.length === 0) {
       dispatch(getPublishedSurveys());
     }
-  }, [dispatch]);
+  }, [dispatch, surveys.items]);
 
   if (surveys.status === "loading") {
     return <Loader />;

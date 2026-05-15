@@ -5,6 +5,7 @@ import Loader from "../../components/ui/Loader/Loader";
 import { useEffect, useState } from "react";
 import api from "../../api/api";
 import Popup from "../../components/ui/Popup/Popup";
+import { Navigate } from "react-router-dom";
 
 function PassSurvey() {
   const navigate = useNavigate();
@@ -27,15 +28,21 @@ function PassSurvey() {
   }, [survey, loading]);
 
   useEffect(() => {
-    if (message.length > 0) {
-      setTimeout(() => {
-        setMessage("");
-      }, 6000);
+    if (message.length === 0) {
+      return;
     }
+
+    const timer = setTimeout(() => {
+      setMessage("");
+    }, 6000);
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, [message]);
 
   if (survey?.isPassed) {
-    navigate("/");
+    return <Navigate to="/" replace />;
   }
 
   const handlePassClick = async () => {

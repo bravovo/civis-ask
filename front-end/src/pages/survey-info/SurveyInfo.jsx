@@ -41,9 +41,11 @@ function SurveyInfo() {
           {new Date(survey.createdAt).toLocaleDateString("en-GB")}
         </p>
       </div>
-      <div>
-        <button onClick={onPassSurveyClick}>Пройти опитування</button>
-      </div>
+      {!survey.isPassed && (
+        <div>
+          <button onClick={onPassSurveyClick}>Пройти опитування</button>
+        </div>
+      )}
     </>
   ) : null;
 
