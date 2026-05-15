@@ -7,6 +7,7 @@ import {
   getAnalyticsForSurvey,
 } from "../services/survey.service.js";
 import User from "../models/user.model.js";
+import mongoose from "mongoose";
 
 export const postSurvey = async (req, res, next) => {
   try {
@@ -89,6 +90,8 @@ export const editSurvey = async (req, res, next) => {
 export const getSurvey = async (req, res, next) => {
   try {
     const { surveyId } = req.params;
+    const user = req.user;
+    let isPassed = false;
 
     const survey = await Survey.findById(surveyId).populate({
       path: "author",
@@ -102,10 +105,22 @@ export const getSurvey = async (req, res, next) => {
       });
     }
 
+    const hasPassed = await SurveyTake.findOne({
+      survey: surveyId,
+      user: user.id,
+    });
+
+    if (hasPassed) {
+      isPassed = true;
+    }
+
     return res.status(200).json({
       success: true,
       message: "Опитування знайдено",
-      survey,
+      survey: {
+        ...survey.toObject(),
+        isPassed,
+      },
     });
   } catch (error) {
     next(error);
@@ -161,15 +176,28 @@ export const postSurveyPass = async (req, res, next) => {
       });
     }
 
-    const surveyTake = await SurveyTake.create({
-      survey: surveyId,
-      user: user.id,
-      demographics: {
-        age: userData.age,
-        gender: userData.gender,
-      },
-      answers,
-    });
+    let surveyTake;
+    try {
+      console.log("here");
+      surveyTake = await SurveyTake.create({
+        survey: new mongoose.Types.ObjectId(surveyId),
+        user: new mongoose.Types.ObjectId(user.id),
+        demographics: {
+          age: userData.age,
+          gender: userData.gender,
+        },
+        answers,
+      });
+    } catch (err) {
+      console.log(err);
+      if (err?.code === 11000) {
+        return res.status(400).json({
+          success: false,
+          message: "Неможливо пройти опитування більше одного разу",
+        });
+      }
+      throw err;
+    }
 
     if (!surveyTake) {
       throw new Error("Помилка проходження опитування");

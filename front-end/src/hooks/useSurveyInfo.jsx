@@ -4,20 +4,12 @@ import { setLoading } from "../state/loaderSlice";
 import api from "../api/api";
 
 const useSurveyInfo = (surveyId) => {
-  const cachedSurvey = useSelector((state) => state.surveyList.items).find(
-    (s) => s._id === surveyId
-  );
-  const [survey, setSurvey] = useState(cachedSurvey);
+  const [survey, setSurvey] = useState(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (!surveyId) {
       console.warn("ID опитування не знайдено");
-      return;
-    }
-
-    if (cachedSurvey) {
-      setSurvey(cachedSurvey);
       return;
     }
 
@@ -40,7 +32,7 @@ const useSurveyInfo = (surveyId) => {
     }
 
     fetchSurvey();
-  }, [surveyId, cachedSurvey, dispatch]);
+  }, [surveyId, dispatch]);
 
   return { survey };
 };

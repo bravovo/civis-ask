@@ -4,12 +4,15 @@ import { useSelector } from "react-redux";
 import Loader from "../../components/ui/Loader/Loader";
 import { useEffect, useState } from "react";
 import api from "../../api/api";
+import Popup from "../../components/ui/Popup/Popup";
+import { Navigate } from "react-router-dom";
 
 function PassSurvey() {
   const navigate = useNavigate();
   const { loading } = useSelector((state) => state.loader);
   const { surveyId } = useParams();
   const { survey } = useSurveyInfo(surveyId);
+  const [message, setMessage] = useState("");
 
   const [surveyTake, setSurveyTake] = useState([]);
 
@@ -24,14 +27,38 @@ function PassSurvey() {
     }
   }, [survey, loading]);
 
+  useEffect(() => {
+    if (message.length === 0) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setMessage("");
+    }, 6000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [message]);
+
+  if (survey?.isPassed) {
+    return <Navigate to="/" replace />;
+  }
+
   const handlePassClick = async () => {
     try {
+      if (survey.isPassed) {
+        setMessage("Ви вже проходили це опитування");
+        return;
+      }
+
       const response = await api.post(`/surveys/survey/${surveyId}/pass`, {
         answers: surveyTake,
       });
 
       if (response.data.success) {
         console.log(response.data);
+        navigate("/");
       }
     } catch (error) {
       console.log(error);
@@ -62,6 +89,11 @@ function PassSurvey() {
 
   return (
     <div>
+      {message && (
+        <div className="w-full flex justify-center">
+          <Popup text={message} color="red" duration={5000} />
+        </div>
+      )}
       <button onClick={() => navigate(-1)} className="w-20">
         Назад
       </button>
