@@ -1,11 +1,24 @@
-import { useState } from "react";
-import FormInput from "../../components/ui/FormInput/FormInput.jsx";
+import { useEffect, useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import Popup from "../../components/ui/Popup/Popup.jsx";
 import { setLoading } from "../../state/loaderSlice.js";
 import { setCreds } from "../../state/profileSlice.js";
 import api from "../../api/api";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 
 function Login() {
   const dispatch = useDispatch();
@@ -19,6 +32,24 @@ function Login() {
   const [error, setError] = useState("");
 
   const { authChecked, token, message } = useSelector((state) => state.profile);
+
+  useEffect(() => {
+    if (isRegistered) {
+      toast.success("Користувача створено успішно!");
+    } else if (isLoggedOut) {
+      toast.success("Ви успішно вийшли з акаунта");
+    } else if (accountDeleted) {
+      toast.success("Ваш акаунт успішно видалено");
+    } else if (message) {
+      toast.info(message);
+    }
+  }, [isRegistered, isLoggedOut, accountDeleted, message]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   if (authChecked && token) {
     return <Navigate to="/" replace />;
@@ -36,7 +67,7 @@ function Login() {
           password,
         });
 
-        if (response.status === 200) {
+        if (response.data.success) {
           dispatch(
             setCreds({
               user: response.data.user,
@@ -59,30 +90,58 @@ function Login() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col justify-center items-center gap-6">
-      {isRegistered && <Popup text="Користувача створено успішно!" />}
-      {isLoggedOut && <Popup text="Ви успішно вийшли з акаунта" />}
-      {accountDeleted && <Popup text="Ваш акаунт успішно видалено" />}
-      {error && <Popup text={error} color="red" />}
-      <h2 className="font-bold text-2xl md:text-4xl">Авторизація</h2>
-      <form
-        onSubmit={handleLoginSubmit}
-        className="w-2xs md:w-[450px] flex flex-col justify-center items-center gap-3 py-5 px-3 border-[1.5px] border-b-gray-400 rounded-[8px]"
-      >
-        <FormInput
-          title="Електронна пошта"
-          name="userEmail"
-          onChange={(e) => setEmail(e.target.value)}
-          type="email"
-        />
-        <FormInput
-          title="Пароль"
-          name="userPassword"
-          onChange={(e) => setPassword(e.target.value)}
-          type="password"
-        />
-        <button type="submit">Увійти</button>
-        {!isRegistered && <Link to="/register">Ще не маєте акаунта?</Link>}
+    <div className="w-full h-full flex flex-col justify-center items-center gap-6 px-3">
+      <Toaster position="top-center" />
+      <form onSubmit={handleLoginSubmit} className="w-full max-w-sm">
+        <Card
+          size="default"
+          className="w-full max-w-sm"
+          onSubmit={handleLoginSubmit}
+        >
+          <CardHeader>
+            <CardTitle>Авторизація</CardTitle>
+            <CardDescription>
+              Введіть свої облікові дані для входу
+            </CardDescription>
+            <CardAction>
+              <Link
+                to="/register"
+                className="text-sm text-primary hover:underline"
+              >
+                Зареєструватися
+              </Link>
+            </CardAction>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-6">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Електронна пошта</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="mail@example.com"
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Пароль</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button type="submit" className="w-full hover:bg-primary/90">
+              Увійти
+            </Button>
+          </CardFooter>
+        </Card>
       </form>
     </div>
   );
