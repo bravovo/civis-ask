@@ -71,8 +71,11 @@ app.use("/api/surveys", surveysRoute);
 app.use((err, req, res, next) => {
   console.log(err);
   if (err instanceof mongoose.Error.ValidationError) {
-    const errMsg = (err.message.split(":")[2] || err.message).trim();
-    return res.status(400).json({ success: false, message: errMsg });
+    return res.status(400).json({
+      success: false,
+      message:
+        "Помилка редагування даних. Перевірте введені дані на правильність",
+    });
   }
 
   const status = err.status || 500;

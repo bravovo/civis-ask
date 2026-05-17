@@ -32,9 +32,11 @@ export const postSurvey = async (req, res, next) => {
       title: q.title,
       required: q.required,
       type: q.type,
-      options: (q.options || []).map((opt) => ({
-        value: opt.text,
-      })),
+      options: (q.options || [])
+        .map((opt) => ({
+          value: opt.text || "",
+        }))
+        .filter((opt) => opt.value.trim() !== ""),
     }));
 
     const survey = await Survey.create({
