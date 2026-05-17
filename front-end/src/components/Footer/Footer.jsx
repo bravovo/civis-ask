@@ -18,7 +18,7 @@ function Footer() {
               asChild
               className={navigationMenuTriggerStyle()}
             >
-              <Link href="/dashboard">Dashboard</Link>
+              <Link to="/dashboard">Файли</Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
         </NavigationMenuList>

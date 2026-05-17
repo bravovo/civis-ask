@@ -12,12 +12,12 @@ function Header() {
         <div className="w-full flex justify-end gap-4">
           <div>
             <Link to="/dashboard" className="hover:underline">
-              Dashboard
+              Файли
             </Link>
           </div>
           <div>
             <Link to="/profile" className="hover:underline">
-              Profile
+              Профіль
             </Link>
           </div>
         </div>

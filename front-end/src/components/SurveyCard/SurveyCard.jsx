@@ -52,9 +52,9 @@ export default function SurveyCard({
     <Link
       to={link}
       key={data._id}
-      className="w-full border border-transparent rounded-lg hover:border-primary/80 transition-colors duration-300"
+      className="w-full border border-transparent rounded-xl hover:border-border transition-colors duration-300"
     >
-      <Card className="h-[200px] flex hover:border-primary/80">
+      <Card className="h-[200px] flex">
         <CardHeader>
           <CardTitle>{data.title}</CardTitle>
           <CardDescription>

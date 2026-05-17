@@ -46,7 +46,7 @@ const surveySlice = createSlice({
           options: [
             {
               _id: nanoid(),
-              text: "Варіант відповіді 1",
+              text: "Варіант відповіді",
             },
           ],
         },
@@ -120,13 +120,25 @@ export const saveSurvey = createAsyncThunk(
 
     console.log(action);
 
-    const response = await api.post(`/surveys/survey`, {
-      ...survey,
-      status: action.status === "publish" ? "published" : "draft",
-    });
+    try {
+      const response = await api.post(`/surveys/survey`, {
+        ...survey,
+        status: action.status === "publish" ? "published" : "draft",
+      });
 
-    localStorage.removeItem("survey");
-    return response.data;
+      localStorage.removeItem("survey");
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        console.error(error.response);
+        throw new Error(
+          error.response.data.message || "Помилка збереження опитування"
+        );
+      } else {
+        console.error(error);
+        throw new Error("Помилка збереження опитування");
+      }
+    }
   }
 );
 
