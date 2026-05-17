@@ -63,14 +63,6 @@ body,
   height: 100%;
 }
 
-h2 {
-  font-size: 2rem;
-}
-
-h3 {
-  font-size: 1.5rem;
-}
-
 @theme inline {
   --font-sans: "Roboto Condensed", sans-serif;
   --font-heading: var(--font-sans);

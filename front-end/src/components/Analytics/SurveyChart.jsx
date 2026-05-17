@@ -1,6 +1,14 @@
 import { useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
 import { Bar, Pie } from "react-chartjs-2";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const options = {
   responsive: true,
@@ -24,7 +32,7 @@ const options = {
       position: "top",
     },
     title: {
-      display: true,
+      display: false,
       text: "Кількість опитаних користувачів за віковими інтервалами",
     },
   },
@@ -43,18 +51,15 @@ const dataTypes = [
 ];
 
 function SurveyChart({ data, title }) {
-  const [selectedDataType, setSelectedDataType] = useState(dataTypes[0]);
-  const [dataDropdownOpen, setDataDropdownOpen] = useState(false);
-
+  const [selectedDataType, setSelectedDataType] = useState(dataTypes[0].value);
   const [selectedDiagramType, setSelectedDiagramType] = useState(
-    diagramTypes[0]
+    diagramTypes[0].value
   );
-  const [diagramDropdownOpen, setDiagramDropdownOpen] = useState(false);
 
   const chartData = useMemo(() => {
     if (!data) return null;
-    return data[selectedDataType.value] || null;
-  }, [data, selectedDataType.value]);
+    return data[selectedDataType] || null;
+  }, [data, selectedDataType]);
 
   if (!data) {
     return (
@@ -67,71 +72,56 @@ function SurveyChart({ data, title }) {
   return (
     data && (
       <div>
-        <div className="w-full flex gap-4 justify-center mb-4">
-          <div className="w-full flex flex-col gap-1 justify-start m-0">
-            Вид діаграми
-            <button
-              type="button"
-              onClick={() => setDiagramDropdownOpen((prev) => !prev)}
-              disabled={selectedDataType.value !== "data"}
+        <div className="w-full flex gap-4 justify-start my-4">
+          <div className="grid gap-2">
+            <Label htmlFor="diagramType">Вид діаграми</Label>
+            <Select
+              value={selectedDiagramType}
+              onValueChange={(value) => setSelectedDiagramType(value)}
+              disabled={selectedDataType !== "data"}
             >
-              {selectedDiagramType.label}
-            </button>
-            {diagramDropdownOpen && (
-              <div className="flex flex-col gap-1">
-                {diagramTypes.map((option) => {
-                  if (option.value === selectedDiagramType.value) {
-                    return null;
-                  }
-                  return (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        setSelectedDiagramType(option);
-                        setDiagramDropdownOpen(false);
-                      }}
-                      type="button"
-                    >
+              <SelectTrigger id="diagramType">
+                <SelectValue placeholder="Оберіть вид діаграми" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                <SelectGroup>
+                  {diagramTypes.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
                       {option.label}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="w-full flex flex-col gap-1 justify-start m-0">
-            Дані діаграми
-            <button
-              type="button"
-              onClick={() => setDataDropdownOpen((prev) => !prev)}
+          <div className="grid gap-2">
+            <Label htmlFor="data">Дані діаграми</Label>
+            <Select
+              value={selectedDataType}
+              onValueChange={(value) => {
+                setSelectedDataType(value);
+                if (value !== "data") {
+                  setSelectedDiagramType(diagramTypes[0].value);
+                }
+              }}
             >
-              {selectedDataType.label}
-            </button>
-            {dataDropdownOpen && (
-              <div className="flex flex-col gap-1">
-                {dataTypes.map((option) => {
-                  return (
-                    <button
-                      key={option.value}
-                      className="block w-full px-4 py-2 text-left hover:bg-gray-100"
-                      onClick={() => {
-                        setSelectedDataType(option);
-                        setDataDropdownOpen(false);
-                        if (option.value !== "data") {
-                          setSelectedDiagramType(diagramTypes[0]);
-                        }
-                      }}
-                    >
+              <SelectTrigger id="data">
+                <SelectValue placeholder="Оберіть дані діаграми" />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                <SelectGroup>
+                  {dataTypes.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
                       {option.label}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
         </div>
-        {selectedDiagramType.value === "bar" ? (
-          <div className="w-full flex justify-center h-[400px]">
+        {selectedDiagramType === "bar" ? (
+          <div className="w-full max-w-2xs md:max-w-3xl flex justify-center items-center md:h-[300px] mx-auto md:my-5">
             <Bar
               options={{
                 ...options,
@@ -151,7 +141,7 @@ function SurveyChart({ data, title }) {
             />
           </div>
         ) : (
-          <div className="w-full flex justify-center h-[400px]">
+          <div className="w-full flex justify-center md:h-[400px]">
             <Pie
               options={{
                 ...options,
