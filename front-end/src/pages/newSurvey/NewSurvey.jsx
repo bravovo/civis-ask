@@ -10,16 +10,8 @@ import {
 import Question from "../../components/Question/Question";
 import { useNavigate } from "react-router-dom";
 
-import { TypographyH2 } from "@/utils/styles";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -29,10 +21,6 @@ function NewSurvey() {
   const navigate = useNavigate();
   const survey = useSelector((state) => state.survey);
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    localStorage.setItem("survey", JSON.stringify(survey));
-  }, [survey]);
 
   const handleSubmit = (type) => {
     console.log(type);
@@ -59,29 +47,34 @@ function NewSurvey() {
 
     toast.promise(promise, {
       loading: "Збереження...",
-      success: "Опитування успішно збережено",
+      success: `Опитування успішно ${type === "publish" ? "опубліковано" : "збережено"}`,
       error: (err) => {
-        return err?.message || "Помилка збереження опитування";
+        return (
+          err?.message ||
+          `Помилка ${type === "publish" ? "публікації" : "збереження"} опитування`
+        );
       },
     });
   };
 
   return (
     <div className="w-full h-full flex flex-col gap-6 px-3">
+      <div className="fixed z-50 right-0 flex gap-2 items-center justify-end bg-muted backdrop-blur-sm rounded-l-lg p-2">
+        <Button variant="outline" onClick={() => handleSubmit("save")}>
+          Зберегти
+        </Button>
+        <Button onClick={() => handleSubmit("publish")}>
+          Зберегти та опублікувати
+        </Button>
+      </div>
       <div className="w-full flex items-center justify-between">
         <Button variant="outline" onClick={() => navigate(-1)} className="w-20">
           Назад
         </Button>
-        {TypographyH2("Створення нового опитування")}
       </div>
-      <Card className="w-full" onSubmit={handleSubmit}>
+      <Card className="w-full relative" onSubmit={handleSubmit}>
         <CardHeader className="w-full flex justify-between items-center">
           <CardTitle>Введіть дані опитування та створіть питання</CardTitle>
-          <CardAction>
-            <Button variant="outline" onClick={() => handleSubmit("save")}>
-              Зберегти
-            </Button>
-          </CardAction>
         </CardHeader>
         <CardContent className="w-full">
           <div className="flex flex-col gap-6">
@@ -123,11 +116,6 @@ function NewSurvey() {
             </Button>
           </div>
         </CardContent>
-        <CardFooter className="w-full flex justify-center">
-          <Button className="w-full" onClick={() => handleSubmit("publish")}>
-            Зберегти та опублікувати
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );

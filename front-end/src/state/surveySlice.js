@@ -1,24 +1,12 @@
 import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
 import api from "../api/api";
 
-const localSurvey = localStorage.getItem("survey");
-const getInitialState = () => {
-  try {
-    if (localSurvey && localSurvey !== "undefined") {
-      return JSON.parse(localSurvey);
-    }
-  } catch (error) {
-    console.error(error);
-  }
-  return {
-    status: "draft",
-    title: "",
-    description: "",
-    questions: [],
-  };
+const initialState = {
+  status: "draft",
+  title: "",
+  description: "",
+  questions: [],
 };
-
-const initialState = getInitialState();
 
 const surveySlice = createSlice({
   name: "survey",
@@ -105,10 +93,10 @@ const surveySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(saveSurvey.fulfilled, () => {
-      return getInitialState();
+      return initialState;
     });
     builder.addCase(editSurvey.fulfilled, () => {
-      return getInitialState();
+      return initialState;
     });
   },
 });
@@ -126,7 +114,6 @@ export const saveSurvey = createAsyncThunk(
         status: action.status === "publish" ? "published" : "draft",
       });
 
-      localStorage.removeItem("survey");
       return response.data;
     } catch (error) {
       if (error.response) {
@@ -147,13 +134,24 @@ export const editSurvey = createAsyncThunk(
   async (action, { getState }) => {
     const survey = getState().survey;
 
-    const response = await api.patch(`/surveys/survey/${survey._id}/edit`, {
-      ...survey,
-      status: action.status === "publish" ? "published" : "draft",
-    });
+    try {
+      const response = await api.patch(`/surveys/survey/${survey._id}/edit`, {
+        ...survey,
+        status: action.status === "publish" ? "published" : "draft",
+      });
 
-    localStorage.removeItem("survey");
-    return response.data;
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        console.error(error.response);
+        throw new Error(
+          error.response.data.message || "Помилка збереження опитування"
+        );
+      } else {
+        console.error(error);
+        throw new Error("Помилка збереження опитування");
+      }
+    }
   }
 );
 

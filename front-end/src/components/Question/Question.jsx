@@ -106,7 +106,7 @@ function Question({ question, variant }) {
                           id={`answer-option-${opt._id}`}
                           type="text"
                           placeholder="Введіть варіант відповіді"
-                          value={opt.text ?? ""}
+                          value={opt.text ?? opt.value ?? ""}
                           onChange={(e) => {
                             dispatch(
                               editOption({

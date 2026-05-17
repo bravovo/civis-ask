@@ -195,7 +195,7 @@ function Analytics({ surveyId }) {
   if (loading) return <Loader />;
   if (!analytics) return <h4>Дані аналітики недоступні</h4>;
 
-  if (analytics.totalParticipants === 0) {
+  if (!analytics.totalParticipants || analytics.totalParticipants === 0) {
     return (
       <Empty className="w-full h-full flex justify-center items-center">
         <EmptyHeader>
