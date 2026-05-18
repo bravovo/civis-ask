@@ -14,13 +14,20 @@ import DeleteAccountDialog from "../../components/ui/dialogs/DeleteAccountDialog
 import Tabs from "../../components/Tabs/Tabs";
 
 import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemTitle,
+} from "@/components/ui/item";
+
+import {
   Card,
   CardAction,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { TypographyH2, TypographyH3 } from "../../utils/styles";
+import { TypographyH2, TypographyH3, TypographyLead } from "../../utils/styles";
 import LogoutDialog from "@/components/ui/dialogs/LogoutDialog";
 
 import { Button } from "@/components/ui/button";
@@ -118,21 +125,61 @@ function Profile() {
       </div>
       <Card className="w-full">
         <CardHeader className="w-full flex justify-between items-center">
-          <CardTitle>
-            {TypographyH3(
-              formatUserFullName({
-                firstName: profile.firstName,
-                lastName: profile.lastName,
-              })
-            )}
-            {TypographyH3(profile.email)}
-            {profile.role === "admin" ? TypographyH3("Адміністратор") : null}
-            {profile.age ? TypographyH3("Вік: " + profile.age) : null}
-            {profile.gender
-              ? TypographyH3(
-                  "Стать: " + (profile.gender === "male" ? "Чоловік" : "Жінка")
-                )
-              : null}
+          <CardTitle className="w-full flex flex-col md:flex-row gap-6">
+            <div className="block md:hidden">
+              {TypographyLead(
+                formatUserFullName({
+                  firstName: profile.firstName,
+                  lastName: profile.lastName,
+                })
+              )}
+              {TypographyLead(profile.email)}
+              {profile.role === "admin" ? TypographyH3("Адміністратор") : null}
+              {profile.age ? TypographyLead("Вік: " + profile.age) : null}
+              {profile.gender
+                ? TypographyLead(
+                    "Стать: " +
+                      (profile.gender === "male" ? "Чоловік" : "Жінка")
+                  )
+                : null}
+            </div>
+            <Item
+              variant="muted"
+              className="hidden md:block hover:bg-background hover:border-border transition-colors duration-200"
+            >
+              <ItemContent>
+                <ItemTitle>{TypographyH3(`Загальна інформація`)}</ItemTitle>
+                <ItemDescription>
+                  {TypographyLead(
+                    formatUserFullName({
+                      firstName: profile.firstName,
+                      lastName: profile.lastName,
+                    })
+                  )}
+                  {TypographyLead(profile.email)}
+                  {profile.role === "admin"
+                    ? TypographyH3("Адміністратор")
+                    : null}
+                </ItemDescription>
+              </ItemContent>
+            </Item>
+            <Item
+              variant="contrast"
+              className="hidden md:block mr-6 hover:border-transparent hover:bg-muted/50 transition-colors duration-200"
+            >
+              <ItemContent>
+                <ItemTitle>{TypographyH3(`Демографічна інформація`)}</ItemTitle>
+                <ItemDescription>
+                  {profile.age ? TypographyLead("Вік: " + profile.age) : null}
+                  {profile.gender
+                    ? TypographyLead(
+                        "Стать: " +
+                          (profile.gender === "male" ? "Чоловік" : "Жінка")
+                      )
+                    : null}
+                </ItemDescription>
+              </ItemContent>
+            </Item>
           </CardTitle>
           <CardAction>
             <div className="flex flex-col gap-4">
