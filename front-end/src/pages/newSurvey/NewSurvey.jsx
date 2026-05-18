@@ -1,5 +1,3 @@
-import { useEffect, useRef } from "react";
-import FormInput from "../../components/ui/FormInput/FormInput";
 import { useSelector, useDispatch } from "react-redux";
 import {
   addQuestion,
@@ -72,7 +70,7 @@ function NewSurvey() {
           Назад
         </Button>
       </div>
-      <Card className="w-full relative" onSubmit={handleSubmit}>
+      <Card className="w-full" onSubmit={handleSubmit}>
         <CardHeader className="w-full flex justify-between items-center">
           <CardTitle>Введіть дані опитування та створіть питання</CardTitle>
         </CardHeader>

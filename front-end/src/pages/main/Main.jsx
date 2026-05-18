@@ -7,15 +7,8 @@ import Loader from "../../components/ui/Loader/Loader";
 import SurveyCard from "../../components/SurveyCard/SurveyCard";
 
 import { Button } from "@/components/ui/button";
-
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@/components/ui/empty";
 import { TypographyH2 } from "../../utils/styles.jsx";
+import EmptyComponent from "@/components/EmptyComponent/EmptyComponent";
 
 function Main() {
   const navigate = useNavigate();
@@ -54,19 +47,12 @@ function Main() {
       <div className="w-full h-full flex flex-col items-center justify-center gap-2">
         {surveys.status === "success" &&
         (!surveys.items || surveys.items.length === 0) ? (
-          <Empty className="w-full h-full flex justify-center items-center">
-            <EmptyHeader>
-              <EmptyTitle>Опитувань не знайдено</EmptyTitle>
-              <EmptyDescription>
-                Створіть нове опитування, щоб побачити його у списку
-              </EmptyDescription>
-            </EmptyHeader>
-            <EmptyContent>
-              <Button onClick={() => navigate("/new-survey")}>
-                Створити опитування
-              </Button>
-            </EmptyContent>
-          </Empty>
+          <EmptyComponent
+            title="Опитувань не знайдено"
+            description="Створіть нове опитування, щоб побачити його у списку"
+            buttonText="Створити опитування"
+            buttonLink="/new-survey"
+          />
         ) : (
           <div className="w-full h-full flex flex-col gap-2 pt-3">
             {surveys.items.map((s) => {

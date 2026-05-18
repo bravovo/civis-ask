@@ -224,6 +224,7 @@ function Register() {
                     id="age"
                     type="number"
                     placeholder="16"
+                    min={16}
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
                     required

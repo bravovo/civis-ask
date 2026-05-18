@@ -1,70 +1,95 @@
 import { useState } from "react";
-import Dialog from "./Dialog";
-import FormInput from "../FormInput/FormInput";
 import { useDispatch } from "react-redux";
 import { deleteAccount } from "../../../state/profileSlice";
-import Loader from "../Loader/Loader";
 import { useNavigate } from "react-router-dom";
 
-function DeleteAccountDialog({ profile, open, onClose }) {
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import { Field, FieldGroup } from "@/components/ui/field";
+
+function DeleteAccountDialog() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  const handleClose = () => {
-    if (profile.status !== "loading") {
-      setError("");
-      setPassword("");
-      onClose();
-    }
-  };
+  const [open, setOpen] = useState(false);
 
   async function handleDeleteAccount(e) {
     e.preventDefault();
 
     if (!password) {
-      setError(
-        "Будь ласка, введіть пароль для підтвердження видалення облікового запису."
+      toast.error(
+        "Будь ласка, введіть пароль для підтвердження видалення облікового запису"
       );
       return;
     }
 
-    dispatch(deleteAccount({ password }))
-      .unwrap()
-      .then(() => {
+    const promise = dispatch(deleteAccount({ password })).unwrap();
+
+    toast.promise(promise, {
+      loading: "Видалення акаунту...",
+      success: () => {
+        setPassword("");
         navigate("/login", { state: { deletedAccount: true } });
-      })
-      .catch((err) => {
-        setError(err);
-      });
+        return "Акаунт успішно видалено";
+      },
+      error: (err) => err || "Помилка при видаленні акаунту",
+    });
   }
 
   return (
-    <Dialog
-      title={"Видалити обліковий запис"}
-      open={open}
-      onClose={handleClose}
-    >
-      {profile.status === "loading" && <Loader />}
-      <form
-        onSubmit={handleDeleteAccount}
-        className="w-full flex flex-col justify-center items-center gap-3"
-      >
-        <FormInput
-          title="Пароль"
-          name="userPassword"
-          onChange={(e) => setPassword(e.target.value)}
-          type="password"
-          value={password}
-        />
-        {error && (
-          <p className="text-red-500 w-full flex justify-start">{error}</p>
-        )}
-        <div className="w-full flex justify-end gap-2">
-          <button type="submit">Видалити</button>
-        </div>
-      </form>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button type="button" variant="destructive">
+          Видалити акаунт
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-sm">
+        <form onSubmit={handleDeleteAccount} className="space-y-6">
+          <DialogHeader>
+            <DialogTitle>Видалити обліковий запис</DialogTitle>
+            <DialogDescription>
+              Для підтвердження видалення введіть пароль
+            </DialogDescription>
+          </DialogHeader>
+          <FieldGroup>
+            <Field>
+              <Label htmlFor="userPassword">Пароль</Label>
+              <Input
+                id="userPassword"
+                type="password"
+                placeholder="Почніть вводити..."
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </Field>
+          </FieldGroup>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                Скасувати
+              </Button>
+            </DialogClose>
+            <Button type="submit" variant="destructive">
+              Видалити акаунт
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 }

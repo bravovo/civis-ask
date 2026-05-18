@@ -90,7 +90,7 @@ function EditSurvey() {
           Назад
         </Button>
       </div>
-      <Card className="w-full relative" onSubmit={handleSubmit}>
+      <Card className="w-full" onSubmit={handleSubmit}>
         <CardHeader className="w-full flex justify-between items-center">
           <CardTitle>Введіть дані опитування та створіть питання</CardTitle>
         </CardHeader>
