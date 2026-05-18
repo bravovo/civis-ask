@@ -82,10 +82,7 @@ export const deleteUser = async (req, res, next) => {
       });
     }
 
-    const result = await deleteUserData(id, password);
-    if (!result) {
-      throw new Error("Не вдалося видалити користувача");
-    }
+    await deleteUserData(id, password);
 
     res.clearCookie("token", {
       httpOnly: true,
