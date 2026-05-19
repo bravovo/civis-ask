@@ -1,7 +1,20 @@
 import { useDispatch } from "react-redux";
 import { addOption, editOption, editQuestion } from "../../state/surveySlice";
 
-function Question({ question }) {
+import { Item, ItemContent, ItemDescription } from "@/components/ui/item";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+import {
+  Field,
+  FieldContent,
+  FieldLabel,
+  FieldTitle,
+} from "@/components/ui/field";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
+
+function Question({ question, variant }) {
   const dispatch = useDispatch();
 
   const changeQuestionType = (newType) => {
@@ -23,67 +36,78 @@ function Question({ question }) {
   };
 
   return (
-    <div className="border-[1px] rounded-2xl border-zinc-400 py-6 px-5 w-full flex flex-col gap-6">
-      <div className="flex flex-col gap-4">
-        <div>
-          <div className="w-full flex flex-col gap-1 justify-start m-0">
-            <label htmlFor="question-title" className="text-[16px]">
-              Текст питання
-            </label>
-            <input
-              type="text"
-              required
-              name="question-title"
-              value={question.title}
-              onChange={(e) => editQuestionTitle(e.target.value)}
-              className="border-[1px] rounded-[4px] border-zinc-400 py-1.5 px-3"
-            />
-          </div>
-        </div>
-        <div>
-          <div className="w-full flex flex-col gap-1 justify-start m-0">
-            Тип відповіді
-            <div className="flex flex-row justify-center items-center gap-6">
-              <label htmlFor="answer-type" className="flex flex-row gap-1.5">
-                Одинарний вибір
-                <input
-                  type="radio"
-                  name={`${question._id}-answer-type`}
-                  onChange={() => changeQuestionType("radio")}
-                  checked={question.type === "radio"}
-                  className="border-[1px] rounded-[4px] border-zinc-400 py-1.5 px-3"
-                />
-              </label>
-              <label htmlFor="answer-type" className="flex flex-row gap-1.5">
-                Множинний вибір
-                <input
-                  type="radio"
-                  name={`${question._id}-answer-type`}
-                  onChange={() => changeQuestionType("check")}
-                  checked={question.type === "check"}
-                  className="border-[1px] rounded-[4px] border-zinc-400 py-1.5 px-3"
-                />
-              </label>
+    <Item variant={variant}>
+      <ItemContent>
+        <ItemDescription>
+          <div className="flex flex-col gap-4">
+            <div>
+              <div className="w-full flex flex-col gap-1 justify-start m-0">
+                <div className="grid gap-2">
+                  <Label htmlFor={`question-title-${question._id}`}>
+                    Текст питання
+                  </Label>
+                  <Input
+                    id={`question-title-${question._id}`}
+                    type="text"
+                    value={question.title || ""}
+                    placeholder="Введіть питання"
+                    onChange={(e) => editQuestionTitle(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div>
-          {question.type !== "text" && (
-            <div className="flex flex-col gap-2">
-              Варіанти відповіді
-              <div className="flex flex-col gap-1 w-full">
-                {question.options.length > 0 &&
-                  question.options.map((opt) => {
-                    return (
-                      <label
-                        className="w-full"
-                        htmlFor="answer-option"
-                        key={opt._id}
-                      >
-                        <input
-                          className="w-full"
+            <div>
+              <div className="w-full flex flex-col gap-1 justify-start m-0">
+                <Label htmlFor="surveyTitle">Тип відповіді</Label>
+                <RadioGroup
+                  value={question.type || "radio"}
+                  onValueChange={(value) => changeQuestionType(value)}
+                  className="grid w-full grid-cols-1 sm:grid-cols-2 gap-4"
+                >
+                  <FieldLabel
+                    htmlFor={`radio-${question._id}`}
+                    className="cursor-pointer"
+                  >
+                    <Field orientation="horizontal">
+                      <FieldContent>
+                        <FieldTitle>Одинарний вибір</FieldTitle>
+                      </FieldContent>
+                      <RadioGroupItem
+                        value="radio"
+                        id={`radio-${question._id}`}
+                      />
+                    </Field>
+                  </FieldLabel>
+                  <FieldLabel
+                    htmlFor={`check-${question._id}`}
+                    className="cursor-pointer"
+                  >
+                    <Field orientation="horizontal">
+                      <FieldContent>
+                        <FieldTitle>Множинний вибір</FieldTitle>
+                      </FieldContent>
+                      <RadioGroupItem
+                        value="check"
+                        id={`check-${question._id}`}
+                      />
+                    </Field>
+                  </FieldLabel>
+                </RadioGroup>
+              </div>
+            </div>
+            <div>
+              <div className="flex flex-col gap-2">
+                <Label>Варіанти відповіді</Label>
+                <div className="flex flex-col gap-1 w-full">
+                  {question.options.length > 0 &&
+                    question.options.map((opt) => {
+                      return (
+                        <Input
+                          key={opt._id}
+                          id={`answer-option-${opt._id}`}
                           type="text"
-                          name="answer-option"
+                          placeholder="Введіть варіант відповіді"
                           value={opt.text ?? opt.value ?? ""}
                           onChange={(e) => {
                             dispatch(
@@ -94,22 +118,24 @@ function Question({ question }) {
                               })
                             );
                           }}
+                          required
                         />
-                      </label>
-                    );
-                  })}
+                      );
+                    })}
+                </div>
+                <Button
+                  type="button"
+                  variant="contrast"
+                  onClick={() => dispatch(addOption(question._id))}
+                >
+                  Додати варіант відповіді
+                </Button>
               </div>
-              <button
-                type="button"
-                onClick={() => dispatch(addOption(question._id))}
-              >
-                Додати ще
-              </button>
             </div>
-          )}
-        </div>
-      </div>
-    </div>
+          </div>
+        </ItemDescription>
+      </ItemContent>
+    </Item>
   );
 }
 

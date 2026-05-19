@@ -5,6 +5,20 @@ import { Chart as ChartJS, registerables } from "chart.js";
 import SurveyChart from "./SurveyChart";
 import Loader from "../../components/ui/Loader/Loader";
 import { chartColors } from "../../constants/constants";
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemTitle,
+} from "@/components/ui/item";
+import { TypographyH2, TypographyH3 } from "@/utils/styles";
+
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
 ChartJS.register(...registerables);
 
@@ -36,11 +50,6 @@ const options = {
   },
   maintainAspectRatio: true,
 };
-
-const diagramTypes = [
-  { value: "bar", label: "Стовпчаста діаграма" },
-  { value: "pie", label: "Кругова діаграма" },
-];
 
 function Analytics({ surveyId }) {
   const [analytics, setAnalytics] = useState(null);
@@ -120,7 +129,6 @@ function Analytics({ surveyId }) {
             labels: optionLabels,
             datasets: [
               {
-                label: "Кількість користувачів",
                 data: question.results.map((r) => r.count),
                 backgroundColor: optionLabels.map((_, index) => {
                   return availableColors[index % availableColors.length];
@@ -186,58 +194,72 @@ function Analytics({ surveyId }) {
   if (loading) return <Loader />;
   if (!analytics) return <h4>Дані аналітики недоступні</h4>;
 
+  if (!analytics.totalParticipants || analytics.totalParticipants === 0) {
+    return (
+      <Empty className="w-full h-full flex justify-center items-center">
+        <EmptyHeader>
+          <EmptyTitle>Занадто мало даних для формування аналітики</EmptyTitle>
+          <EmptyDescription>
+            Пройдіть це опитування, щоб побачити аналітику по ньому
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+    );
+  }
+
   return (
-    <div>
-      <h3>
-        Загальна кількість опитаних користувачів: {analytics.totalParticipants}
-      </h3>
-      <div className="flex flex-row gap-4">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "300px",
-            width: "100%",
-            maxWidth: "800px",
-            margin: "20px auto",
-          }}
-        >
-          <Bar options={options} data={formattedData.ageChartData} />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "300px",
-            width: "100%",
-            maxWidth: "800px",
-            margin: "20px auto",
-          }}
-        >
-          <Bar
-            options={{
-              ...options,
-              plugins: {
-                ...options.plugins,
-                title: {
-                  ...options.plugins.title,
-                  text: "Кількість опитаних користувачів за статтю",
-                },
-              },
-            }}
-            data={formattedData.genderChartData}
-          />
-        </div>
+    <div className="w-full h-full flex flex-col gap-6 px-3">
+      <div className="w-full h-full mt-3">
+        <Item variant="muted">
+          <ItemContent>
+            <ItemTitle>
+              {TypographyH2(
+                `Загальна кількість опитаних користувачів: ${analytics.totalParticipants}`
+              )}
+            </ItemTitle>
+            <ItemDescription>
+              <div className="flex flex-col md:flex-row gap-0 md:gap-4">
+                <div className="w-full max-w-2xs md:max-w-3xl flex justify-center items-center md:h-[300px] mx-auto md:my-5">
+                  <Bar options={options} data={formattedData.ageChartData} />
+                </div>
+                <div className="w-full max-w-2xs md:max-w-3xl flex justify-center items-center md:h-[300px] mx-auto md:my-5">
+                  <Bar
+                    options={{
+                      ...options,
+                      plugins: {
+                        ...options.plugins,
+                        title: {
+                          ...options.plugins.title,
+                          text: "Кількість опитаних користувачів за статтю",
+                        },
+                      },
+                    }}
+                    data={formattedData.genderChartData}
+                  />
+                </div>
+              </div>
+            </ItemDescription>
+          </ItemContent>
+        </Item>
       </div>
-      <h3>Статистика по питанням:</h3>
+      <div className="w-full flex justify-center">
+        {TypographyH2("Статистика по кожному питанню")}
+      </div>
       {formattedData.questionsChartData.map((questionData, index) => (
-        <SurveyChart
-          key={index}
-          data={questionData}
-          title={questionData.title}
-        />
+        <Item variant={index % 2 === 0 ? "outline" : "muted"} key={index}>
+          <ItemContent>
+            <ItemTitle>
+              {TypographyH3(`Питання ${index + 1}: ${questionData.title}`)}
+            </ItemTitle>
+            <ItemDescription>
+              <SurveyChart
+                key={index}
+                data={questionData}
+                title={questionData.title}
+              />
+            </ItemDescription>
+          </ItemContent>
+        </Item>
       ))}
     </div>
   );

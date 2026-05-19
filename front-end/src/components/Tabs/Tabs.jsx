@@ -1,29 +1,32 @@
-import { useState } from "react";
+import {
+  Tabs as StyledTabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/ui/tabs";
 
 function Tabs({ tabs }) {
-  const [activeTab, setActiveTab] = useState(tabs[0]);
-
   if (!Boolean(tabs)) {
     return null;
   }
 
   return (
-    <>
-      <div className="h-16 border-t-[1px] border-zinc-400 flex flex-row justify-between items-center-safe gap-2">
+    <StyledTabs defaultValue={tabs[0].id} className="w-full h-full">
+      <TabsList variant="line" className="w-full justify-start">
         {tabs.map((tab) => {
           return (
-            <button
-              key={tab.id}
-              className={`w-full !border-none hover:!shadow-none hover:!transform-none ${activeTab.id === tab.id ? "!bg-gray-700 !text-white" : "hover:!bg-gray-400"}`}
-              onClick={() => setActiveTab(tab)}
-            >
+            <TabsTrigger key={tab.id} value={tab.id} className="text-[16px]">
               {tab.label}
-            </button>
+            </TabsTrigger>
           );
         })}
-      </div>
-      {activeTab.children}
-    </>
+      </TabsList>
+      {tabs.map((tab) => (
+        <TabsContent key={tab.id} value={tab.id}>
+          {tab.children}
+        </TabsContent>
+      ))}
+    </StyledTabs>
   );
 }
 

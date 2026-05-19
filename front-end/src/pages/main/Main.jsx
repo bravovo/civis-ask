@@ -1,15 +1,18 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getPublishedSurveys } from "../../state/surveysSlice";
 import Popup from "../../components/ui/Popup/Popup";
 import Loader from "../../components/ui/Loader/Loader";
 import SurveyCard from "../../components/SurveyCard/SurveyCard";
 
+import { Button } from "@/components/ui/button";
+import { TypographyH2 } from "../../utils/styles.jsx";
+import EmptyComponent from "@/components/EmptyComponent/EmptyComponent";
+
 function Main() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.profile);
 
   const surveys = useSelector((state) => state.surveyList);
 
@@ -32,19 +35,30 @@ function Main() {
   }
 
   return (
-    <div className="w-full flex flex-col gap-2">
-      <h2>Ласкаво просимо на головну сторінку, {user.firstName}</h2>
-      <button onClick={() => navigate("/new-survey")}>
+    <div className="w-full h-full flex flex-col gap-2 px-3">
+      {TypographyH2("Почніть створення власних опитувань")}
+      <Button
+        className="h-10"
+        variant="outline"
+        onClick={() => navigate("/new-survey")}
+      >
         Створити опитування
-      </button>
-      <div className="flex flex-col items-center justify-center gap-2">
+      </Button>
+      <div className="w-full h-full flex flex-col items-center justify-center gap-2">
         {surveys.status === "success" &&
         (!surveys.items || surveys.items.length === 0) ? (
-          <h2>Опитувань не знайдено</h2>
+          <EmptyComponent
+            title="Опитувань не знайдено"
+            description="Створіть нове опитування, щоб побачити його у списку"
+            buttonText="Створити опитування"
+            buttonLink="/new-survey"
+          />
         ) : (
-          surveys.items.map((s) => {
-            return <SurveyCard key={s._id} data={s} />;
-          })
+          <div className="w-full h-full flex flex-col gap-2 pt-3">
+            {surveys.items.map((s) => {
+              return <SurveyCard key={s._id} data={s} />;
+            })}
+          </div>
         )}
       </div>
     </div>

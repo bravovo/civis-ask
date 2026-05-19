@@ -72,36 +72,30 @@ export const updatePassword = async (id, currentPassword, newPassword) => {
 };
 
 export const deleteUserData = async (id, password) => {
-  try {
-    if (!password) {
-      const error = new Error("Пароль обов'язковий для видалення акаунта");
-      error.status = 400;
-      throw error;
-    }
-
-    const user = await User.findById(id);
-
-    if (!user) {
-      const error = new Error("Користувача не знайдено");
-      error.status = 404;
-      throw error;
-    }
-
-    const isMatch = await user.comparePasswords(password);
-    if (!isMatch) {
-      const error = new Error("Невірний пароль");
-      error.status = 400;
-      throw error;
-    }
-
-    await Survey.deleteMany({ author: id });
-
-    await SurveyTake.deleteMany({ user: id });
-
-    await User.findByIdAndDelete(id);
-  } catch (error) {
-    console.log(error.message);
-    return false;
+  if (!password) {
+    const error = new Error("Пароль обов'язковий для видалення акаунта");
+    error.status = 400;
+    throw error;
   }
-  return true;
+
+  const user = await User.findById(id);
+
+  if (!user) {
+    const error = new Error("Користувача не знайдено");
+    error.status = 404;
+    throw error;
+  }
+
+  const isMatch = await user.comparePasswords(password);
+  if (!isMatch) {
+    const error = new Error("Невірний пароль");
+    error.status = 400;
+    throw error;
+  }
+
+  await Survey.deleteMany({ author: id });
+
+  await SurveyTake.deleteMany({ user: id });
+
+  await User.findByIdAndDelete(id);
 };

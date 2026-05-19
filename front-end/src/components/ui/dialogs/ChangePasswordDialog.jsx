@@ -1,72 +1,125 @@
-import { useEffect, useState } from "react";
-import Dialog from "./Dialog";
-import FormInput from "../FormInput/FormInput";
+import { useState } from "react";
 import { changePassword } from "../../../state/profileSlice";
 import { useDispatch } from "react-redux";
-import Loader from "../Loader/Loader";
 
-function ChangePasswordDialog({ profile, open, onClose }) {
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import { Field, FieldGroup } from "@/components/ui/field";
+
+function ChangePasswordDialog() {
   const dispatch = useDispatch();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-
-  const [error, setError] = useState("");
-
-  const handleClose = () => {
-    if (profile.status !== "loading") {
-      setError("");
-      setCurrentPassword("");
-      setNewPassword("");
-      onClose();
-    }
-  };
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleChangePassword(e) {
     e.preventDefault();
 
+    if (isSubmitting) return;
+
     if (!currentPassword || !newPassword) {
-      setError("Будь ласка, заповніть всі поля.");
+      toast.error("Будь ласка, заповніть всі поля");
       return;
     }
 
-    dispatch(changePassword({ currentPassword, newPassword }))
-      .unwrap()
-      .then(() => {
-        handleClose();
-      })
-      .catch((err) => {
-        setError(err);
+    if (newPassword.length < 8) {
+      toast.error("Новий пароль повинен містити не менше 8 символів");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const promise = dispatch(
+        changePassword({ currentPassword, newPassword })
+      ).unwrap();
+
+      toast.promise(promise, {
+        loading: "Зміна пароля...",
+        success: () => {
+          setCurrentPassword("");
+          setNewPassword("");
+          setOpen(false);
+          return "Пароль успішно змінено";
+        },
+        error: (err) => err || "Помилка при зміні пароля",
       });
+
+      await promise;
+
+      setOpen(false);
+    } catch (err) {
+      console.error(err);
+      setIsSubmitting(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
-    <Dialog title="Змінити пароль" open={open} onClose={handleClose}>
-      {profile.status === "loading" && <Loader />}
-      <form
-        onSubmit={handleChangePassword}
-        className="w-full flex flex-col justify-center items-center gap-3"
-      >
-        <FormInput
-          title="Поточний пароль"
-          name="userCurrentPassword"
-          onChange={(e) => setCurrentPassword(e.target.value)}
-          type="password"
-          value={currentPassword}
-        />
-        <FormInput
-          title="Новий пароль"
-          name="userNewPassword"
-          onChange={(e) => setNewPassword(e.target.value)}
-          type="password"
-          value={newPassword}
-        />
-        {error && (
-          <p className="text-red-500 w-full flex justify-start">{error}</p>
-        )}
-        <div className="w-full flex justify-end gap-2">
-          <button type="submit">Змінити</button>
-        </div>
-      </form>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button type="button">Змінити пароль</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-sm">
+        <form onSubmit={handleChangePassword} className="space-y-6">
+          <DialogHeader>
+            <DialogTitle>Змінити пароль</DialogTitle>
+            <DialogDescription>
+              Для зміни паролю введіть поточний пароль та новий пароль
+            </DialogDescription>
+          </DialogHeader>
+          <FieldGroup>
+            <Field>
+              <Label htmlFor="userCurrentPassword">Поточний пароль</Label>
+              <Input
+                id="userCurrentPassword"
+                type="password"
+                placeholder="Почніть вводити..."
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                required
+              />
+            </Field>
+            <Field>
+              <Label htmlFor="userNewPassword">Новий пароль</Label>
+              <Input
+                id="userNewPassword"
+                type="password"
+                placeholder="Почніть вводити..."
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
+            </Field>
+          </FieldGroup>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                Скасувати
+              </Button>
+            </DialogClose>
+            <Button type="submit" disabled={isSubmitting}>
+              Зберегти зміни
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 }

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api/api";
+import axios from "axios";
 
 const createInitialState = () => ({
   firstName: "",
@@ -261,10 +262,21 @@ export const editProfile = createAsyncThunk(
         return response.data.user;
       }
     } catch (error) {
-      console.error(error);
+      if (axios.isAxiosError(error) && error.code === "ERR_NETWORK") {
+        return rejectWithValue(
+          "Невдалось з'єднатись з сервером. Будь ласка, спробуйте пізніше"
+        );
+      }
+
+      if (error.response && error.response.data) {
+        return rejectWithValue(
+          error.response.data.message ||
+            "Не вдалось оновити профіль. Спробуйте ще раз"
+        );
+      }
+
       return rejectWithValue(
-        error.response?.data?.message ||
-          "Неможливо зберегти профіль. Спробуйте ще раз."
+        error.message || "Не вдалось оновити профіль. Спробуйте ще раз"
       );
     }
   }
@@ -284,10 +296,21 @@ export const changePassword = createAsyncThunk(
         return response.data.message;
       }
     } catch (error) {
-      console.error(error);
+      if (axios.isAxiosError(error) && error.code === "ERR_NETWORK") {
+        return rejectWithValue(
+          "Невдалось з'єднатись з сервером. Будь ласка, спробуйте пізніше"
+        );
+      }
+
+      if (error.response && error.response.data) {
+        return rejectWithValue(
+          error.response.data.message ||
+            "Не вдалось змінити пароль. Спробуйте ще раз"
+        );
+      }
+
       return rejectWithValue(
-        error.response?.data?.message ||
-          "Неможливо змінити пароль. Спробуйте ще раз."
+        error.message || "Не вдалось змінити пароль. Спробуйте ще раз"
       );
     }
   }
@@ -307,10 +330,21 @@ export const deleteAccount = createAsyncThunk(
         return "Акаунт успішно видалено";
       }
     } catch (error) {
-      console.error(error);
+      if (axios.isAxiosError(error) && error.code === "ERR_NETWORK") {
+        return rejectWithValue(
+          "Невдалось з'єднатись з сервером. Будь ласка, спробуйте пізніше"
+        );
+      }
+
+      if (error.response && error.response.data) {
+        return rejectWithValue(
+          error.response.data.message ||
+            "Не вдалось видалити акаунт. Спробуйте ще раз"
+        );
+      }
+
       return rejectWithValue(
-        error.response?.data?.message ||
-          "Неможливо видалити акаунт. Спробуйте ще раз."
+        error.message || "Не вдалось видалити акаунт. Спробуйте ще раз"
       );
     }
   }
@@ -327,9 +361,21 @@ export const logout = createAsyncThunk(
         return "Ви успішно вийшли з акаунта";
       }
     } catch (error) {
+      if (axios.isAxiosError(error) && error.code === "ERR_NETWORK") {
+        return rejectWithValue(
+          "Невдалось з'єднатись з сервером. Будь ласка, спробуйте пізніше"
+        );
+      }
+
+      if (error.response && error.response.data) {
+        return rejectWithValue(
+          error.response.data.message ||
+            "Не вдалось вийти з акаунта. Спробуйте ще раз"
+        );
+      }
+
       return rejectWithValue(
-        error.response?.data?.message ||
-          "Неможливо вийти з акаунта. Спробуйте ще раз."
+        error.message || "Не вдалось вийти з акаунта. Спробуйте ще раз"
       );
     }
   }

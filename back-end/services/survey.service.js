@@ -162,7 +162,12 @@ export const getAnalyticsForSurvey = async (surveyId) => {
           {
             $unwind: {
               path: "$answers.answer",
-              preserveNullAndEmptyArrays: true,
+              preserveNullAndEmptyArrays: false,
+            },
+          },
+          {
+            $match: {
+              "answers.answer": { $nin: [null, "", undefined] },
             },
           },
           {
