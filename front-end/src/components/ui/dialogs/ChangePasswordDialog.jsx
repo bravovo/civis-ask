@@ -25,9 +25,12 @@ function ChangePasswordDialog() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleChangePassword(e) {
     e.preventDefault();
+
+    if (isSubmitting) return;
 
     if (!currentPassword || !newPassword) {
       toast.error("Будь ласка, заповніть всі поля");
@@ -39,20 +42,33 @@ function ChangePasswordDialog() {
       return;
     }
 
-    const promise = dispatch(
-      changePassword({ currentPassword, newPassword })
-    ).unwrap();
+    setIsSubmitting(true);
 
-    toast.promise(promise, {
-      loading: "Зміна пароля...",
-      success: () => {
-        setCurrentPassword("");
-        setNewPassword("");
-        setOpen(false);
-        return "Пароль успішно змінено";
-      },
-      error: (err) => err || "Помилка при зміні пароля",
-    });
+    try {
+      const promise = dispatch(
+        changePassword({ currentPassword, newPassword })
+      ).unwrap();
+
+      toast.promise(promise, {
+        loading: "Зміна пароля...",
+        success: () => {
+          setCurrentPassword("");
+          setNewPassword("");
+          setOpen(false);
+          return "Пароль успішно змінено";
+        },
+        error: (err) => err || "Помилка при зміні пароля",
+      });
+
+      await promise;
+
+      setOpen(false);
+    } catch (err) {
+      console.error(err);
+      setIsSubmitting(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -98,7 +114,9 @@ function ChangePasswordDialog() {
                 Скасувати
               </Button>
             </DialogClose>
-            <Button type="submit">Зберегти зміни</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              Зберегти зміни
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

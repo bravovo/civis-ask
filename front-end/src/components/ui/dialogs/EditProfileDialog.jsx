@@ -41,11 +41,14 @@ function EditProfileDialog({ profile }) {
   const [age, setAge] = useState(profile.age || "");
   const [gender, setGender] = useState(profile.gender || "");
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSaveEditedProfile(e) {
+  async function handleSaveEditedProfile(e) {
     e.preventDefault();
 
-    if (!firstName || !lastName || !age) {
+    if (isSubmitting) return;
+
+    if (!firstName || !lastName || !age || !gender) {
       toast.error("Неможливо зберегти профіль. Будь ласка, заповніть всі поля");
       return;
     }
@@ -55,23 +58,28 @@ function EditProfileDialog({ profile }) {
       return;
     }
 
-    if (gender === "Оберіть стать") {
-      toast.error("Будь ласка, виберіть стать");
-      return;
+    setIsSubmitting(true);
+
+    try {
+      const promise = dispatch(
+        editProfile({ firstName, lastName, age: Number(age), gender })
+      ).unwrap();
+
+      toast.promise(promise, {
+        loading: "Оновлення профілю...",
+        success: "Профіль успішно оновлено",
+        error: (err) => err || "Помилка при оновленні профілю",
+      });
+
+      await promise;
+
+      setOpen(false);
+    } catch (err) {
+      console.error(err);
+      setIsSubmitting(false);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const promise = dispatch(
-      editProfile({ firstName, lastName, age, gender: gender })
-    ).unwrap();
-
-    toast.promise(promise, {
-      loading: "Оновлення профілю...",
-      success: () => {
-        setOpen(false);
-        return "Профіль успішно оновлено";
-      },
-      error: (err) => err || "Помилка при оновленні профілю",
-    });
   }
 
   return (
@@ -150,7 +158,9 @@ function EditProfileDialog({ profile }) {
                 Скасувати
               </Button>
             </DialogClose>
-            <Button type="submit">Зберегти зміни</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              Зберегти зміни
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

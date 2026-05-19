@@ -26,9 +26,12 @@ function DeleteAccountDialog() {
   const dispatch = useDispatch();
   const [password, setPassword] = useState("");
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleDeleteAccount(e) {
     e.preventDefault();
+
+    if (isSubmitting) return;
 
     if (!password) {
       toast.error(
@@ -37,17 +40,30 @@ function DeleteAccountDialog() {
       return;
     }
 
-    const promise = dispatch(deleteAccount({ password })).unwrap();
+    setIsSubmitting(true);
 
-    toast.promise(promise, {
-      loading: "Видалення акаунту...",
-      success: () => {
-        setPassword("");
-        navigate("/login", { state: { deletedAccount: true } });
-        return "Акаунт успішно видалено";
-      },
-      error: (err) => err || "Помилка при видаленні акаунту",
-    });
+    try {
+      const promise = dispatch(deleteAccount({ password })).unwrap();
+
+      toast.promise(promise, {
+        loading: "Видалення акаунту...",
+        success: () => {
+          setPassword("");
+          navigate("/login", { state: { deletedAccount: true } });
+          return "Акаунт успішно видалено";
+        },
+        error: (err) => err || "Помилка при видаленні акаунту",
+      });
+
+      await promise;
+
+      setOpen(false);
+    } catch (err) {
+      console.error(err);
+      setIsSubmitting(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -84,7 +100,7 @@ function DeleteAccountDialog() {
                 Скасувати
               </Button>
             </DialogClose>
-            <Button type="submit" variant="destructive">
+            <Button type="submit" variant="destructive" disabled={isSubmitting}>
               Видалити акаунт
             </Button>
           </DialogFooter>
