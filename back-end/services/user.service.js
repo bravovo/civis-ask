@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import Survey from "../models/survey.model.js";
 import SurveyTake from "../models/surveyTake.model.js";
+import mongoose from "mongoose";
 
 export const updateUser = async (id, updateData) => {
   console.log("updateData:", updateData);
@@ -93,9 +94,26 @@ export const deleteUserData = async (id, password) => {
     throw error;
   }
 
-  await Survey.deleteMany({ author: id });
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const authoredSurveys = await Survey.find({ author: id }, "_id").session(
+      session
+    );
+    const authoredSurveyIds = authoredSurveys.map((s) => s._id);
 
-  await SurveyTake.deleteMany({ user: id });
+    await SurveyTake.deleteMany({
+      $or: [{ survey: { $in: authoredSurveyIds } }, { user: id }],
+    }).session(session);
 
-  await User.findByIdAndDelete(id);
+    await Survey.deleteMany({ author: id }).session(session);
+    await User.findByIdAndDelete(id).session(session);
+
+    await session.commitTransaction();
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
 };
