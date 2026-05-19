@@ -98,7 +98,7 @@ function EditProfileDialog({ profile }) {
           </DialogHeader>
           <FieldGroup>
             <Field>
-              <Label htmlFor="age">Ім'я</Label>
+              <Label htmlFor="userFirstName">Ім'я</Label>
               <Input
                 id="userFirstName"
                 type="text"
@@ -109,7 +109,7 @@ function EditProfileDialog({ profile }) {
               />
             </Field>
             <Field>
-              <Label htmlFor="age">Прізвище</Label>
+              <Label htmlFor="userLastName">Прізвище</Label>
               <Input
                 id="userLastName"
                 type="text"

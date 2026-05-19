@@ -246,7 +246,7 @@ function Analytics({ surveyId }) {
         {TypographyH2("Статистика по кожному питанню")}
       </div>
       {formattedData.questionsChartData.map((questionData, index) => (
-        <Item variant={index % 2 === 0 ? "outlined" : "muted"} key={index}>
+        <Item variant={index % 2 === 0 ? "outline" : "muted"} key={index}>
           <ItemContent>
             <ItemTitle>
               {TypographyH3(`Питання ${index + 1}: ${questionData.title}`)}

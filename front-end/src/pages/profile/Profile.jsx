@@ -61,8 +61,14 @@ function Profile() {
     profile.surveysStatus === "error" ||
     profile.passedSurveysStatus === "error"
   ) {
-    toast.error(profile.error || "Помилка при завантаженні даних");
-    return;
+    return (
+      <EmptyComponent
+        title="Помилка при завантаженні даних"
+        description="Виникла помилка при завантаженні даних. Спробуйте ще раз."
+        buttonText="На головну"
+        buttonLink="/"
+      />
+    );
   }
 
   const mySurveys =

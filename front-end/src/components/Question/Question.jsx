@@ -43,11 +43,13 @@ function Question({ question, variant }) {
             <div>
               <div className="w-full flex flex-col gap-1 justify-start m-0">
                 <div className="grid gap-2">
-                  <Label htmlFor="surveyTitle">Текст питання</Label>
+                  <Label htmlFor={`question-title-${question._id}`}>
+                    Текст питання
+                  </Label>
                   <Input
-                    id="question-title"
+                    id={`question-title-${question._id}`}
                     type="text"
-                    value={question.title}
+                    value={question.title || ""}
                     placeholder="Введіть питання"
                     onChange={(e) => editQuestionTitle(e.target.value)}
                     required
