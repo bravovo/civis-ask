@@ -10,7 +10,7 @@ function Layout({ children, hasHeader = true }) {
         <div className="max-w-7xl w-full mx-auto py-6">{children}</div>
       </main>
       <Toaster position="top-center" />
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

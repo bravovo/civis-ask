@@ -10,16 +10,9 @@ function Header() {
           </Link>
         </div>
         <div className="w-full flex justify-end gap-4">
-          <div>
-            <Link to="/dashboard" className="hover:underline">
-              Файли
-            </Link>
-          </div>
-          <div>
-            <Link to="/profile" className="hover:underline">
-              Профіль
-            </Link>
-          </div>
+          <Link to="/profile" className="hover:underline">
+            Профіль
+          </Link>
         </div>
       </div>
     </header>

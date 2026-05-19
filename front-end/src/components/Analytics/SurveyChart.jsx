@@ -129,7 +129,7 @@ function SurveyChart({ data, title }) {
                   ...options.plugins,
                   legend: {
                     ...options.plugins.legend,
-                    display: selectedDataType.value !== "data",
+                    display: selectedDataType !== "data",
                   },
                   title: {
                     ...options.plugins.title,

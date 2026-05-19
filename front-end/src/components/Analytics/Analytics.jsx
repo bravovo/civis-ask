@@ -129,7 +129,6 @@ function Analytics({ surveyId }) {
             labels: optionLabels,
             datasets: [
               {
-                label: "Кількість користувачів",
                 data: question.results.map((r) => r.count),
                 backgroundColor: optionLabels.map((_, index) => {
                   return availableColors[index % availableColors.length];
