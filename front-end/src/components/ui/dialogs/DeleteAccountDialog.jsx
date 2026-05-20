@@ -60,7 +60,6 @@ function DeleteAccountDialog() {
       setOpen(false);
     } catch (err) {
       console.error(err);
-      setIsSubmitting(false);
     } finally {
       setIsSubmitting(false);
     }

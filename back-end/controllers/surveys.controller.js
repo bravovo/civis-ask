@@ -5,6 +5,7 @@ import {
   getSurveysPassedByUser,
   patchEditSurvey,
   getAnalyticsForSurvey,
+  deleteSurveyById,
 } from "../services/survey.service.js";
 import User from "../models/user.model.js";
 import mongoose from "mongoose";
@@ -131,18 +132,36 @@ export const getSurvey = async (req, res, next) => {
 
 export const getPublishedSurveys = async (req, res, next) => {
   try {
-    const surveys = await Survey.find({ status: "published" }).populate(
-      "author"
-    );
+    const user = req.user;
+
+    const surveys = await Survey.find({ status: "published" })
+      .populate("author", "firstName lastName email")
+      .lean();
 
     if (surveys.length === 0) {
       return res.sendStatus(204);
     }
 
+    const processedSurveys = surveys.map((survey) => {
+      if (!user) {
+        return { ...survey, isAuthor: false };
+      }
+
+      const authorId = survey.author?._id
+        ? survey.author._id.toString()
+        : survey.author.toString();
+      const isAuthor = authorId === user.id.toString();
+
+      return {
+        ...survey,
+        isAuthor: isAuthor,
+      };
+    });
+
     return res.status(200).json({
       success: true,
-      message: `Знайдено опитувань: ${surveys.length}`,
-      surveys,
+      message: `Знайдено опитувань: ${processedSurveys.length}`,
+      surveys: processedSurveys,
     });
   } catch (error) {
     next(error);
@@ -242,6 +261,33 @@ export const getCurrentUserPassedSurveys = async (req, res, next) => {
       message: "Опитування, пройдені користувачем успішно знайдено",
       surveys: surveysPassedByUser,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteSurvey = async (req, res, next) => {
+  try {
+    const { surveyId } = req.params;
+    const userId = req.user.id;
+
+    const survey = await Survey.findById(surveyId);
+
+    if (!survey) {
+      return res.status(200).json({
+        success: true,
+        message: "Опитування вже видалено",
+      });
+    } else if (survey.author.toString() !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Ви не маєте прав на видалення цього опитування",
+      });
+    }
+
+    await deleteSurveyById(surveyId);
+
+    return res.sendStatus(204);
   } catch (error) {
     next(error);
   }

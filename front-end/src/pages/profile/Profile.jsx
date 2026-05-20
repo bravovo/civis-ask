@@ -13,12 +13,7 @@ import ChangePasswordDialog from "../../components/ui/dialogs/ChangePasswordDial
 import DeleteAccountDialog from "../../components/ui/dialogs/DeleteAccountDialog";
 import Tabs from "../../components/Tabs/Tabs";
 
-import {
-  Item,
-  ItemContent,
-  ItemDescription,
-  ItemTitle,
-} from "@/components/ui/item";
+import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
 
 import {
   Card,
@@ -48,6 +43,7 @@ function Profile() {
     if (profile.surveysStatus === "none") {
       dispatch(getUserSurveys());
     }
+    console.log(userSurveys);
   }, [profile.passedSurveysStatus, profile.surveysStatus]);
 
   if (
@@ -155,18 +151,16 @@ function Profile() {
             >
               <ItemContent>
                 <ItemTitle>{TypographyH3(`Загальна інформація`)}</ItemTitle>
-                <ItemDescription>
-                  {TypographyLead(
-                    formatUserFullName({
-                      firstName: profile.firstName,
-                      lastName: profile.lastName,
-                    })
-                  )}
-                  {TypographyLead(profile.email)}
-                  {profile.role === "admin"
-                    ? TypographyH3("Адміністратор")
-                    : null}
-                </ItemDescription>
+                {TypographyLead(
+                  formatUserFullName({
+                    firstName: profile.firstName,
+                    lastName: profile.lastName,
+                  })
+                )}
+                {TypographyLead(profile.email)}
+                {profile.role === "admin"
+                  ? TypographyH3("Адміністратор")
+                  : null}
               </ItemContent>
             </Item>
             <Item
@@ -175,15 +169,13 @@ function Profile() {
             >
               <ItemContent>
                 <ItemTitle>{TypographyH3(`Демографічна інформація`)}</ItemTitle>
-                <ItemDescription>
-                  {profile.age ? TypographyLead("Вік: " + profile.age) : null}
-                  {profile.gender
-                    ? TypographyLead(
-                        "Стать: " +
-                          (profile.gender === "male" ? "Чоловік" : "Жінка")
-                      )
-                    : null}
-                </ItemDescription>
+                {profile.age ? TypographyLead("Вік: " + profile.age) : null}
+                {profile.gender
+                  ? TypographyLead(
+                      "Стать: " +
+                        (profile.gender === "male" ? "Чоловік" : "Жінка")
+                    )
+                  : null}
               </ItemContent>
             </Item>
           </CardTitle>

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api/api";
 import axios from "axios";
+import { deleteSurvey } from "./surveysSlice";
 
 const createInitialState = () => ({
   firstName: "",
@@ -154,6 +155,17 @@ const profileSlice = createSlice({
       .addCase(logout.rejected, (state, action) => {
         state.status = "error";
         state.error = action.payload;
+      })
+      .addCase(deleteSurvey.fulfilled, (state, action) => {
+        const deletedSurveyId = action.payload;
+
+        state.userSurveys = state.userSurveys.filter(
+          (survey) => survey._id !== deletedSurveyId
+        );
+
+        state.passedSurveys = state.passedSurveys.filter(
+          (take) => take.survey._id !== deletedSurveyId
+        );
       });
   },
 });
@@ -227,6 +239,7 @@ export const getSurveysPassedByUser = createAsyncThunk(
         return response.data.surveys;
       }
     } catch (error) {
+      console.log(error.response);
       return rejectWithValue(
         error.response?.data?.message || "Помилка отримання списку"
       );
