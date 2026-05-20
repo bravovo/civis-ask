@@ -37,21 +37,35 @@ function EditSurvey() {
   const handleSubmit = (type) => {
     console.log(type);
 
-    if (!survey.title || !survey.description || survey.questions.length === 0) {
-      toast.error("Всі дані повинні бути заповненні");
+    if (!survey.title || !survey.description) {
+      toast.error("Назва та опис опитування повинні бути заповненні");
       return;
     }
 
-    const hasEmptyOptions = survey.questions.some(
-      (q) =>
+    if (survey.questions.length === 0) {
+      toast.error("Опитування повинно містити хоча б одне питання");
+      return;
+    }
+
+    let message = "";
+
+    const hasEmptyOptions = survey.questions.some((q) => {
+      if (q.title.trim() === "") {
+        message = "Будь ласка, заповніть назви питань";
+        return true;
+      }
+      if (
         q.options.length === 0 ||
-        q.options.some((opt) => !opt.text || opt.text.trim() === "")
-    );
+        q.options.some((opt) => !opt.value || opt.value.trim() === "")
+      ) {
+        console.log(q.options);
+        message = `Будь ласка, заповніть порожні варіанти відповідей у питанні "${q.title || "Без назви"}"`;
+        return true;
+      }
+    });
 
     if (hasEmptyOptions) {
-      toast.error(
-        "Будь ласка, заповніть порожні варіанти відповідей у питаннях"
-      );
+      toast.error(message);
       return;
     }
 
@@ -59,7 +73,10 @@ function EditSurvey() {
 
     toast.promise(promise, {
       loading: "Збереження...",
-      success: `Опитування успішно ${type === "publish" ? "опубліковано" : "збережено"}`,
+      success: () => {
+        navigate(`/`);
+        return `Опитування успішно ${type === "publish" ? "опубліковано" : "збережено"}`;
+      },
       error: (err) => {
         return (
           err?.message ||

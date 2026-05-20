@@ -31,12 +31,7 @@ const surveySlice = createSlice({
           title: "",
           type: "radio",
           required: false,
-          options: [
-            {
-              _id: nanoid(),
-              text: "Варіант відповіді",
-            },
-          ],
+          options: [],
         },
       }),
     },
@@ -53,7 +48,7 @@ const surveySlice = createSlice({
           questionId,
           option: {
             _id: nanoid(),
-            text: "",
+            value: "",
           },
         },
       }),
@@ -67,7 +62,7 @@ const surveySlice = createSlice({
         (opt) => opt._id === action.payload.optionId
       );
 
-      option.text = action.payload.text;
+      option.value = action.payload.value;
     },
     removeOption: (state, action) => {
       const question = state.questions.find(
