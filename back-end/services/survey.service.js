@@ -96,10 +96,54 @@ export const getSurveysPassedByUser = async (user) => {
     })
     .lean();
 
-  if (Array.isArray(surveysPassedByUser)) {
-    return surveysPassedByUser.filter((take) => take.survey !== null);
-  } else {
+  if (!Array.isArray(surveysPassedByUser)) {
     throw new Error("Помилка отримання пройдених користувачем опитувань");
+  }
+
+  const validTakes = surveysPassedByUser.filter((take) => take.survey !== null);
+
+  const processedSurveys = validTakes.map((take) => {
+    const survey = take.survey;
+
+    const authorId = survey.author?._id
+      ? survey.author._id.toString()
+      : survey.author
+        ? survey.author.toString()
+        : "";
+
+    const isAuthor = authorId === user.id.toString();
+
+    return {
+      ...take,
+      survey: {
+        ...survey,
+        isAuthor: isAuthor,
+      },
+    };
+  });
+
+  return processedSurveys;
+};
+
+export const deleteSurveyById = async (surveyId) => {
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+
+    await SurveyTake.deleteMany({
+      survey: new mongoose.Types.ObjectId(surveyId),
+    }).session(session);
+
+    await Survey.deleteOne({
+      _id: new mongoose.Types.ObjectId(surveyId),
+    }).session(session);
+
+    await session.commitTransaction();
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
   }
 };
 

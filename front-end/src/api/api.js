@@ -33,7 +33,7 @@ export const setupAxios = (store) => {
       return response;
     },
     (error) => {
-      if (error.response?.status === 401) {
+      if (error.response?.status === 401 || error.response?.status === 403) {
         if (!window.location.pathname.includes("/login")) {
           console.warn("Перенаправлення на логін");
           localStorage.removeItem("token");
