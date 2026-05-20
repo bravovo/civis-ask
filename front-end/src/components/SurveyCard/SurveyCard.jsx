@@ -65,7 +65,7 @@ export default function SurveyCard({
           return "Опитування успішно видалено";
         },
         error: (err) => {
-          return err.message || "Не вдалось видалити опитування";
+          return err.message || err || "Не вдалось видалити опитування";
         },
       });
 

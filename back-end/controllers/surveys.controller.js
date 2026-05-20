@@ -274,10 +274,7 @@ export const deleteSurvey = async (req, res, next) => {
     const survey = await Survey.findById(surveyId);
 
     if (!survey) {
-      return res.status(200).json({
-        success: true,
-        message: "Опитування вже видалено",
-      });
+      return res.sendStatus(204);
     } else if (survey.author.toString() !== userId) {
       return res.status(403).json({
         success: false,
