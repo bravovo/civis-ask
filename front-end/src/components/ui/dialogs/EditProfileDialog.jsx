@@ -76,6 +76,7 @@ function EditProfileDialog({ profile }) {
       setOpen(false);
     } catch (err) {
       console.error(err);
+      toast.error(err?.message || "Помилка при оновленні профілю");
     } finally {
       setIsSubmitting(false);
     }

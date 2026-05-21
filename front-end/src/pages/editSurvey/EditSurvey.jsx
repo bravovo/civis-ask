@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   addQuestion,
@@ -6,6 +6,7 @@ import {
   changeTitle,
   editSurvey,
   setSurvey,
+  resetState,
 } from "../../state/surveySlice";
 import Question from "../../components/Question/Question";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
@@ -27,6 +28,7 @@ function EditSurvey() {
   const { survey: data } = useSurveyInfo(surveyId);
 
   const survey = useSelector((state) => state.survey);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -34,39 +36,68 @@ function EditSurvey() {
     }
   }, [data, dispatch]);
 
-  const handleSubmit = (type) => {
+  useEffect(() => () => dispatch(resetState()), [dispatch]);
+
+  const handleSubmit = async (type) => {
     console.log(type);
 
-    if (!survey.title || !survey.description || survey.questions.length === 0) {
-      toast.error("Всі дані повинні бути заповненні");
-      return;
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      if (!survey.title || !survey.description) {
+        toast.error("Назва та опис опитування повинні бути заповнені");
+        return;
+      }
+
+      if (survey.questions.length === 0) {
+        toast.error("Опитування повинно містити хоча б одне питання");
+        return;
+      }
+
+      let message = "";
+
+      const hasEmptyOptions = survey.questions.some((q) => {
+        if (q.title.trim() === "") {
+          message = "Будь ласка, заповніть назви питань";
+          return true;
+        }
+        if (
+          q.options.length === 0 ||
+          q.options.some((opt) => !opt.value || opt.value.trim() === "")
+        ) {
+          console.log(q.options);
+          message = `Будь ласка, заповніть порожні варіанти відповідей у питанні "${q.title || "Без назви"}"`;
+          return true;
+        }
+      });
+
+      if (hasEmptyOptions) {
+        toast.error(message);
+        return;
+      }
+
+      const promise = dispatch(editSurvey({ status: type })).unwrap();
+
+      toast.promise(promise, {
+        loading: "Збереження...",
+        success: () => {
+          return `Опитування успішно ${type === "publish" ? "опубліковано" : "збережено"}`;
+        },
+        error: (err) => {
+          return (
+            err?.message ||
+            `Помилка ${type === "publish" ? "публікації" : "збереження"} опитування`
+          );
+        },
+      });
+
+      await promise;
+
+      navigate(`/`);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const hasEmptyOptions = survey.questions.some(
-      (q) =>
-        q.options.length === 0 ||
-        q.options.some((opt) => !opt.text || opt.text.trim() === "")
-    );
-
-    if (hasEmptyOptions) {
-      toast.error(
-        "Будь ласка, заповніть порожні варіанти відповідей у питаннях"
-      );
-      return;
-    }
-
-    const promise = dispatch(editSurvey({ status: type })).unwrap();
-
-    toast.promise(promise, {
-      loading: "Збереження...",
-      success: `Опитування успішно ${type === "publish" ? "опубліковано" : "збережено"}`,
-      error: (err) => {
-        return (
-          err?.message ||
-          `Помилка ${type === "publish" ? "публікації" : "збереження"} опитування`
-        );
-      },
-    });
   };
 
   if (loading) return <Loader />;
@@ -78,10 +109,14 @@ function EditSurvey() {
   return (
     <div className="w-full h-full flex flex-col gap-6 px-3">
       <div className="fixed z-50 right-0 flex gap-2 items-center justify-end bg-muted backdrop-blur-sm rounded-l-lg p-2">
-        <Button variant="outline" onClick={() => handleSubmit("save")}>
+        <Button
+          variant="outline"
+          onClick={() => handleSubmit("save")}
+          disabled={isSubmitting}
+        >
           Зберегти
         </Button>
-        <Button onClick={() => handleSubmit("publish")}>
+        <Button onClick={() => handleSubmit("publish")} disabled={isSubmitting}>
           Зберегти та опублікувати
         </Button>
       </div>

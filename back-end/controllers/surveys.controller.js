@@ -35,7 +35,7 @@ export const postSurvey = async (req, res, next) => {
       type: q.type,
       options: (Array.isArray(q.options) ? q.options : [])
         .map((opt) => ({
-          value: String(opt?.text ?? "").trim(),
+          value: String(opt?.text ?? opt?.value ?? "").trim(),
         }))
         .filter((opt) => opt.value.length > 0),
     }));

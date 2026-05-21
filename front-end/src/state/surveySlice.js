@@ -12,6 +12,9 @@ const surveySlice = createSlice({
   name: "survey",
   initialState,
   reducers: {
+    resetState: () => {
+      return initialState;
+    },
     setSurvey: (_state, action) => {
       return { ...action.payload };
     },
@@ -31,12 +34,7 @@ const surveySlice = createSlice({
           title: "",
           type: "radio",
           required: false,
-          options: [
-            {
-              _id: nanoid(),
-              text: "Варіант відповіді",
-            },
-          ],
+          options: [],
         },
       }),
     },
@@ -53,7 +51,7 @@ const surveySlice = createSlice({
           questionId,
           option: {
             _id: nanoid(),
-            text: "",
+            value: "",
           },
         },
       }),
@@ -67,7 +65,7 @@ const surveySlice = createSlice({
         (opt) => opt._id === action.payload.optionId
       );
 
-      option.text = action.payload.text;
+      option.value = action.payload.value;
     },
     removeOption: (state, action) => {
       const question = state.questions.find(
@@ -140,6 +138,8 @@ export const editSurvey = createAsyncThunk(
         status: action.status === "publish" ? "published" : "draft",
       });
 
+      console.log("SAVE");
+
       return response.data;
     } catch (error) {
       if (error.response) {
@@ -156,6 +156,7 @@ export const editSurvey = createAsyncThunk(
 );
 
 export const {
+  resetState,
   setSurvey,
   changeTitle,
   changeDescription,
