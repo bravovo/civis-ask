@@ -12,6 +12,9 @@ const surveySlice = createSlice({
   name: "survey",
   initialState,
   reducers: {
+    resetState: () => {
+      return initialState;
+    },
     setSurvey: (_state, action) => {
       return { ...action.payload };
     },
@@ -135,6 +138,8 @@ export const editSurvey = createAsyncThunk(
         status: action.status === "publish" ? "published" : "draft",
       });
 
+      console.log("SAVE");
+
       return response.data;
     } catch (error) {
       if (error.response) {
@@ -151,6 +156,7 @@ export const editSurvey = createAsyncThunk(
 );
 
 export const {
+  resetState,
   setSurvey,
   changeTitle,
   changeDescription,
