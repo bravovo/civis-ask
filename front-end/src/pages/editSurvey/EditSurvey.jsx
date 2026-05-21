@@ -34,11 +34,9 @@ function EditSurvey() {
     if (data) {
       dispatch(setSurvey(data));
     }
-
-    return () => {
-      dispatch(resetState());
-    };
   }, [data, dispatch]);
+
+  useEffect(() => () => dispatch(resetState()), [dispatch]);
 
   const handleSubmit = async (type) => {
     console.log(type);
@@ -48,7 +46,7 @@ function EditSurvey() {
 
     try {
       if (!survey.title || !survey.description) {
-        toast.error("Назва та опис опитування повинні бути заповненні");
+        toast.error("Назва та опис опитування повинні бути заповнені");
         return;
       }
 
@@ -97,11 +95,6 @@ function EditSurvey() {
       await promise;
 
       navigate(`/`);
-    } catch (err) {
-      toast.error(
-        err?.message ||
-          `Помилка ${type === "publish" ? "публікації" : "збереження"} опитування`
-      );
     } finally {
       setIsSubmitting(false);
     }

@@ -98,8 +98,7 @@ function Question({ question, variant }) {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem
                       className="text-destructive focus:text-destructive cursor-pointer flex justify-center"
-                      onSelect={(e) => {
-                        e.preventDefault();
+                      onSelect={() => {
                         setOpen(true);
                       }}
                     >
