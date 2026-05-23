@@ -40,6 +40,19 @@ function PassSurvey() {
     }
   }, [survey, loading]);
 
+  if (loading) return <Loader />;
+
+  if (!survey) {
+    return (
+      <EmptyComponent
+        title="Опитування не знайдено"
+        description="Опитування, яке ви шукаєте, не існує або було видалено."
+        buttonText="На головну"
+        buttonLink="/"
+      />
+    );
+  }
+
   if (survey?.isPassed) {
     return <Navigate to="/" replace />;
   }
@@ -114,12 +127,6 @@ function PassSurvey() {
       });
     });
   };
-
-  if (loading) return <Loader />;
-
-  if (!survey) {
-    return <EmptyComponent title="Опитування не знайдено" />;
-  }
 
   return (
     <div className="w-full h-full flex flex-col gap-6 px-3">
