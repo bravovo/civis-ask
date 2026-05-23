@@ -10,6 +10,7 @@ import { TypographyLarge, TypographyP, TypographyLead } from "@/utils/styles";
 import { Badge } from "@/components/ui/badge";
 import { formatUserFullName } from "../../utils/utils.js";
 import { toast } from "sonner";
+import EmptyComponent from "@/components/EmptyComponent/EmptyComponent";
 
 import {
   Card,
@@ -88,34 +89,35 @@ function SurveyInfo() {
     },
   ];
 
-  return (
-    survey && (
-      <div className="w-full h-full flex flex-col gap-6 px-3">
-        <div className="w-full flex gap-2 justify-between items-center">
-          <Button
-            variant="outline"
-            onClick={() => navigate(-1)}
-            className="w-20"
-          >
-            Назад
-          </Button>
-          <div className="flex flex-col md:flex-row gap-2 items-end md:items-center">
-            {TypographyLarge(survey.title)}
-            {survey.verified ? (
-              <Badge className="bg-green-950 text-green-300">Перевірене</Badge>
-            ) : (
-              <Badge className="bg-red-950 text-red-300">Не перевірене</Badge>
-            )}
-          </div>
-        </div>
-        {!survey.isPassed && (
-          <Button onClick={onPassSurveyClick}>Пройти опитування</Button>
-        )}
-        <div className="w-full h-full">
-          <Tabs tabs={tabs} />
+  return survey ? (
+    <div className="w-full h-full flex flex-col gap-6 px-3">
+      <div className="w-full flex gap-2 justify-between items-center">
+        <Button variant="outline" onClick={() => navigate(-1)} className="w-20">
+          Назад
+        </Button>
+        <div className="flex flex-col md:flex-row gap-2 items-end md:items-center">
+          {TypographyLarge(survey.title)}
+          {survey.verified ? (
+            <Badge className="bg-green-950 text-green-300">Перевірене</Badge>
+          ) : (
+            <Badge className="bg-red-950 text-red-300">Не перевірене</Badge>
+          )}
         </div>
       </div>
-    )
+      {!survey.isPassed && (
+        <Button onClick={onPassSurveyClick}>Пройти опитування</Button>
+      )}
+      <div className="w-full h-full">
+        <Tabs tabs={tabs} />
+      </div>
+    </div>
+  ) : (
+    <EmptyComponent
+      title="Опитування не знайдено"
+      description="Опитування, яке ви шукаєте, не існує або було видалено."
+      buttonText="На головну"
+      buttonLink="/"
+    />
   );
 }
 
