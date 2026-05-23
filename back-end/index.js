@@ -10,8 +10,10 @@ import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
 import uploadsRoute from "./routes/uploads.route.js";
 import surveysRoute from "./routes/surveys.route.js";
+import adminRoute from "./routes/admin.route.js";
 
 import { checkUserAccess } from "./middlewares/jwt.middleware.js";
+import { checkAdminAccess } from "./middlewares/admin.middleware.js";
 
 const app = express();
 
@@ -68,6 +70,7 @@ app.use("/api/user", userRoute);
 app.use("/api/uploads", uploadsRoute);
 app.use("/api/surveys", surveysRoute);
 
+app.use("/api/admin", checkAdminAccess, adminRoute);
 app.use((err, req, res, next) => {
   if (err instanceof mongoose.Error.ValidationError) {
     const errorMessage = Object.values(err.errors)[0].message;

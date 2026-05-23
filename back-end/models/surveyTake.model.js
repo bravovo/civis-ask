@@ -41,6 +41,7 @@ const surveyTake = mongoose.Schema(
 
 surveyTake.index({ user: 1, survey: 1 }, { unique: true });
 
-const SurveyTake = mongoose.model("SurveyTake", surveyTake);
+const SurveyTake =
+  mongoose.models.SurveyTake || mongoose.model("SurveyTake", surveyTake);
 
 export default SurveyTake;
