@@ -49,7 +49,10 @@ function Profile() {
 
   useEffect(() => {
     console.log("Profile:", profile);
-    if (!Boolean(profile.age) || !Boolean(profile.gender)) {
+    if (
+      (profile.authChecked && !Boolean(profile.age)) ||
+      !Boolean(profile.gender)
+    ) {
       console.log("Missing demographic info");
       toast.error("Будь ласка, заповніть дані про вік та стать");
     }

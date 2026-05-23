@@ -29,7 +29,7 @@ function SurveyInfo() {
   const navigate = useNavigate();
 
   const onPassSurveyClick = () => {
-    if (profile && survey) {
+    if (profile.status === "success" && survey) {
       if (!profile.age || !profile.gender) {
         toast.error("Будь ласка, заповніть дані про вік та стать у профілі");
         return;

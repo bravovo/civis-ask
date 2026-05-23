@@ -101,7 +101,7 @@ function EditProfileDialog({ profile }) {
               <Alert className="max-w-md border-amber-900 bg-amber-950 text-amber-50">
                 <AlertTriangleIcon />
                 <AlertTitle>
-                  У вас відсутня інформація про вік та стать
+                  У вас відсутня інформація про вік або стать
                 </AlertTitle>
                 <AlertDescription>
                   Будь ласка, додайте ці дані, щоб мати можливість проходити
