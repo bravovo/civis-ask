@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { TypographyLarge, TypographyP, TypographyLead } from "@/utils/styles";
 import { Badge } from "@/components/ui/badge";
 import { formatUserFullName } from "../../utils/utils.js";
+import { toast } from "sonner";
 
 import {
   Card,
@@ -21,13 +22,20 @@ import {
 
 function SurveyInfo() {
   const { loading } = useSelector((state) => state.loader);
+  const profile = useSelector((state) => state.profile);
   const { surveyId } = useParams();
   const { survey } = useSurveyInfo(surveyId);
 
   const navigate = useNavigate();
 
   const onPassSurveyClick = () => {
-    navigate(`/${surveyId}/pass`);
+    if (profile.status === "success" && survey) {
+      if (!profile.age || !profile.gender) {
+        toast.error("Будь ласка, заповніть дані про вік та стать у профілі");
+        return;
+      }
+      navigate(`/${surveyId}/pass`);
+    }
   };
 
   if (loading) return <Loader />;

@@ -26,6 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AlertTriangleIcon } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { Field, FieldGroup } from "@/components/ui/field";
 
@@ -95,6 +97,18 @@ function EditProfileDialog({ profile }) {
               Тут ви можете змінити свої персональні дані. Для зміни паролю або
               видалення акаунта натисніть відповідні кнопки
             </DialogDescription>
+            {(!profile.age || !profile.gender) && (
+              <Alert className="max-w-md border-amber-900 bg-amber-950 text-amber-50">
+                <AlertTriangleIcon />
+                <AlertTitle>
+                  У вас відсутня інформація про вік або стать
+                </AlertTitle>
+                <AlertDescription>
+                  Будь ласка, додайте ці дані, щоб мати можливість проходити
+                  опитування
+                </AlertDescription>
+              </Alert>
+            )}
           </DialogHeader>
           <FieldGroup>
             <Field>

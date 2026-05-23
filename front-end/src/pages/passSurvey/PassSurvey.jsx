@@ -84,7 +84,9 @@ function PassSurvey() {
           return "Відповідь успішно збережена";
         },
         error: (err) => {
-          return err.message || "Помилка при проходженні опитування";
+          return (
+            err.response?.data?.message || "Помилка при проходженні опитування"
+          );
         },
       });
     } catch (error) {

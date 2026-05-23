@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/card";
 import { TypographyH2, TypographyH3, TypographyLead } from "../../utils/styles";
 import LogoutDialog from "@/components/ui/dialogs/LogoutDialog";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import EmptyComponent from "@/components/EmptyComponent/EmptyComponent";
@@ -45,6 +46,17 @@ function Profile() {
     }
     console.log(userSurveys);
   }, [profile.passedSurveysStatus, profile.surveysStatus]);
+
+  useEffect(() => {
+    console.log("Profile:", profile);
+    if (
+      (profile.authChecked && !Boolean(profile.age)) ||
+      !Boolean(profile.gender)
+    ) {
+      console.log("Missing demographic info");
+      toast.error("Будь ласка, заповніть дані про вік та стать");
+    }
+  }, []);
 
   if (
     profile.surveysStatus === "loading" ||
