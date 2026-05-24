@@ -1,8 +1,8 @@
-import User from "../models/User.model.js";
+import User from "../models/user.model.js";
 import { isAdmin } from "../utils/utils.js";
 
 export const checkAdminAccess = async (req, res, next) => {
-  const { role, id } = req.user;
+  const { id } = req.user;
 
   const user = await User.findById(id, "-password");
 
@@ -13,7 +13,7 @@ export const checkAdminAccess = async (req, res, next) => {
     });
   }
 
-  if (!isAdmin(req.user.role)) {
+  if (!isAdmin(user.role)) {
     return res.status(403).json({
       success: false,
       message: "Доступ адміністратора заборонено",

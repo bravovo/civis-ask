@@ -6,9 +6,9 @@ import {
   deleteUser,
   patchSurveyVerification,
   deleteSurvey,
+  getUser,
 } from "../controllers/admin.controller.js";
 import { getPublishedSurveys } from "../controllers/surveys.controller.js";
-import { getUser } from "../controllers/user.controller.js";
 
 const router = Router();
 

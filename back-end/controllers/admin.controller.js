@@ -4,6 +4,7 @@ import {
   deleteUserService,
   patchSurveyVerificationService,
   deleteSurveyService,
+  getUserService,
 } from "../services/admin.service.js";
 
 export const getAllUsers = async (req, res, next) => {
@@ -23,12 +24,27 @@ export const getAllUsers = async (req, res, next) => {
   }
 };
 
+export const getUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const user = await getUserService(id, req.user.role);
+
+    return res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const patchUserRole = async (req, res, next) => {
   try {
-    const { userId } = req.params;
+    const { id } = req.params;
     const { newRole } = req.body;
 
-    await updateUserRoleService(userId, newRole, req.user.role);
+    await updateUserRoleService(id, newRole, req.user.role);
 
     return res.status(200).json({
       success: true,
@@ -41,9 +57,11 @@ export const patchUserRole = async (req, res, next) => {
 
 export const deleteUser = async (req, res, next) => {
   try {
-    const { userId } = req.params;
+    const { id } = req.params;
 
-    await deleteUserService(userId, req.user.role);
+    await deleteUserService(id, req.user.role);
+
+    return res.sendStatus(204);
   } catch (err) {
     next(err);
   }
