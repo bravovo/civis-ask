@@ -3,9 +3,9 @@ import {
   updateUserRoleService,
   deleteUserService,
   patchSurveyVerificationService,
-  deleteSurveyService,
   getUserService,
 } from "../services/admin.service.js";
+import { deleteSurveyById } from "../services/survey.service.js";
 
 export const getAllUsers = async (req, res, next) => {
   try {
@@ -87,7 +87,15 @@ export const deleteSurvey = async (req, res, next) => {
   try {
     const { surveyId } = req.params;
 
-    await deleteSurveyService(surveyId, req.user.role);
+    if (!isAdmin(req.user.role)) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Доступ адміністратора заборонено" });
+    }
+
+    await deleteSurveyById(surveyId);
+
+    return res.sendStatus(204);
   } catch (err) {
     next(err);
   }

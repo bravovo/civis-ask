@@ -20,5 +20,7 @@ export const checkAdminAccess = async (req, res, next) => {
     });
   }
 
+  req.user.role = user.role;
+
   next();
 };
