@@ -141,6 +141,7 @@ function Profile() {
         <CardHeader className="w-full flex justify-between items-center">
           <CardTitle className="w-full flex flex-col md:flex-row gap-6">
             <div className="block md:hidden">
+              {profile.role === "admin" ? TypographyH3("Адміністратор") : null}
               {TypographyLead(
                 formatUserFullName({
                   firstName: profile.firstName,
@@ -148,7 +149,6 @@ function Profile() {
                 })
               )}
               {TypographyLead(profile.email)}
-              {profile.role === "admin" ? TypographyH3("Адміністратор") : null}
               {profile.age ? TypographyLead("Вік: " + profile.age) : null}
               {profile.gender
                 ? TypographyLead(

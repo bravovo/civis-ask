@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import Survey from "../models/survey.model.js";
+import SurveyTake from "../models/surveyTake.model.js";
 import { isValidRole, isAdmin } from "../utils/utils.js";
 import mongoose from "mongoose";
 
@@ -65,17 +66,18 @@ export const deleteUserService = async (userId, requesterRole) => {
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
-    const authoredSurveys = await Survey.find({ author: id }, "_id").session(
-      session
-    );
+    const authoredSurveys = await Survey.find(
+      { author: userId },
+      "_id"
+    ).session(session);
     const authoredSurveyIds = authoredSurveys.map((s) => s._id);
 
     await SurveyTake.deleteMany({
-      $or: [{ survey: { $in: authoredSurveyIds } }, { user: id }],
+      $or: [{ survey: { $in: authoredSurveyIds } }, { user: userId }],
     }).session(session);
 
-    await Survey.deleteMany({ author: id }).session(session);
-    const deletedUser = await User.findByIdAndDelete(id).session(session);
+    await Survey.deleteMany({ author: userId }).session(session);
+    const deletedUser = await User.findByIdAndDelete(userId).session(session);
 
     if (!deletedUser) {
       const error = new Error("Користувача не знайдено");

@@ -4,6 +4,7 @@ import axios from "axios";
 import { deleteSurvey } from "./surveysSlice";
 
 const createInitialState = () => ({
+  _id: null,
   firstName: "",
   lastName: "",
   email: "",
@@ -28,9 +29,10 @@ const profileSlice = createSlice({
   initialState,
   reducers: {
     setCreds: (state, action) => {
-      const { firstName, lastName, email, role, age, gender } =
+      const { firstName, lastName, email, role, age, gender, _id } =
         action.payload.user;
 
+      state._id = _id;
       state.firstName = firstName;
       state.lastName = lastName;
       state.email = email;
@@ -57,6 +59,7 @@ const profileSlice = createSlice({
       .addCase(me.fulfilled, (state, action) => {
         state.status = "success";
         console.log(action.payload);
+        state._id = action.payload._id;
         state.firstName = action.payload.firstName;
         state.lastName = action.payload.lastName;
         state.email = action.payload.email;
@@ -178,6 +181,7 @@ export const me = createAsyncThunk(
       const response = await api.get(`/user/me`);
 
       if (response.data.success) {
+        console.log(response.data);
         return response.data.user;
       }
     } catch (error) {
