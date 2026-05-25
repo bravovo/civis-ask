@@ -114,7 +114,7 @@ export default function AdminSurveyCard({ data }) {
 
     const isVerified = verified === "verified" ? true : false;
 
-    if (data.verified === isVerified || !data.verified === !isVerified) {
+    if (data.verified === isVerified) {
       toast.info("Немає змін для збереження");
       setEditDialogOpen(false);
       return;

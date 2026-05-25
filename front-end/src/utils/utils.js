@@ -8,11 +8,12 @@ export const formatUserFullName = ({ firstName, lastName }) => {
 
 export async function getDatabaseData(dispatch) {
   try {
-    await dispatch(getPublishedSurveys());
-    await dispatch(getUserSurveys());
-    await dispatch(getSurveysPassedByUser());
+    await Promise.all([
+      dispatch(getPublishedSurveys()).unwrap(),
+      dispatch(getUserSurveys()).unwrap(),
+      dispatch(getSurveysPassedByUser()).unwrap(),
+    ]);
   } catch (error) {
-    console.error("Error fetching database data:", error);
     toast.error(
       "Помилка отримання актуальних даних. Будь ласка, оновіть сторінку."
     );

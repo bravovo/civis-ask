@@ -13,10 +13,10 @@ function Surveys() {
   const state = useSelector((state) => state.surveyList);
 
   useEffect(() => {
-    if (!state.items || state.items.length === 0) {
+    if (state.status === "none") {
       dispatch(getPublishedSurveys());
     }
-  }, [dispatch, state.items]);
+  }, [dispatch, state.status]);
 
   if (state.status === "loading") {
     return <Loader />;
@@ -27,7 +27,7 @@ function Surveys() {
       {TypographyH2("Список опитувань")}
       <div className="w-full h-full flex flex-col items-center justify-center gap-2">
         {state.status === "success" &&
-        (!state.items || state.items.length === 0) ? (
+        (!Array.isArray(state.items) || state.items.length === 0) ? (
           <EmptyComponent
             title="Опитувань не знайдено"
             description="Створіть нове опитування, щоб воно з'явилось у цьому списку"

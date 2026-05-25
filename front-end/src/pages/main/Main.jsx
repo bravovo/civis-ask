@@ -16,10 +16,10 @@ function Main() {
   const surveys = useSelector((state) => state.surveyList);
 
   useEffect(() => {
-    if (!surveys.items || surveys.items.length === 0) {
+    if (surveys.status === "none") {
       dispatch(getPublishedSurveys());
     }
-  }, [dispatch, surveys.items]);
+  }, [dispatch, surveys.status]);
 
   if (surveys.status === "loading") {
     return <Loader />;
@@ -48,7 +48,7 @@ function Main() {
       </Button>
       <div className="w-full h-full flex flex-col items-center justify-center gap-2">
         {surveys.status === "success" &&
-        (!surveys.items || surveys.items.length === 0) ? (
+        (!Array.isArray(surveys.items) || surveys.items.length === 0) ? (
           <EmptyComponent
             title="Опитувань не знайдено"
             description="Створіть нове опитування, щоб побачити його у списку"
