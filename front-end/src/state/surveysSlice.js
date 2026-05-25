@@ -25,6 +25,20 @@ const surveysSlice = createSlice({
         state.status = "error";
         state.error = action.payload;
       })
+      .addCase(deleteSurvey.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(deleteSurvey.fulfilled, (state, action) => {
+        console.log("ITEMS", state);
+        state.status = "success";
+        state.items = state.items.filter(
+          (survey) => survey._id !== action.payload
+        );
+      })
+      .addCase(deleteSurvey.rejected, (state, action) => {
+        state.status = "error";
+        state.error = action.payload;
+      })
       .addCase(logout.fulfilled, () => {
         return initialState;
       });

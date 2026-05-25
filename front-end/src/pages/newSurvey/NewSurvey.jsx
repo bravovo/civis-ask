@@ -76,6 +76,8 @@ function NewSurvey() {
       await promise;
 
       navigate(`/`);
+    } catch (err) {
+      // error is handled in toast
     } finally {
       setIsSubmitting(false);
     }

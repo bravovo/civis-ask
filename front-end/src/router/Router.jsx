@@ -12,7 +12,8 @@ import NewSurvey from "../pages/newSurvey/NewSurvey";
 import SurveyInfo from "../pages/survey-info/SurveyInfo";
 import PassSurvey from "../pages/passSurvey/PassSurvey";
 import EditSurvey from "../pages/editSurvey/EditSurvey";
-import Users from "../pages/users/Users";
+import Users from "../pages/admin/users/Users";
+import Surveys from "@/pages/admin/surveys/Surveys";
 
 function Router() {
   return (
@@ -96,6 +97,16 @@ function Router() {
           <RoleCheck roles={["admin"]}>
             <Layout>
               <Users />
+            </Layout>
+          </RoleCheck>
+        }
+      />
+      <Route
+        path="/admin/surveys"
+        element={
+          <RoleCheck roles={["admin"]}>
+            <Layout>
+              <Surveys />
             </Layout>
           </RoleCheck>
         }

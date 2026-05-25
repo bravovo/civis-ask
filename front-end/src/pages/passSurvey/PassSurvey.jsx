@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import useSurveyInfo from "../../hooks/useSurveyInfo";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../components/ui/Loader/Loader";
 import { useEffect, useState } from "react";
 import api from "../../api/api";
@@ -20,9 +20,11 @@ import {
 import EmptyComponent from "@/components/EmptyComponent/EmptyComponent";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { getSurveysPassedByUser } from "@/state/profileSlice";
 
 function PassSurvey() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.loader);
   const { surveyId } = useParams();
   const { survey } = useSurveyInfo(surveyId);
@@ -94,6 +96,7 @@ function PassSurvey() {
         loading: "Збереження відповіді...",
         success: () => {
           navigate("/survey-info/" + surveyId);
+          dispatch(getSurveysPassedByUser());
           return "Відповідь успішно збережена";
         },
         error: (err) => {

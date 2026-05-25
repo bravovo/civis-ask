@@ -26,15 +26,6 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { Ellipsis } from "lucide-react";
-import { toast } from "sonner";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { deleteUser, patchUserRole } from "../../state/adminSlice";
-
-import { Label } from "@/components/ui/label";
 
 import {
   Dialog,
@@ -46,6 +37,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { Label } from "@/components/ui/label";
+
 import {
   Select,
   SelectContent,
@@ -56,22 +49,31 @@ import {
 } from "@/components/ui/select";
 
 import { Field, FieldGroup } from "@/components/ui/field";
+import { Button } from "@/components/ui/button";
+import { Ellipsis } from "lucide-react";
+import { toast } from "sonner";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { deleteSurvey, patchSurveyVerification } from "../../state/adminSlice";
 
-const roles = [
-  { value: "civis", label: "Користувач" },
-  { value: "admin", label: "Адміністратор" },
+const verificationOptions = [
+  { value: "verified", label: "Перевірене" },
+  { value: "not-verified", label: "Не перевірене" },
 ];
 
-function UserCard({ data }) {
+export default function AdminSurveyCard({ data }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [role, setRole] = useState(data.role);
-  const link = `/admin/user/${data._id}`;
+  const [verified, setVerified] = useState(
+    data.verified ? "verified" : "not-verified"
+  );
+  const link = `/survey-info/${data._id}`;
 
-  async function handleUserDelete(e) {
+  async function handleSurveyDelete(e) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -79,16 +81,16 @@ function UserCard({ data }) {
     setIsSubmitting(true);
 
     try {
-      const promise = dispatch(deleteUser(data._id)).unwrap();
+      const promise = dispatch(deleteSurvey(data._id)).unwrap();
 
       toast.promise(promise, {
-        loading: "Видалення користувача...",
+        loading: "Видалення опитування...",
         success: () => {
           setDeleteDialogOpen(false);
-          return "Користувач успішно видалений";
+          return "Опитування успішно видалено";
         },
         error: (err) => {
-          return err.message || err || "Не вдалось видалити користувача";
+          return err.message || err || "Не вдалось видалити опитування";
         },
       });
 
@@ -96,19 +98,19 @@ function UserCard({ data }) {
 
       setDeleteDialogOpen(false);
     } catch (err) {
-      console.error(err);
+      // error is handled in toast
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  const handleUserEdit = async (e) => {
+  async function handleSurveyVerifiedEdit(e) {
     e.preventDefault();
     e.stopPropagation();
 
     if (isSubmitting) return;
 
-    if (role === data.role) {
+    if (data.verified === verified) {
       toast.info("Немає змін для збереження");
       setEditDialogOpen(false);
       return;
@@ -118,17 +120,20 @@ function UserCard({ data }) {
 
     try {
       const promise = dispatch(
-        patchUserRole({ userId: data._id, newRole: role })
+        patchSurveyVerification({
+          surveyId: data._id,
+          isVerified: verified === "verified" ? true : false,
+        })
       ).unwrap();
 
       toast.promise(promise, {
-        loading: "Оновлення ролі користувача...",
+        loading: "Оновлення даних опитування...",
         success: () => {
           setEditDialogOpen(false);
-          return "Роль користувача успішно оновлена";
+          return "Дані опитування успішно оновлені";
         },
         error: (err) => {
-          return err.message || err || "Не вдалось оновити роль користувача";
+          return err.message || err || "Не вдалось оновити дані опитування";
         },
       });
 
@@ -140,24 +145,30 @@ function UserCard({ data }) {
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  const handleCardClick = (targetLink) => {
+    if (deleteDialogOpen) return;
+    navigate(targetLink);
   };
 
   return (
     <div
-      onClick={() => navigate(link)}
+      onClick={() => handleCardClick(link)}
       className="w-full border border-transparent rounded-xl hover:border-border transition-colors duration-300 cursor-pointer"
     >
-      <Card className="flex">
+      <Card className="h-[200px] flex">
         <CardHeader className="flex justify-between items-start w-full">
           <div>
-            <CardTitle>
-              {formatUserFullName({
-                firstName: data.firstName,
-                lastName: data.lastName,
-              })}
-            </CardTitle>
+            <CardTitle>{data.title}</CardTitle>
             <CardDescription>
-              Роль: {roles.find((r) => r.value === data.role)?.label}
+              Автор:{" "}
+              {data.isAuthor || fromProfile
+                ? "Ви"
+                : formatUserFullName({
+                    firstName: data.author.firstName,
+                    lastName: data.author.lastName,
+                  })}
             </CardDescription>
           </div>
           <div onClick={(e) => e.stopPropagation()}>
@@ -173,7 +184,7 @@ function UserCard({ data }) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
-                    className="cursor-pointer flex "
+                    className="cursor-pointer flex"
                     onSelect={() => {
                       setEditDialogOpen(true);
                     }}
@@ -192,26 +203,29 @@ function UserCard({ data }) {
               </DropdownMenu>
               <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                 <DialogContent className="sm:max-w-sm">
-                  <form onSubmit={handleUserEdit} className="space-y-6">
+                  <form
+                    onSubmit={handleSurveyVerifiedEdit}
+                    className="space-y-6"
+                  >
                     <DialogHeader>
-                      <DialogTitle>Редагувати користувача</DialogTitle>
+                      <DialogTitle>Редагувати опитування</DialogTitle>
                       <DialogDescription>
-                        Тут ви можете змінити дані про роль користувача
+                        Тут ви можете змінити дані про верифікацію опитування
                       </DialogDescription>
                     </DialogHeader>
                     <FieldGroup>
                       <Field>
-                        <Label htmlFor="role">Роль</Label>
+                        <Label htmlFor="verification">Перевірка</Label>
                         <Select
-                          value={role}
-                          onValueChange={(value) => setRole(value)}
+                          value={verified}
+                          onValueChange={(value) => setVerified(value)}
                         >
-                          <SelectTrigger id="role">
-                            <SelectValue placeholder="Оберіть роль" />
+                          <SelectTrigger id="verification">
+                            <SelectValue placeholder="Оберіть стан перевірки" />
                           </SelectTrigger>
                           <SelectContent position="popper">
                             <SelectGroup>
-                              {roles.map((option) => (
+                              {verificationOptions.map((option) => (
                                 <SelectItem
                                   key={option.value}
                                   value={option.value}
@@ -240,16 +254,17 @@ function UserCard({ data }) {
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
-                    Ви впевнені, що хочете видалити цього користувача?
+                    Ви впевнені, що хочете видалити це опитування?
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    Користувач та всі зібрані дані будуть назавжди видалені.
+                    Опитування та всі зібрані відповіді будуть назавжди
+                    видалені.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Скасувати</AlertDialogCancel>
                   <AlertDialogAction
-                    onClick={handleUserDelete}
+                    onClick={handleSurveyDelete}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     disabled={isSubmitting}
                   >
@@ -260,24 +275,19 @@ function UserCard({ data }) {
             </AlertDialog>
           </div>
         </CardHeader>
-        <CardContent>
-          <a
-            href={`mailto:${data.email}`}
-            className="hover:underline"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {data.email}
-          </a>
+        <CardContent className="flex-1 flex items-center">
+          <p>Кількість питань: {data.questions.length}</p>
         </CardContent>
         <CardFooter className="flex items-center justify-between">
           <p>
-            Дата створення акаунта:{" "}
+            Дата створення:{" "}
             {new Date(data.createdAt).toLocaleDateString("en-GB")}
           </p>
+          <div className={`${data.verified ? "text-[green]" : "text-[red]"}`}>
+            {data.verified ? "Перевірене" : "Не перевірене"}
+          </div>
         </CardFooter>
       </Card>
     </div>
   );
 }
-
-export default UserCard;

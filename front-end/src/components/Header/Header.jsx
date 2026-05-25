@@ -16,6 +16,11 @@ function Header({ isAdmin = false }) {
               Користувачі
             </Link>
           )}
+          {isAdmin && (
+            <Link to="/admin/surveys" className="hover:underline">
+              Опитування
+            </Link>
+          )}
           <Link to="/profile" className="hover:underline">
             Профіль
           </Link>

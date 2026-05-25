@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api/api";
 import axios from "axios";
 import { deleteSurvey } from "./surveysSlice";
+import { saveSurvey } from "./surveySlice";
 
 const createInitialState = () => ({
   _id: null,
@@ -52,6 +53,10 @@ const profileSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(saveSurvey.fulfilled, (state, action) => {
+        const survey = action.payload.survey;
+        state.userSurveys.push(survey);
+      })
       .addCase(me.pending, (state) => {
         state.status = "loading";
         state.message = null;
@@ -236,7 +241,6 @@ export const getSurveysPassedByUser = createAsyncThunk(
   "profile/getSurveysPassedByUser",
   async (_, { rejectWithValue }) => {
     try {
-      console.log("SURVEYS PASSED BY USER FROM DB");
       const response = await api.get(`/surveys/user-passed-surveys`);
 
       if (response.data.success) {
@@ -248,18 +252,6 @@ export const getSurveysPassedByUser = createAsyncThunk(
         error.response?.data?.message || "Помилка отримання списку"
       );
     }
-  },
-  {
-    condition: (_, { getState }) => {
-      const { profile } = getState();
-      if (
-        profile.passedSurveysStatus === "loading" ||
-        profile.passedSurveys.length > 0
-      ) {
-        console.log("SURVEYS PASSED BY USER FROM CACHE");
-        return false;
-      }
-    },
   }
 );
 

@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Loader from "../../components/ui/Loader/Loader";
-import UserCard from "../../components/UserCard/UserCard";
+import Loader from "../../../components/ui/Loader/Loader";
+import UserCard from "../../../components/UserCard/UserCard";
 
-import { TypographyH2 } from "../../utils/styles.jsx";
+import { TypographyH2 } from "../../../utils/styles.jsx";
 import EmptyComponent from "@/components/EmptyComponent/EmptyComponent";
 import { getUsers } from "@/state/adminSlice";
 
@@ -33,7 +33,7 @@ function Users() {
             title="Користувачів не знайдено"
             description="Ви можете перейти до перегляду опитувань"
             buttonText="Перейти до опитувань"
-            buttonLink="/"
+            buttonLink="/admin/surveys"
           />
         ) : (
           <div className="w-full h-full flex flex-col gap-2 pt-3">

@@ -103,6 +103,7 @@ export const saveSurvey = createAsyncThunk(
   "survey/saveSurvey",
   async (action, { getState }) => {
     const survey = getState().survey;
+    const author = getState().profile;
 
     console.log(action);
 
@@ -111,6 +112,12 @@ export const saveSurvey = createAsyncThunk(
         ...survey,
         status: action.status === "publish" ? "published" : "draft",
       });
+
+      response.data.survey.author = {
+        _id: author._id,
+        firstName: author.firstName,
+        lastName: author.lastName,
+      };
 
       return response.data;
     } catch (error) {

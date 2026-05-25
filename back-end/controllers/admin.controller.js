@@ -6,6 +6,7 @@ import {
   getUserService,
 } from "../services/admin.service.js";
 import { deleteSurveyById } from "../services/survey.service.js";
+import { isAdmin } from "../utils/utils.js";
 
 export const getAllUsers = async (req, res, next) => {
   try {
