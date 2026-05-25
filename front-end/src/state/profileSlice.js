@@ -222,18 +222,6 @@ export const getUserSurveys = createAsyncThunk(
         error.response?.data?.message || "Помилка отримання списку"
       );
     }
-  },
-  {
-    condition: (_, { getState }) => {
-      const { profile } = getState();
-      if (
-        profile.surveysStatus === "loading" ||
-        profile.userSurveys.length > 0
-      ) {
-        console.log("USER SURVEYS FROM CACHE");
-        return false;
-      }
-    },
   }
 );
 

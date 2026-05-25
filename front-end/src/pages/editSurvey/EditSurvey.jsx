@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
+import { getDatabaseData } from "../../utils/utils";
 
 function EditSurvey() {
   const dispatch = useDispatch();
@@ -93,6 +94,8 @@ function EditSurvey() {
       });
 
       await promise;
+
+      await getDatabaseData(dispatch);
 
       navigate(`/`);
     } catch (err) {

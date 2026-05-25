@@ -56,6 +56,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { deleteSurvey, patchSurveyVerification } from "../../state/adminSlice";
+import { getDatabaseData } from "../../utils/utils";
 
 const verificationOptions = [
   { value: "verified", label: "Перевірене" },
@@ -97,6 +98,7 @@ export default function AdminSurveyCard({ data }) {
       await promise;
 
       setDeleteDialogOpen(false);
+      await getDatabaseData(dispatch);
     } catch (err) {
       // error is handled in toast
     } finally {
@@ -110,7 +112,9 @@ export default function AdminSurveyCard({ data }) {
 
     if (isSubmitting) return;
 
-    if (data.verified === verified) {
+    const isVerified = verified === "verified" ? true : false;
+
+    if (data.verified === isVerified || !data.verified === !isVerified) {
       toast.info("Немає змін для збереження");
       setEditDialogOpen(false);
       return;
@@ -140,6 +144,7 @@ export default function AdminSurveyCard({ data }) {
       await promise;
 
       setEditDialogOpen(false);
+      await getDatabaseData(dispatch);
     } catch (err) {
       // error is handled in toast
     } finally {
@@ -163,7 +168,7 @@ export default function AdminSurveyCard({ data }) {
             <CardTitle>{data.title}</CardTitle>
             <CardDescription>
               Автор:{" "}
-              {data.isAuthor || fromProfile
+              {data.isAuthor
                 ? "Ви"
                 : formatUserFullName({
                     firstName: data.author.firstName,

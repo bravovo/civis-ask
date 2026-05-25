@@ -4,7 +4,6 @@ import axios from "axios";
 
 const initialState = {
   users: [],
-  surveys: [],
   loading: false,
   status: "none",
   error: null,
@@ -61,60 +60,6 @@ const adminSlice = createSlice({
         state.users = state.users.filter((user) => user._id !== action.payload);
       })
       .addCase(deleteUser.rejected, (state, action) => {
-        state.loading = false;
-        state.status = "error";
-        state.error = action.payload;
-      })
-      .addCase(getPublishedSurveys.pending, (state) => {
-        state.loading = true;
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(getPublishedSurveys.fulfilled, (state, action) => {
-        state.loading = false;
-        state.status = "success";
-        state.surveys = action.payload;
-      })
-      .addCase(getPublishedSurveys.rejected, (state, action) => {
-        state.loading = false;
-        state.status = "error";
-        state.error = action.payload;
-      })
-      .addCase(patchSurveyVerification.pending, (state) => {
-        state.loading = true;
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(patchSurveyVerification.fulfilled, (state, action) => {
-        state.loading = false;
-        state.status = "success";
-        const { surveyId, isVerified } = action.payload;
-        const surveyIndex = state.surveys.findIndex(
-          (survey) => survey._id === surveyId
-        );
-
-        if (surveyIndex !== -1) {
-          state.surveys[surveyIndex].verified = isVerified;
-        }
-      })
-      .addCase(patchSurveyVerification.rejected, (state, action) => {
-        state.loading = false;
-        state.status = "error";
-        state.error = action.payload;
-      })
-      .addCase(deleteSurvey.pending, (state) => {
-        state.loading = true;
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(deleteSurvey.fulfilled, (state, action) => {
-        state.loading = false;
-        state.status = "success";
-        state.surveys = state.surveys.filter(
-          (survey) => survey._id !== action.payload
-        );
-      })
-      .addCase(deleteSurvey.rejected, (state, action) => {
         state.loading = false;
         state.status = "error";
         state.error = action.payload;
@@ -207,34 +152,6 @@ export const deleteUser = createAsyncThunk(
 
       return rejectWithValue(
         error.message || "Не вдалось видалити користувача"
-      );
-    }
-  }
-);
-
-export const getPublishedSurveys = createAsyncThunk(
-  "admin/getPublishedSurveys",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await api.get("/admin/surveys");
-      if (response.data.success) {
-        return response.data.surveys;
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.code === "ERR_NETWORK") {
-        return rejectWithValue(
-          "Невдалось з'єднатись з сервером. Будь ласка, спробуйте пізніше"
-        );
-      }
-
-      if (error.response && error.response.data) {
-        return rejectWithValue(
-          error.response.data.message || "Не вдалось отримати список опитувань"
-        );
-      }
-
-      return rejectWithValue(
-        error.message || "Не вдалось отримати список опитувань"
       );
     }
   }

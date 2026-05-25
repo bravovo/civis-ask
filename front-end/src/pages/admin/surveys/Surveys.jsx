@@ -4,19 +4,19 @@ import Loader from "../../../components/ui/Loader/Loader";
 
 import { TypographyH2 } from "../../../utils/styles.jsx";
 import EmptyComponent from "@/components/EmptyComponent/EmptyComponent";
-import { getPublishedSurveys } from "@/state/adminSlice";
+import { getPublishedSurveys } from "@/state/surveysSlice";
 import AdminSurveyCard from "@/components/AdminSurveyCard/AdminSurveyCard";
 
 function Surveys() {
   const dispatch = useDispatch();
 
-  const state = useSelector((state) => state.admin);
+  const state = useSelector((state) => state.surveyList);
 
   useEffect(() => {
-    if (!state.surveys || state.surveys.length === 0) {
+    if (!state.items || state.items.length === 0) {
       dispatch(getPublishedSurveys());
     }
-  }, [dispatch, state.surveys]);
+  }, [dispatch, state.items]);
 
   if (state.status === "loading") {
     return <Loader />;
@@ -27,7 +27,7 @@ function Surveys() {
       {TypographyH2("Список опитувань")}
       <div className="w-full h-full flex flex-col items-center justify-center gap-2">
         {state.status === "success" &&
-        (!state.surveys || state.surveys.length === 0) ? (
+        (!state.items || state.items.length === 0) ? (
           <EmptyComponent
             title="Опитувань не знайдено"
             description="Створіть нове опитування, щоб воно з'явилось у цьому списку"
@@ -36,7 +36,7 @@ function Surveys() {
           />
         ) : (
           <div className="w-full h-full flex flex-col gap-2 pt-3">
-            {state.surveys.map((survey) => {
+            {state.items.map((survey) => {
               return <AdminSurveyCard key={survey._id} data={survey} />;
             })}
           </div>

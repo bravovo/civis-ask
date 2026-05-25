@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
+import { getDatabaseData } from "../../utils/utils";
 
 function NewSurvey() {
   const navigate = useNavigate();
@@ -74,6 +75,8 @@ function NewSurvey() {
       });
 
       await promise;
+
+      await getDatabaseData(dispatch);
 
       navigate(`/`);
     } catch (err) {

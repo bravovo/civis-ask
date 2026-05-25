@@ -51,14 +51,28 @@ export const getPublishedSurveys = createAsyncThunk(
     try {
       const response = await api.get(`/surveys`);
 
+      if (response.status === 204) {
+        return [];
+      }
+
       if (response.status === 200) {
         return response.data.surveys;
       }
     } catch (error) {
-      console.log(error);
+      if (axios.isAxiosError(error) && error.code === "ERR_NETWORK") {
+        return rejectWithValue(
+          "Невдалось з'єднатись з сервером. Будь ласка, спробуйте пізніше"
+        );
+      }
+
+      if (error.response && error.response.data) {
+        return rejectWithValue(
+          error.response.data.message || "Не вдалось отримати список опитувань"
+        );
+      }
+
       return rejectWithValue(
-        error.response?.data?.message ||
-          "Помилка отримання опитувань. Будь ласка, спробуйте ще раз пізніше"
+        error.message || "Не вдалось отримати список опитувань"
       );
     }
   }
