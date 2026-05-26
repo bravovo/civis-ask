@@ -72,7 +72,7 @@ function SurveyChart({ data, title }) {
   return (
     data && (
       <div>
-        <div className="w-full flex gap-4 justify-start my-4">
+        <div className="w-full flex flex-col md:flex-row gap-4 justify-start my-4">
           <div className="grid gap-2">
             <Label htmlFor="diagramType">Вид діаграми</Label>
             <Select

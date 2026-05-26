@@ -138,7 +138,7 @@ function Profile() {
         {TypographyH2("Профіль")}
       </div>
       <Card className="w-full">
-        <CardHeader className="w-full flex justify-between items-center">
+        <CardHeader className="w-full flex flex-col md:flex-row justify-between items-center">
           <CardTitle className="w-full flex flex-col md:flex-row gap-6">
             <div className="block md:hidden">
               {profile.role === "admin" ? TypographyH3("Адміністратор") : null}
@@ -192,7 +192,7 @@ function Profile() {
             </Item>
           </CardTitle>
           <CardAction>
-            <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
               <EditProfileDialog profile={profile} />
               <ChangePasswordDialog />
               <DeleteAccountDialog />

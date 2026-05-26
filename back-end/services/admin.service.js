@@ -21,6 +21,7 @@ export const getUserService = async (userId, role) => {
   }
 
   const user = await User.findById(userId, "-password");
+  const surveys = await Survey.find({ author: userId });
 
   if (!user) {
     const error = new Error("Користувача не знайдено");
@@ -28,7 +29,11 @@ export const getUserService = async (userId, role) => {
     throw error;
   }
 
-  return user;
+  if (!Array.isArray(surveys)) {
+    throw new Error("Помилка отримання опитувань користувача");
+  }
+
+  return { ...user.toObject(), surveys };
 };
 
 export const updateUserRoleService = async (userId, newRole, requesterRole) => {

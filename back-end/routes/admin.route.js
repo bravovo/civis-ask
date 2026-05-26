@@ -14,13 +14,11 @@ const router = Router();
 
 router.get("/users", getAllUsers);
 
-router.get("/user/:id", getUser);
+router.get("/users/:id", getUser);
 
 router.patch("/user/:id/role", patchUserRole);
 
 router.delete("/user/:id", deleteUser);
-
-router.get("/surveys", getPublishedSurveys);
 
 router.patch("/survey/:surveyId/verification", patchSurveyVerification);
 

@@ -14,6 +14,7 @@ import PassSurvey from "../pages/passSurvey/PassSurvey";
 import EditSurvey from "../pages/editSurvey/EditSurvey";
 import Users from "../pages/admin/users/Users";
 import Surveys from "@/pages/admin/surveys/Surveys";
+import User from "@/pages/admin/user/User";
 
 function Router() {
   return (
@@ -97,6 +98,16 @@ function Router() {
           <RoleCheck roles={["admin"]}>
             <Layout>
               <Users />
+            </Layout>
+          </RoleCheck>
+        }
+      />
+      <Route
+        path="/admin/users/:userId"
+        element={
+          <RoleCheck roles={["admin"]}>
+            <Layout>
+              <User />
             </Layout>
           </RoleCheck>
         }

@@ -23,11 +23,11 @@ export function TypographyH3(text) {
 }
 
 export function TypographyLarge(text) {
-  return <div className="text-lg font-semibold">{text}</div>;
+  return <div className="text-[14px] md:text-lg font-semibold">{text}</div>;
 }
 
 export function TypographyLead(text) {
-  return <p className="text-xl text-muted-foreground">{text}</p>;
+  return <p className="text-lg md:text-xl text-muted-foreground">{text}</p>;
 }
 
 export function TypographyP(text) {

@@ -87,7 +87,9 @@ function EditProfileDialog({ profile }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="button">Змінити дані профілю</Button>
+        <Button type="button" className="px-2 md:px-8">
+          Змінити дані
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
         <form onSubmit={handleSaveEditedProfile} className="space-y-6">

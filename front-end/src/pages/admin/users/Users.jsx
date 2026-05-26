@@ -12,6 +12,9 @@ function Users() {
 
   const state = useSelector((state) => state.admin);
   const profile = useSelector((state) => state.profile);
+  const usersToShow = state.users
+    ? state.users.filter((user) => user._id !== profile._id)
+    : [];
 
   useEffect(() => {
     if (!state.users || state.users.length === 0) {
@@ -23,12 +26,23 @@ function Users() {
     return <Loader />;
   }
 
+  if (state.status === "error") {
+    return (
+      <EmptyComponent
+        title="Сталася помилка при завантаженні користувачів"
+        description="Оновіть сторінку або перейдіть до перегляду опитувань"
+        buttonText="Перейти до опитувань"
+        buttonLink="/admin/surveys"
+      />
+    );
+  }
+
   return (
     <div className="w-full h-full flex flex-col gap-2 px-3">
       {TypographyH2("Список користувачів")}
       <div className="w-full h-full flex flex-col items-center justify-center gap-2">
         {state.status === "success" &&
-        (!state.users || state.users.length === 0) ? (
+        (!usersToShow || usersToShow.length === 0) ? (
           <EmptyComponent
             title="Користувачів не знайдено"
             description="Ви можете перейти до перегляду опитувань"
@@ -37,8 +51,7 @@ function Users() {
           />
         ) : (
           <div className="w-full h-full flex flex-col gap-2 pt-3">
-            {state.users.map((user) => {
-              if (user._id === profile._id) return null;
+            {usersToShow.map((user) => {
               return <UserCard key={user._id} data={user} />;
             })}
           </div>

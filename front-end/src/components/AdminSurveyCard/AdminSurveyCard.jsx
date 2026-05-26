@@ -56,14 +56,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { deleteSurvey, patchSurveyVerification } from "../../state/adminSlice";
-import { getDatabaseData } from "../../utils/utils";
+import { getDatabaseData } from "../../state/utils";
 
 const verificationOptions = [
   { value: "verified", label: "Перевірене" },
   { value: "not-verified", label: "Не перевірене" },
 ];
 
-export default function AdminSurveyCard({ data }) {
+export default function AdminSurveyCard({ data, author }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -73,6 +73,7 @@ export default function AdminSurveyCard({ data }) {
     data.verified ? "verified" : "not-verified"
   );
   const link = `/survey-info/${data._id}`;
+  const resolvedAuthor = author ?? data.author;
 
   async function handleSurveyDelete(e) {
     e.preventDefault();
@@ -168,11 +169,11 @@ export default function AdminSurveyCard({ data }) {
             <CardTitle>{data.title}</CardTitle>
             <CardDescription>
               Автор:{" "}
-              {data.isAuthor
+              {resolvedAuthor.isAuthor
                 ? "Ви"
                 : formatUserFullName({
-                    firstName: data.author.firstName,
-                    lastName: data.author.lastName,
+                    firstName: resolvedAuthor.firstName,
+                    lastName: resolvedAuthor.lastName,
                   })}
             </CardDescription>
           </div>

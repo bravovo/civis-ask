@@ -22,6 +22,17 @@ function Surveys() {
     return <Loader />;
   }
 
+  if (state.status === "error") {
+    return (
+      <EmptyComponent
+        title="Сталася помилка при завантаженні опитувань"
+        description="Оновіть сторінку або створіть нове опитування тим часом"
+        buttonText="Створити опитування"
+        buttonLink="/new-survey"
+      />
+    );
+  }
+
   return (
     <div className="w-full h-full flex flex-col gap-2 px-3">
       {TypographyH2("Список опитувань")}

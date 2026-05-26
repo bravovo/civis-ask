@@ -69,7 +69,7 @@ function UserCard({ data }) {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [role, setRole] = useState(data.role);
-  const link = `/admin/users`;
+  const link = `/admin/users/${data._id}`;
 
   async function handleUserDelete(e) {
     e.preventDefault();
