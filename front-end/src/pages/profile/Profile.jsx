@@ -44,16 +44,13 @@ function Profile() {
     if (profile.surveysStatus === "none") {
       dispatch(getUserSurveys());
     }
-    console.log(userSurveys);
   }, [profile.passedSurveysStatus, profile.surveysStatus]);
 
   useEffect(() => {
-    console.log("Profile:", profile);
     if (
       (profile.authChecked && !Boolean(profile.age)) ||
       !Boolean(profile.gender)
     ) {
-      console.log("Missing demographic info");
       toast.error("Будь ласка, заповніть дані про вік та стать");
     }
   }, []);
@@ -138,9 +135,10 @@ function Profile() {
         {TypographyH2("Профіль")}
       </div>
       <Card className="w-full">
-        <CardHeader className="w-full flex justify-between items-center">
+        <CardHeader className="w-full flex flex-col md:flex-row justify-between items-center">
           <CardTitle className="w-full flex flex-col md:flex-row gap-6">
             <div className="block md:hidden">
+              {profile.role === "admin" ? TypographyH3("Адміністратор") : null}
               {TypographyLead(
                 formatUserFullName({
                   firstName: profile.firstName,
@@ -148,14 +146,15 @@ function Profile() {
                 })
               )}
               {TypographyLead(profile.email)}
-              {profile.role === "admin" ? TypographyH3("Адміністратор") : null}
-              {profile.age ? TypographyLead("Вік: " + profile.age) : null}
+              {profile.age
+                ? TypographyLead("Вік: " + profile.age)
+                : TypographyLead("Вік: дані відсутні", "text-destructive")}
               {profile.gender
                 ? TypographyLead(
                     "Стать: " +
                       (profile.gender === "male" ? "Чоловік" : "Жінка")
                   )
-                : null}
+                : TypographyLead("Стать: дані відсутні", "text-destructive")}
             </div>
             <Item
               variant="muted"
@@ -181,18 +180,20 @@ function Profile() {
             >
               <ItemContent>
                 <ItemTitle>{TypographyH3(`Демографічна інформація`)}</ItemTitle>
-                {profile.age ? TypographyLead("Вік: " + profile.age) : null}
+                {profile.age
+                  ? TypographyLead("Вік: " + profile.age)
+                  : TypographyLead("Вік: дані відсутні", "text-destructive")}
                 {profile.gender
                   ? TypographyLead(
                       "Стать: " +
                         (profile.gender === "male" ? "Чоловік" : "Жінка")
                     )
-                  : null}
+                  : TypographyLead("Стать: дані відсутні", "text-destructive")}
               </ItemContent>
             </Item>
           </CardTitle>
           <CardAction>
-            <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
               <EditProfileDialog profile={profile} />
               <ChangePasswordDialog />
               <DeleteAccountDialog />

@@ -62,11 +62,9 @@ function Analytics({ surveyId }) {
         const response = await api.get(`/surveys/survey/${surveyId}/analytics`);
 
         if (response.status === 200 && response.data.data.analytics) {
-          console.log("ANALYTICS FOUND", response.data.data);
           setAnalytics(response.data.data.analytics);
         }
       } catch (error) {
-        console.log(error);
         return "Аналітика опитування недоступна";
       } finally {
         setLoading(false);

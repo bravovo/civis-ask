@@ -59,8 +59,7 @@ function DeleteAccountDialog() {
 
       setOpen(false);
     } catch (err) {
-      console.error(err);
-      toast.error(err?.message || "Помилка при видаленні акаунту");
+      // error is handled in toast
     } finally {
       setIsSubmitting(false);
     }

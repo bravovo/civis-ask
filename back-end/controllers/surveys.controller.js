@@ -13,7 +13,6 @@ import mongoose from "mongoose";
 export const postSurvey = async (req, res, next) => {
   try {
     const { title, description, questions, status } = req.body;
-    console.log(status);
 
     if (!Array.isArray(questions)) {
       return res.status(400).json({
@@ -199,7 +198,6 @@ export const postSurveyPass = async (req, res, next) => {
 
     let surveyTake;
     try {
-      console.log("here");
       surveyTake = await SurveyTake.create({
         survey: new mongoose.Types.ObjectId(surveyId),
         user: new mongoose.Types.ObjectId(user.id),
@@ -210,7 +208,6 @@ export const postSurveyPass = async (req, res, next) => {
         answers,
       });
     } catch (err) {
-      console.log(err);
       if (err?.code === 11000) {
         return res.status(400).json({
           success: false,

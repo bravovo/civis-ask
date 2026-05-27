@@ -25,7 +25,6 @@ export const setupAxios = (store) => {
       const newToken = response.headers["x-new-access-token"];
 
       if (newToken) {
-        console.log("TOKEN UPDATE");
         localStorage.setItem("token", newToken);
 
         store.dispatch(setTokenFromAxios({ token: newToken }));
@@ -35,7 +34,6 @@ export const setupAxios = (store) => {
     (error) => {
       if (error.response?.status === 401 || error.response?.status === 403) {
         if (!window.location.pathname.includes("/login")) {
-          console.warn("Перенаправлення на логін");
           localStorage.removeItem("token");
           window.location.href = "/login";
         }

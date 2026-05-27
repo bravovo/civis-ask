@@ -2,8 +2,10 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api/api";
 import axios from "axios";
 import { deleteSurvey } from "./surveysSlice";
+import { saveSurvey } from "./surveySlice";
 
 const createInitialState = () => ({
+  _id: null,
   firstName: "",
   lastName: "",
   email: "",
@@ -28,9 +30,10 @@ const profileSlice = createSlice({
   initialState,
   reducers: {
     setCreds: (state, action) => {
-      const { firstName, lastName, email, role, age, gender } =
+      const { firstName, lastName, email, role, age, gender, _id } =
         action.payload.user;
 
+      state._id = _id;
       state.firstName = firstName;
       state.lastName = lastName;
       state.email = email;
@@ -50,13 +53,17 @@ const profileSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(saveSurvey.fulfilled, (state, action) => {
+        const survey = action.payload.survey;
+        state.userSurveys.push(survey);
+      })
       .addCase(me.pending, (state) => {
         state.status = "loading";
         state.message = null;
       })
       .addCase(me.fulfilled, (state, action) => {
         state.status = "success";
-        console.log(action.payload);
+        state._id = action.payload._id;
         state.firstName = action.payload.firstName;
         state.lastName = action.payload.lastName;
         state.email = action.payload.email;
@@ -174,14 +181,12 @@ export const me = createAsyncThunk(
   "profile/me",
   async (_, { rejectWithValue }) => {
     try {
-      console.log("PROFILE FROM DB");
       const response = await api.get(`/user/me`);
 
       if (response.data.success) {
         return response.data.user;
       }
     } catch (error) {
-      console.log(error);
       return rejectWithValue(
         error.response?.data?.message || "Помилка авторизації"
       );
@@ -191,7 +196,6 @@ export const me = createAsyncThunk(
     condition: (_, { getState }) => {
       const { profile } = getState();
       if (profile.status === "loading" || profile.email) {
-        console.log("PROFILE FROM CACHE");
         return false;
       }
     },
@@ -202,7 +206,6 @@ export const getUserSurveys = createAsyncThunk(
   "profile/getUserSurveys",
   async (_, { rejectWithValue }) => {
     try {
-      console.log("USER SURVEYS FROM DB");
       const response = await api.get(`/surveys/user-surveys`);
 
       if (response.data.success) {
@@ -213,18 +216,6 @@ export const getUserSurveys = createAsyncThunk(
         error.response?.data?.message || "Помилка отримання списку"
       );
     }
-  },
-  {
-    condition: (_, { getState }) => {
-      const { profile } = getState();
-      if (
-        profile.surveysStatus === "loading" ||
-        profile.userSurveys.length > 0
-      ) {
-        console.log("USER SURVEYS FROM CACHE");
-        return false;
-      }
-    },
   }
 );
 
@@ -232,30 +223,16 @@ export const getSurveysPassedByUser = createAsyncThunk(
   "profile/getSurveysPassedByUser",
   async (_, { rejectWithValue }) => {
     try {
-      console.log("SURVEYS PASSED BY USER FROM DB");
       const response = await api.get(`/surveys/user-passed-surveys`);
 
       if (response.data.success) {
         return response.data.surveys;
       }
     } catch (error) {
-      console.log(error.response);
       return rejectWithValue(
         error.response?.data?.message || "Помилка отримання списку"
       );
     }
-  },
-  {
-    condition: (_, { getState }) => {
-      const { profile } = getState();
-      if (
-        profile.passedSurveysStatus === "loading" ||
-        profile.passedSurveys.length > 0
-      ) {
-        console.log("SURVEYS PASSED BY USER FROM CACHE");
-        return false;
-      }
-    },
   }
 );
 

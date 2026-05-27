@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getPublishedSurveys } from "../../state/surveysSlice";
-import Popup from "../../components/ui/Popup/Popup";
 import Loader from "../../components/ui/Loader/Loader";
 import SurveyCard from "../../components/SurveyCard/SurveyCard";
 
@@ -17,10 +16,10 @@ function Main() {
   const surveys = useSelector((state) => state.surveyList);
 
   useEffect(() => {
-    if (!surveys.items || surveys.items.length === 0) {
+    if (surveys.status === "none") {
       dispatch(getPublishedSurveys());
     }
-  }, [dispatch, surveys.items]);
+  }, [dispatch, surveys.status]);
 
   if (surveys.status === "loading") {
     return <Loader />;
@@ -28,9 +27,12 @@ function Main() {
 
   if (surveys.status === "error") {
     return (
-      <div className="w-full h-full flex justify-center items-center text-center">
-        <Popup text={surveys.error} color={"red"} duration={5000} />
-      </div>
+      <EmptyComponent
+        title="Помилка завантаження опитувань"
+        description="Сталася помилка при отриманні списку опитувань. Будь ласка, спробуйте пізніше."
+        buttonText="Переглянути профіль"
+        buttonLink="/profile"
+      />
     );
   }
 
@@ -46,7 +48,7 @@ function Main() {
       </Button>
       <div className="w-full h-full flex flex-col items-center justify-center gap-2">
         {surveys.status === "success" &&
-        (!surveys.items || surveys.items.length === 0) ? (
+        (!Array.isArray(surveys.items) || surveys.items.length === 0) ? (
           <EmptyComponent
             title="Опитувань не знайдено"
             description="Створіть нове опитування, щоб побачити його у списку"

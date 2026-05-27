@@ -75,7 +75,6 @@ export const login = async (req, res, next) => {
   const isMatch = await user.comparePasswords(password);
 
   if (!isMatch) {
-    console.log("NO MATCH", isMatch);
     return res.status(400).json({
       success: false,
       message: "Невірні дані авторизації",

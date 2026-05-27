@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
+import { getDatabaseData } from "../../state/utils";
 
 function EditSurvey() {
   const dispatch = useDispatch();
@@ -39,8 +40,6 @@ function EditSurvey() {
   useEffect(() => () => dispatch(resetState()), [dispatch]);
 
   const handleSubmit = async (type) => {
-    console.log(type);
-
     if (isSubmitting) return;
     setIsSubmitting(true);
 
@@ -66,7 +65,6 @@ function EditSurvey() {
           q.options.length === 0 ||
           q.options.some((opt) => !opt.value || opt.value.trim() === "")
         ) {
-          console.log(q.options);
           message = `Будь ласка, заповніть порожні варіанти відповідей у питанні "${q.title || "Без назви"}"`;
           return true;
         }
@@ -94,9 +92,12 @@ function EditSurvey() {
 
       await promise;
 
-      navigate(`/`);
+      await getDatabaseData(dispatch);
+    } catch (err) {
+      // error is handled in toast
     } finally {
       setIsSubmitting(false);
+      navigate(`/`);
     }
   };
 

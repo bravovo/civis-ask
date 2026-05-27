@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
+import { getDatabaseData } from "../../state/utils";
 
 function NewSurvey() {
   const navigate = useNavigate();
@@ -23,8 +24,6 @@ function NewSurvey() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (type) => {
-    console.log(type);
-
     if (isSubmitting) return;
     setIsSubmitting(true);
 
@@ -75,9 +74,12 @@ function NewSurvey() {
 
       await promise;
 
-      navigate(`/`);
+      await getDatabaseData(dispatch);
+    } catch (err) {
+      // error is handled in toast
     } finally {
       setIsSubmitting(false);
+      navigate(`/`);
     }
   };
 

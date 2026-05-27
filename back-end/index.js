@@ -10,8 +10,10 @@ import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
 import uploadsRoute from "./routes/uploads.route.js";
 import surveysRoute from "./routes/surveys.route.js";
+import adminRoute from "./routes/admin.route.js";
 
 import { checkUserAccess } from "./middlewares/jwt.middleware.js";
+import { checkAdminAccess } from "./middlewares/admin.middleware.js";
 
 const app = express();
 
@@ -29,7 +31,6 @@ const corsOptions = {
     if (isMatch || isVercelPreview) {
       callback(null, true);
     } else {
-      console.log(origin);
       const error = new Error("Заблоковано CORS");
       error.status = 403;
       callback(error);
@@ -68,6 +69,7 @@ app.use("/api/user", userRoute);
 app.use("/api/uploads", uploadsRoute);
 app.use("/api/surveys", surveysRoute);
 
+app.use("/api/admin", checkAdminAccess, adminRoute);
 app.use((err, req, res, next) => {
   if (err instanceof mongoose.Error.ValidationError) {
     const errorMessage = Object.values(err.errors)[0].message;
@@ -85,9 +87,6 @@ app.use((err, req, res, next) => {
   return res.status(status).json({ success: false, message: err.message });
 });
 
-app.listen(PORT, () => {
-  console.log(NODE_ENV, "ENV");
-  console.log("LISTENING ON PORT", PORT);
-});
+app.listen(PORT);
 
 export default app;

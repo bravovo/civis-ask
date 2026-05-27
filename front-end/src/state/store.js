@@ -4,6 +4,7 @@ import profileReducer from "./profileSlice";
 import loaderReducer from "./loaderSlice";
 import surveyReducer from "./surveySlice";
 import surveyListReducer from "./surveysSlice";
+import adminReducer from "./adminSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,5 +12,6 @@ export const store = configureStore({
     loader: loaderReducer,
     survey: surveyReducer,
     surveyList: surveyListReducer,
+    admin: adminReducer,
   },
 });
