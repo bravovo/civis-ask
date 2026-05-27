@@ -74,15 +74,13 @@ function User() {
           toast.error(
             "Невдалось з'єднатись з сервером. Будь ласка, спробуйте пізніше"
           );
-        }
-
-        if (error.response?.data?.message) {
+        } else if (error.response?.data?.message) {
           toast.error(error.response.data.message);
+        } else {
+          toast.error(
+            error.message || "Не вдалось оновити профіль. Спробуйте ще раз"
+          );
         }
-
-        toast.error(
-          error.message || "Не вдалось оновити профіль. Спробуйте ще раз"
-        );
       } finally {
         setLoading(false);
       }

@@ -107,7 +107,6 @@ function PassSurvey() {
       });
     } catch (error) {
       toast.error("Помилка при проходженні опитування");
-      console.log(error);
     }
   };
 

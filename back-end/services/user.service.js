@@ -4,8 +4,6 @@ import SurveyTake from "../models/surveyTake.model.js";
 import mongoose from "mongoose";
 
 export const updateUser = async (id, updateData) => {
-  console.log("updateData:", updateData);
-
   const allowedUpdateFields = ["firstName", "lastName", "age", "gender"];
   const hasUpdateData = allowedUpdateFields.some(
     (field) => updateData[field] !== undefined

@@ -64,8 +64,7 @@ function ChangePasswordDialog() {
 
       setOpen(false);
     } catch (err) {
-      console.error(err);
-      toast.error(err?.message || "Помилка при зміні пароля");
+      // error is handled in toast
     } finally {
       setIsSubmitting(false);
     }

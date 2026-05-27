@@ -282,8 +282,6 @@ export const getAnalyticsForSurvey = async (surveyId) => {
   };
 
   if (finalAnalytics.questionStats) {
-    console.log(finalAnalytics.questionStats);
-
     finalAnalytics.questionStats = finalAnalytics.questionStats.map((stat) => {
       const questionDoc = survey.questions.id(stat._id);
 

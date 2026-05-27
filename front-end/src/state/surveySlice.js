@@ -105,8 +105,6 @@ export const saveSurvey = createAsyncThunk(
     const survey = getState().survey;
     const author = getState().profile;
 
-    console.log(action);
-
     try {
       const response = await api.post(`/surveys/survey`, {
         ...survey,
@@ -122,12 +120,10 @@ export const saveSurvey = createAsyncThunk(
       return response.data;
     } catch (error) {
       if (error.response) {
-        console.error(error.response);
         throw new Error(
           error.response.data.message || "Помилка збереження опитування"
         );
       } else {
-        console.error(error);
         throw new Error("Помилка збереження опитування");
       }
     }
@@ -145,17 +141,13 @@ export const editSurvey = createAsyncThunk(
         status: action.status === "publish" ? "published" : "draft",
       });
 
-      console.log("SAVE");
-
       return response.data;
     } catch (error) {
       if (error.response) {
-        console.error(error.response);
         throw new Error(
           error.response.data.message || "Помилка збереження опитування"
         );
       } else {
-        console.error(error);
         throw new Error("Помилка збереження опитування");
       }
     }

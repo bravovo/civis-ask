@@ -31,7 +31,6 @@ const corsOptions = {
     if (isMatch || isVercelPreview) {
       callback(null, true);
     } else {
-      console.log(origin);
       const error = new Error("Заблоковано CORS");
       error.status = 403;
       callback(error);
@@ -88,9 +87,6 @@ app.use((err, req, res, next) => {
   return res.status(status).json({ success: false, message: err.message });
 });
 
-app.listen(PORT, () => {
-  console.log(NODE_ENV, "ENV");
-  console.log("LISTENING ON PORT", PORT);
-});
+app.listen(PORT);
 
 export default app;

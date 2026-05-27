@@ -63,7 +63,6 @@ const profileSlice = createSlice({
       })
       .addCase(me.fulfilled, (state, action) => {
         state.status = "success";
-        console.log(action.payload);
         state._id = action.payload._id;
         state.firstName = action.payload.firstName;
         state.lastName = action.payload.lastName;
@@ -182,15 +181,12 @@ export const me = createAsyncThunk(
   "profile/me",
   async (_, { rejectWithValue }) => {
     try {
-      console.log("PROFILE FROM DB");
       const response = await api.get(`/user/me`);
 
       if (response.data.success) {
-        console.log(response.data);
         return response.data.user;
       }
     } catch (error) {
-      console.log(error);
       return rejectWithValue(
         error.response?.data?.message || "Помилка авторизації"
       );
@@ -200,7 +196,6 @@ export const me = createAsyncThunk(
     condition: (_, { getState }) => {
       const { profile } = getState();
       if (profile.status === "loading" || profile.email) {
-        console.log("PROFILE FROM CACHE");
         return false;
       }
     },
@@ -211,7 +206,6 @@ export const getUserSurveys = createAsyncThunk(
   "profile/getUserSurveys",
   async (_, { rejectWithValue }) => {
     try {
-      console.log("USER SURVEYS FROM DB");
       const response = await api.get(`/surveys/user-surveys`);
 
       if (response.data.success) {
@@ -235,7 +229,6 @@ export const getSurveysPassedByUser = createAsyncThunk(
         return response.data.surveys;
       }
     } catch (error) {
-      console.log(error.response);
       return rejectWithValue(
         error.response?.data?.message || "Помилка отримання списку"
       );

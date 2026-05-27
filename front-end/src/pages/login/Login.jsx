@@ -80,10 +80,9 @@ function Login() {
       }
     } catch (error) {
       if (error.response) {
-        console.error(error.response);
         setError(error.response.data.message);
       } else {
-        console.error(error);
+        setError("Помилка при вході в акаунт");
       }
     }
     dispatch(setLoading(false));

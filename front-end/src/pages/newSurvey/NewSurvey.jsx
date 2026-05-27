@@ -24,8 +24,6 @@ function NewSurvey() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (type) => {
-    console.log(type);
-
     if (isSubmitting) return;
     setIsSubmitting(true);
 
@@ -77,12 +75,11 @@ function NewSurvey() {
       await promise;
 
       await getDatabaseData(dispatch);
-
-      navigate(`/`);
     } catch (err) {
       // error is handled in toast
     } finally {
       setIsSubmitting(false);
+      navigate(`/`);
     }
   };
 

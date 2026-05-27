@@ -44,16 +44,13 @@ function Profile() {
     if (profile.surveysStatus === "none") {
       dispatch(getUserSurveys());
     }
-    console.log(userSurveys);
   }, [profile.passedSurveysStatus, profile.surveysStatus]);
 
   useEffect(() => {
-    console.log("Profile:", profile);
     if (
       (profile.authChecked && !Boolean(profile.age)) ||
       !Boolean(profile.gender)
     ) {
-      console.log("Missing demographic info");
       toast.error("Будь ласка, заповніть дані про вік та стать");
     }
   }, []);

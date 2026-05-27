@@ -46,12 +46,10 @@ function Dashboard() {
       }
     } catch (error) {
       if (error.response) {
-        console.error(error.response);
         setError(error.response.data.message);
       } else {
-        console.error(error);
+        setError("Помилка при завантаженні файлу");
       }
-      console.log(error.response || error);
     }
     dispatch(setLoading(false));
   };

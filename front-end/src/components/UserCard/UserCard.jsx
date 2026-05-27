@@ -96,7 +96,7 @@ function UserCard({ data }) {
 
       setDeleteDialogOpen(false);
     } catch (err) {
-      console.error(err);
+      // error is handled in toast
     } finally {
       setIsSubmitting(false);
     }

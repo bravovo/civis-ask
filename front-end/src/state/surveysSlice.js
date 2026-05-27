@@ -29,7 +29,6 @@ const surveysSlice = createSlice({
         state.status = "loading";
       })
       .addCase(deleteSurvey.fulfilled, (state, action) => {
-        console.log("ITEMS", state);
         state.status = "success";
         state.items = state.items.filter(
           (survey) => survey._id !== action.payload

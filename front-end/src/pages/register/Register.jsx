@@ -105,10 +105,8 @@ function Register() {
       }
     } catch (error) {
       if (error.response) {
-        console.error(error.response);
         setError(error.response.data.message || "Помилка реєстрації");
       } else {
-        console.error(error);
         setError("Помилка реєстрації");
       }
     } finally {
