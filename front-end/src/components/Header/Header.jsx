@@ -10,7 +10,7 @@ function Header({ isAdmin = false }) {
             <img src={logo} alt="Logo" className="h-20" />
           </Link>
         </div>
-        <div className="w-full flex justify-end gap-4">
+        <div className="w-full flex justify-end gap-2 md:gap-4 ">
           {isAdmin && (
             <Link to="/admin/users" className="hover:underline">
               Користувачі

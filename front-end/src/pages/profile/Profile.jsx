@@ -149,13 +149,15 @@ function Profile() {
                 })
               )}
               {TypographyLead(profile.email)}
-              {profile.age ? TypographyLead("Вік: " + profile.age) : null}
+              {profile.age
+                ? TypographyLead("Вік: " + profile.age)
+                : TypographyLead("Вік: дані відсутні", "text-destructive")}
               {profile.gender
                 ? TypographyLead(
                     "Стать: " +
                       (profile.gender === "male" ? "Чоловік" : "Жінка")
                   )
-                : null}
+                : TypographyLead("Стать: дані відсутні", "text-destructive")}
             </div>
             <Item
               variant="muted"
@@ -181,13 +183,15 @@ function Profile() {
             >
               <ItemContent>
                 <ItemTitle>{TypographyH3(`Демографічна інформація`)}</ItemTitle>
-                {profile.age ? TypographyLead("Вік: " + profile.age) : null}
+                {profile.age
+                  ? TypographyLead("Вік: " + profile.age)
+                  : TypographyLead("Вік: дані відсутні", "text-destructive")}
                 {profile.gender
                   ? TypographyLead(
                       "Стать: " +
                         (profile.gender === "male" ? "Чоловік" : "Жінка")
                     )
-                  : null}
+                  : TypographyLead("Стать: дані відсутні", "text-destructive")}
               </ItemContent>
             </Item>
           </CardTitle>

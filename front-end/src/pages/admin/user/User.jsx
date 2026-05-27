@@ -3,7 +3,7 @@ import EmptyComponent from "@/components/EmptyComponent/EmptyComponent";
 
 import api from "@/api/api";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import { formatUserFullName } from "../../../utils/utils";
@@ -11,7 +11,13 @@ import Loader from "@/components/ui/Loader/Loader";
 
 import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardAction,
+} from "@/components/ui/card";
 import {
   TypographyH2,
   TypographyH3,
@@ -20,11 +26,35 @@ import {
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import AdminDeleteUserAccountDialog from "@/components/AdminDeleteUserAccountDialog/AdminDeleteUserAccountDialog";
+import { useDispatch, useSelector } from "react-redux";
+import { getPublishedSurveys } from "@/state/surveysSlice";
 
 function User() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { userId } = useParams();
   const [user, setUser] = useState(null);
+  const currentUserId = useSelector((state) => state.profile._id);
+  const surveys = useSelector((state) => state.surveyList);
+  const [userSurveys, setUserSurveys] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  function getUserSurveys() {
+    if (!user || !surveys) return [];
+
+    return surveys.items.filter((s) => s.author._id === user._id);
+  }
+
+  useEffect(() => {
+    if (surveys.status === "none") {
+      dispatch(getPublishedSurveys());
+    }
+  }, []);
+
+  useEffect(() => {
+    setUserSurveys(getUserSurveys());
+  }, [surveys, user]);
 
   useEffect(() => {
     async function getUser() {
@@ -63,7 +93,7 @@ function User() {
     }
   }, [userId]);
 
-  if (loading) {
+  if (loading || surveys.status === "loading") {
     return <Loader />;
   }
 
@@ -87,7 +117,7 @@ function User() {
         {TypographyH2("Профіль користувача")}
       </div>
       <Card className="w-full">
-        <CardHeader className="w-full flex justify-between items-center">
+        <CardHeader className="w-full flex flex-col md:flex-row justify-between items-center">
           <CardTitle className="w-full flex flex-col md:flex-row gap-6">
             <div className="block md:hidden">
               {user.role === "admin" ? TypographyH3("Адміністратор") : null}
@@ -98,12 +128,14 @@ function User() {
                 })
               )}
               {TypographyLead(user.email)}
-              {user.age ? TypographyLead("Вік: " + user.age) : null}
+              {user.age
+                ? TypographyLead("Вік: " + user.age)
+                : TypographyLead("Вік: дані відсутні", "text-destructive")}
               {user.gender
                 ? TypographyLead(
                     "Стать: " + (user.gender === "male" ? "Чоловік" : "Жінка")
                   )
-                : null}
+                : TypographyLead("Стать: дані відсутні", "text-destructive")}
             </div>
             <Item
               variant="muted"
@@ -127,27 +159,32 @@ function User() {
             >
               <ItemContent>
                 <ItemTitle>{TypographyH3(`Демографічна інформація`)}</ItemTitle>
-                {user.age ? TypographyLead("Вік: " + user.age) : null}
+                {user.age
+                  ? TypographyLead("Вік: " + user.age)
+                  : TypographyLead("Вік: дані відсутні", "text-destructive")}
                 {user.gender
                   ? TypographyLead(
                       "Стать: " + (user.gender === "male" ? "Чоловік" : "Жінка")
                     )
-                  : null}
+                  : TypographyLead("Стать: дані відсутні", "text-destructive")}
               </ItemContent>
             </Item>
           </CardTitle>
+          <CardAction className="h-full">
+            <AdminDeleteUserAccountDialog userId={user._id} />
+          </CardAction>
         </CardHeader>
         <CardContent className="w-full pb-4">
-          {user.surveys.length > 0 ? (
+          {userSurveys.length > 0 ? (
             <div className="flex flex-col gap-2 pt-3">
-              {user.surveys.map((s) => (
+              {userSurveys.map((s) => (
                 <AdminSurveyCard
                   key={s._id}
                   data={s}
                   author={{
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    isAuthor: true,
+                    isAuthor: currentUserId === user._id,
                   }}
                 />
               ))}

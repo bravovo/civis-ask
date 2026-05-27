@@ -26,8 +26,8 @@ export function TypographyLarge(text) {
   return <div className="text-[14px] md:text-lg font-semibold">{text}</div>;
 }
 
-export function TypographyLead(text) {
-  return <p className="text-lg md:text-xl text-muted-foreground">{text}</p>;
+export function TypographyLead(text, color = "text-muted-foreground") {
+  return <p className={`text-lg md:text-xl ${color}`}>{text}</p>;
 }
 
 export function TypographyP(text) {
