@@ -85,6 +85,20 @@ export default function SurveyCard({
     navigate(targetLink);
   };
 
+  const handleCopyClick = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      await navigator.clipboard.writeText(
+        window.location.origin + `/survey-info/${data._id}`
+      );
+      toast.success("Посилання скопійовано");
+    } catch (err) {
+      toast.error("Не вдалося скопіювати посилання");
+    }
+  };
+
   return isSurveyTake ? (
     <Link
       to={`/survey-info/${data.survey._id}`}
@@ -157,12 +171,14 @@ export default function SurveyCard({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-full">
-                    <CopyButton
-                      content={
-                        window.location.origin + `/survey-info/${data._id}`
-                      }
-                      text="Скопіювати посилання"
-                    />
+                    <DropdownMenuItem
+                      className="cursor-pointer flex"
+                      onSelect={(e) => {
+                        handleCopyClick(e);
+                      }}
+                    >
+                      Скопіювати посилання
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-destructive focus:text-destructive cursor-pointer flex justify-center"
                       onSelect={() => {

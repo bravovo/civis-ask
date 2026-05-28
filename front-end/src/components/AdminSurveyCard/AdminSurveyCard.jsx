@@ -168,7 +168,6 @@ export default function AdminSurveyCard({ data, author }) {
       );
       toast.success("Посилання скопійовано");
     } catch (err) {
-      console.error("Failed to copy link:", err);
       toast.error("Не вдалося скопіювати посилання");
     }
   };
