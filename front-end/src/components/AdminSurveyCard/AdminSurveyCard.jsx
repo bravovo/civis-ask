@@ -158,6 +158,21 @@ export default function AdminSurveyCard({ data, author }) {
     navigate(targetLink);
   };
 
+  const handleCopyClick = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      await navigator.clipboard.writeText(
+        window.location.origin + `/survey-info/${data._id}`
+      );
+      toast.success("Посилання скопійовано");
+    } catch (err) {
+      console.error("Failed to copy link:", err);
+      toast.error("Не вдалося скопіювати посилання");
+    }
+  };
+
   return (
     <div
       onClick={() => handleCardClick(link)}
@@ -188,7 +203,15 @@ export default function AdminSurveyCard({ data, author }) {
                     <Ellipsis />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="w-full">
+                  <DropdownMenuItem
+                    className="cursor-pointer flex"
+                    onSelect={(e) => {
+                      handleCopyClick(e);
+                    }}
+                  >
+                    Скопіювати посилання
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer flex"
                     onSelect={() => {

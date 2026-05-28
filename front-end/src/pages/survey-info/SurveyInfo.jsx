@@ -20,6 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import CopyButton from "@/components/CopyButton/CopyButton";
 
 function SurveyInfo() {
   const { loading } = useSelector((state) => state.loader);
@@ -96,6 +97,9 @@ function SurveyInfo() {
           Назад
         </Button>
         <div className="flex flex-col md:flex-row gap-2 items-end md:items-center">
+          <CopyButton
+            content={window.location.origin + `/survey-info/${survey._id}`}
+          />
           {TypographyLarge(survey.title)}
           {survey.verified ? (
             <Badge className="bg-green-950 text-green-300">Перевірене</Badge>

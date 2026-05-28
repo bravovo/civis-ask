@@ -35,6 +35,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { deleteSurvey } from "../../state/surveysSlice";
+import CopyButton from "../CopyButton/CopyButton";
 
 export default function SurveyCard({
   data,
@@ -102,20 +103,25 @@ export default function SurveyCard({
                   lastName: data.survey.author.lastName,
                 })}
           </CardDescription>
-          <CardAction
-            className={`${data.survey.verified ? "text-[green]" : "text-[red]"}`}
-          >
-            {data.survey.verified ? "Перевірене" : "Не перевірене"}
+          <CardAction>
+            <CopyButton
+              content={
+                window.location.origin + `/survey-info/${data.survey._id}`
+              }
+            />
           </CardAction>
         </CardHeader>
         <CardContent className="flex-1 flex items-center">
           <p>Кількість питань: {data.survey.questions.length}</p>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex items-center justify-between">
           <p>
             Дата проходження:{" "}
             {new Date(data.createdAt).toLocaleDateString("en-GB")}
           </p>
+          <div className={`${data.verified ? "text-[green]" : "text-[red]"}`}>
+            {data.verified ? "Перевірене" : "Не перевірене"}
+          </div>
         </CardFooter>
       </Card>
     </Link>
@@ -150,7 +156,13 @@ export default function SurveyCard({
                       <Ellipsis />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" className="w-full">
+                    <CopyButton
+                      content={
+                        window.location.origin + `/survey-info/${data._id}`
+                      }
+                      text="Скопіювати посилання"
+                    />
                     <DropdownMenuItem
                       className="text-destructive focus:text-destructive cursor-pointer flex justify-center"
                       onSelect={() => {

@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import { store } from "./state/store";
 import AuthProvider from "./features/auth/AuthProvider";
 import { setupAxios } from "./api/api";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 let axiosConfigured = false;
 
@@ -18,7 +19,9 @@ function App() {
     <BrowserRouter>
       <Provider store={store}>
         <AuthProvider>
-          <Router />
+          <TooltipProvider>
+            <Router />
+          </TooltipProvider>
         </AuthProvider>
       </Provider>
     </BrowserRouter>
