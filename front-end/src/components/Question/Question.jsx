@@ -11,6 +11,8 @@ import { Item, ItemContent, ItemDescription } from "@/components/ui/item";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Ellipsis, Trash } from "lucide-react";
+import { toast } from "sonner";
+import { Oval } from "react-loader-spinner";
 import { useState } from "react";
 
 import {
@@ -38,10 +40,15 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
+import { AlertTriangleIcon, CircleCheck, Ban } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import api from "@/api/api";
 
 function Question({ question, variant }) {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+  const [analysis, setAnalysis] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const changeQuestionType = (newType) => {
     dispatch(
@@ -69,13 +76,168 @@ function Question({ question, variant }) {
     dispatch(removeOption({ questionId: question._id, optionId }));
   };
 
+  const handleAnalysisClick = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const response = await api.post(`/surveys/survey/analysis`, {
+        title: question.title,
+        type: question.type,
+        options: question.options,
+      });
+
+      if (response.data.success) {
+        setAnalysis(response.data.analysis);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Помилка при аналізі питання");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const renderAnalysis = () => {
+    if (!analysis) return null;
+
+    if (analysis.score >= 8) {
+      return (
+        <Alert className="max-w border-green-900 bg-green-950 text-green-50">
+          <CircleCheck />
+          <AlertTitle className="flex justify-between">
+            <p>Аналіз питання</p>
+            <p>{analysis.score}/10</p>
+          </AlertTitle>
+          <AlertDescription className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <h4 className="font-semibold text-white">Коментар</h4>
+              {analysis.comment}
+            </div>
+            <div className="flex flex-col gap-2">
+              <h4 className="font-semibold text-white">Рекомендації</h4>
+              <div className="flex flex-col gap-1">
+                {(analysis.recommendations ?? []).map((rec, index) => (
+                  <p key={index} className="mb-0!">
+                    {index + 1}: {rec}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    if (analysis.score >= 5) {
+      return (
+        <Alert className="max-w border-amber-900 bg-amber-950 text-amber-50">
+          <AlertTriangleIcon />
+          <AlertTitle className="flex justify-between">
+            <p>Аналіз питання</p>
+            <p>{analysis.score}/10</p>
+          </AlertTitle>
+          <AlertDescription className="flex flex-col gap-4">
+            <div className="flex flex-col ">
+              <h4 className="font-semibold text-white mb-0">Коментар</h4>
+              {analysis.comment}
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-col">
+                <h4 className="font-semibold text-white mb-0">Рекомендації</h4>
+                <div className="flex flex-col">
+                  {(analysis.recommendations ?? []).map((rec, index) => (
+                    <p key={index} className="mb-0!">
+                      {index + 1}: {rec}
+                    </p>
+                  ))}
+                </div>
+              </div>
+              {(analysis.suggestedOptions ?? []).length > 0 && (
+                <div className="flex flex-col">
+                  <h4 className="font-semibold text-white mb-0">
+                    Пропоновані варіанти відповіді:
+                  </h4>
+                  <div className="flex flex-col">
+                    {(analysis.suggestedOptions ?? []).map((opt, index) => (
+                      <p key={index} className="mb-0!">
+                        {index + 1}: {opt}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    return (
+      <Alert className="max-w border-red-900 bg-red-950 text-red-50 ">
+        <Ban />
+        <AlertTitle className="flex justify-between">
+          <p>Аналіз питання</p>
+          <p>{analysis.score}/10</p>
+        </AlertTitle>
+        <AlertDescription className="flex flex-col gap-4">
+          <div className="flex flex-col ">
+            <h4 className="font-semibold text-white mb-0">Коментар</h4>
+            {analysis.comment}
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col">
+              <h4 className="font-semibold text-white mb-0">Рекомендації</h4>
+              <div className="flex flex-col">
+                {(analysis.recommendations ?? []).map((rec, index) => (
+                  <p key={index} className="mb-0!">
+                    {index + 1}: {rec}
+                  </p>
+                ))}
+              </div>
+            </div>
+            {(analysis.suggestedOptions ?? []).length > 0 && (
+              <div className="flex flex-col">
+                <h4 className="font-semibold text-white mb-0">
+                  Пропоновані варіанти відповіді:
+                </h4>
+                <div className="flex flex-col">
+                  {(analysis.suggestedOptions ?? []).map((opt, index) => (
+                    <p key={index} className="mb-0!">
+                      {index + 1}: {opt}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </AlertDescription>
+      </Alert>
+    );
+  };
+
   return (
     <Item variant={variant}>
+      {isSubmitting && (
+        <div className="loader-overlay flex flex-col gap-4">
+          <Oval
+            visible={true}
+            height="100"
+            width="100"
+            color="#000"
+            secondaryColor="gray"
+            ariaLabel="oval-loading"
+            wrapperStyle={{}}
+            wrapperClass=""
+          />
+          <h4>
+            Штучний інтелект аналізує питання. Це може зайняти деякий час...
+          </h4>
+        </div>
+      )}
       <ItemContent>
         <ItemDescription>
           <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div className="grid gap-2 w-1/2">
+            <div className="flex items-center justify-between gap-4">
+              <div className="grid gap-2 flex-grow-1">
                 <Label htmlFor={`question-title-${question._id}`}>
                   Текст питання
                 </Label>
@@ -91,11 +253,19 @@ function Question({ question, variant }) {
               <AlertDialog open={open} onOpenChange={setOpen}>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" disabled={isSubmitting}>
                       <Ellipsis />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      className="cursor-pointer flex justify-center"
+                      onSelect={() => {
+                        handleAnalysisClick();
+                      }}
+                    >
+                      Аналіз питання
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-destructive focus:text-destructive cursor-pointer flex justify-center"
                       onSelect={() => {
@@ -120,6 +290,7 @@ function Question({ question, variant }) {
                     <AlertDialogAction
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       onClick={handleRemoveQuestion}
+                      disabled={isSubmitting}
                     >
                       Видалити
                     </AlertDialogAction>
@@ -127,6 +298,7 @@ function Question({ question, variant }) {
                 </AlertDialogContent>
               </AlertDialog>
             </div>
+            {renderAnalysis()}
             <div className="w-full flex flex-col gap-1 justify-start m-0">
               <Label htmlFor="surveyTitle">Тип відповіді</Label>
               <RadioGroup
@@ -193,6 +365,7 @@ function Question({ question, variant }) {
                         <Button
                           variant="destructive"
                           size="icon"
+                          disabled={isSubmitting}
                           onClick={() => handleRemoveOption(opt._id)}
                         >
                           <Trash />
@@ -204,6 +377,7 @@ function Question({ question, variant }) {
               <Button
                 type="button"
                 variant="contrast"
+                disabled={isSubmitting}
                 onClick={() => dispatch(addOption(question._id))}
               >
                 Додати варіант відповіді

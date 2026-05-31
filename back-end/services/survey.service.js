@@ -1,6 +1,10 @@
 import Survey from "../models/survey.model.js";
 import SurveyTake from "../models/surveyTake.model.js";
 import mongoose from "mongoose";
+import { GoogleGenAI } from "@google/genai";
+import { AI_API_KEY } from "../config/env.js";
+
+const genAI = new GoogleGenAI({ apiKey: AI_API_KEY });
 
 export const patchEditSurvey = async ({
   surveyId,
@@ -144,6 +148,83 @@ export const deleteSurveyById = async (surveyId) => {
     throw error;
   } finally {
     session.endSession();
+  }
+};
+
+const aiInstruction = `Answer in ukrainian. Be polite, but honest. Don't add too much text. 
+  Don't use technical IT terms, use plain words for everybody to understand. 
+  You are an analytics assistant for survey results. 
+  You will be given a survey question and the aggregated responses to that question. 
+  Your task is to analyze the questions for validity, neutrality, 
+  mutual exclusivity and completeness, 
+  and give some recommendations on how to improve questions or responses, 
+  or fix them if necessary. Also analyze if the question type is appropriate for the given question.\n
+  Return only JSON: { 
+  "score": number, 
+  "comment": string, 
+  "recommendations": string[], 
+  "suggestedOptions": string[] 
+  }.\n
+  Quality of question is a number from 1 to 10, where 1 is very bad and 10 is excellent.`;
+
+export const getSurveyQuestionAnalysis = async (surveyData) => {
+  const { title, type, options } = surveyData;
+
+  if (title.trim().length === 0) {
+    const error = new Error("Відсутня назва питання");
+    error.status = 400;
+    throw error;
+  }
+
+  if (type.trim().length === 0) {
+    const error = new Error("Відсутній тип питання");
+    error.status = 400;
+    throw error;
+  }
+
+  if (!options || !Array.isArray(options) || options.length === 0) {
+    const error = new Error("Відсутні варіанти відповіді для питання");
+    error.status = 400;
+    throw error;
+  }
+
+  const content = `${aiInstruction}\n\nQuestion: ${title}\nType: ${type}\nAnswer Options: ${options
+    .map((opt) => opt.value)
+    .join(", ")}
+  `;
+
+  const response = await genAI.models
+    .generateContent({
+      model: "gemini-3.1-flash-lite",
+      contents: content,
+      config: {
+        responseMimeType: "application/json",
+      },
+    })
+    .catch((err) => {
+      console.error("Error generating AI content:", err);
+      const error = new Error(
+        "Помилка при отриманні аналізу відповіді від штучного інтелекту"
+      );
+      error.status = 500;
+      throw error;
+    });
+
+  if (!response?.text) {
+    const error = new Error(
+      "Отримано некоректну відповідь від штучного інтелекту"
+    );
+    error.status = 500;
+    throw error;
+  }
+
+  try {
+    const analysis = JSON.parse(response.text);
+    return analysis;
+  } catch (err) {
+    const error = new Error("Помилка обробки відповіді від штучного інтелекту");
+    error.status = 500;
+    throw error;
   }
 };
 

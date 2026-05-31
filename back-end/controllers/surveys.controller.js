@@ -6,6 +6,7 @@ import {
   patchEditSurvey,
   getAnalyticsForSurvey,
   deleteSurveyById,
+  getSurveyQuestionAnalysis,
 } from "../services/survey.service.js";
 import User from "../models/user.model.js";
 import mongoose from "mongoose";
@@ -296,6 +297,22 @@ export const getSurveyAnalytics = async (req, res, next) => {
       success: true,
       message: "Аналітика опитування успішно отримана",
       data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSurveyAnalysis = async (req, res, next) => {
+  try {
+    const questionData = req.body;
+
+    const analysis = await getSurveyQuestionAnalysis(questionData);
+
+    return res.status(200).json({
+      success: true,
+      message: "Аналіз питання опитування успішно отримано",
+      analysis,
     });
   } catch (error) {
     next(error);
