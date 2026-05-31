@@ -105,6 +105,7 @@ function Question({ question, variant }) {
           <CircleCheck />
           <AlertTitle className="flex justify-between">
             <p>Аналіз питання</p>
+            <p>{analysis.score}/10</p>
           </AlertTitle>
           <AlertDescription className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
@@ -114,7 +115,7 @@ function Question({ question, variant }) {
             <div className="flex flex-col gap-2">
               <h4 className="font-semibold text-white">Рекомендації</h4>
               <div className="flex flex-col gap-1">
-                {analysis.recommendations.map((rec, index) => (
+                {(analysis.recommendations ?? []).map((rec, index) => (
                   <p key={index} className="mb-0!">
                     {index + 1}: {rec}
                   </p>
@@ -143,20 +144,20 @@ function Question({ question, variant }) {
               <div className="flex flex-col">
                 <h4 className="font-semibold text-white mb-0">Рекомендації</h4>
                 <div className="flex flex-col">
-                  {analysis.recommendations.map((rec, index) => (
+                  {(analysis.recommendations ?? []).map((rec, index) => (
                     <p key={index} className="mb-0!">
                       {index + 1}: {rec}
                     </p>
                   ))}
                 </div>
               </div>
-              {analysis.suggestedOptions.length > 0 && (
+              {(analysis.suggestedOptions ?? []).length > 0 && (
                 <div className="flex flex-col">
                   <h4 className="font-semibold text-white mb-0">
                     Пропоновані варіанти відповіді:
                   </h4>
                   <div className="flex flex-col">
-                    {analysis.suggestedOptions.map((opt, index) => (
+                    {(analysis.suggestedOptions ?? []).map((opt, index) => (
                       <p key={index} className="mb-0!">
                         {index + 1}: {opt}
                       </p>
@@ -186,20 +187,20 @@ function Question({ question, variant }) {
             <div className="flex flex-col">
               <h4 className="font-semibold text-white mb-0">Рекомендації</h4>
               <div className="flex flex-col">
-                {analysis.recommendations.map((rec, index) => (
+                {(analysis.recommendations ?? []).map((rec, index) => (
                   <p key={index} className="mb-0!">
                     {index + 1}: {rec}
                   </p>
                 ))}
               </div>
             </div>
-            {analysis.suggestedOptions.length > 0 && (
+            {(analysis.suggestedOptions ?? []).length > 0 && (
               <div className="flex flex-col">
                 <h4 className="font-semibold text-white mb-0">
                   Пропоновані варіанти відповіді:
                 </h4>
                 <div className="flex flex-col">
-                  {analysis.suggestedOptions.map((opt, index) => (
+                  {(analysis.suggestedOptions ?? []).map((opt, index) => (
                     <p key={index} className="mb-0!">
                       {index + 1}: {opt}
                     </p>
