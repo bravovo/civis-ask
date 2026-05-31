@@ -10,3 +10,5 @@ export const MONGO_URI = process.env.MONGO_URI;
 
 export const ACCESS_TOKEN_SECRET = process.env.ACCESS_SECRET;
 export const REFRESH_TOKEN_SECRET = process.env.REFRESH_SECRET;
+
+export const AI_API_KEY = process.env.AI_API_KEY;

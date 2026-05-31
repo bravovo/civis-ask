@@ -93,11 +93,11 @@ function EditSurvey() {
       await promise;
 
       await getDatabaseData(dispatch);
+      navigate(`/`);
     } catch (err) {
       // error is handled in toast
     } finally {
       setIsSubmitting(false);
-      navigate(`/`);
     }
   };
 

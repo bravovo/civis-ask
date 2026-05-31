@@ -10,6 +10,7 @@ import {
   editSurvey,
   getSurveyAnalytics,
   deleteSurvey,
+  getSurveyAnalysis,
 } from "../controllers/surveys.controller.js";
 
 const router = Router();
@@ -17,6 +18,8 @@ const router = Router();
 router.post("/survey", postSurvey);
 
 router.get("/", getPublishedSurveys);
+
+router.post("/survey/analysis", getSurveyAnalysis);
 
 router.get("/survey/:surveyId", getSurvey);
 
