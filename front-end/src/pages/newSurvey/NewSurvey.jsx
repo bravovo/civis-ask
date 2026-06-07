@@ -78,7 +78,7 @@ function NewSurvey() {
       if (type === "publish") {
         navigate(`/`);
       } else {
-        navigate(`/survey-info/${result.survey._id}`);
+        navigate(`/${result.survey._id}/edit`);
       }
     } catch (err) {
       // error is handled in toast
