@@ -91,12 +91,12 @@ const surveySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(saveSurvey.fulfilled, (_state, action) => {
-      if (!action.payload.status === "draft") {
+      if (action.payload.status !== "draft") {
         return initialState;
       }
     });
     builder.addCase(editSurvey.fulfilled, (_state, action) => {
-      if (!action.payload.status === "draft") {
+      if (action.payload.status !== "draft") {
         return initialState;
       }
     });

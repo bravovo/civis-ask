@@ -39,7 +39,7 @@ function SurveyInfo() {
         navigate(`/${survey._id}/edit`, { replace: true });
       }
     }
-  }, [survey]);
+  }, [survey, navigate]);
 
   const onPassSurveyClick = () => {
     if (profile.status === "success" && survey) {
