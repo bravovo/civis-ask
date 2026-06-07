@@ -19,9 +19,9 @@ const surveySchema = mongoose.Schema(
       required: true,
       validate: {
         validator: function (v) {
-          return v.length <= 500;
+          return v.length <= 5000;
         },
-        message: (props) => `Опис опитування не може бути більше 500 символів`,
+        message: (props) => `Опис опитування не може бути більше 5000 символів`,
       },
     },
     questions: [
