@@ -8,7 +8,6 @@ import { PORT, CLIENT_ORIGIN, NODE_ENV } from "./config/env.js";
 
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
-import uploadsRoute from "./routes/uploads.route.js";
 import surveysRoute from "./routes/surveys.route.js";
 import adminRoute from "./routes/admin.route.js";
 
@@ -25,10 +24,8 @@ const corsOptions = {
     if (!origin) return callback(null, true);
 
     const isMatch = origin === CLIENT_ORIGIN;
-    const isVercelPreview =
-      /^https:\/\/civis-ask(-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
 
-    if (isMatch || isVercelPreview) {
+    if (isMatch) {
       callback(null, true);
     } else {
       const error = new Error("Заблоковано CORS");
@@ -66,7 +63,6 @@ app.use("/api/auth", authRoute);
 app.use(checkUserAccess);
 
 app.use("/api/user", userRoute);
-app.use("/api/uploads", uploadsRoute);
 app.use("/api/surveys", surveysRoute);
 
 app.use("/api/admin", checkAdminAccess, adminRoute);

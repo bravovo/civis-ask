@@ -1,4 +1,4 @@
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useSurveyInfo from "../../hooks/useSurveyInfo";
 import { useSelector } from "react-redux";
 import Loader from "../../components/ui/Loader/Loader";
@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatUserFullName } from "../../utils/utils.js";
 import { toast } from "sonner";
 import EmptyComponent from "@/components/EmptyComponent/EmptyComponent";
+import { useLayoutEffect } from "react";
 
 import {
   Card,
@@ -30,6 +31,16 @@ function SurveyInfo() {
 
   const navigate = useNavigate();
 
+  useLayoutEffect(() => {
+    if (survey && survey.status === "draft") {
+      if (!survey.isAuthor) {
+        navigate("/404", { replace: true });
+      } else {
+        navigate(`/${survey._id}/edit`, { replace: true });
+      }
+    }
+  }, [survey, navigate]);
+
   const onPassSurveyClick = () => {
     if (profile.status === "success" && survey) {
       if (!profile.age || !profile.gender) {
@@ -41,10 +52,6 @@ function SurveyInfo() {
   };
 
   if (loading) return <Loader />;
-
-  if (survey && survey.status === "draft") {
-    return <Navigate to={`/${survey._id}/edit`} replace />;
-  }
 
   const surveyInfo = survey ? (
     <div className="w-full h-full pt-3">

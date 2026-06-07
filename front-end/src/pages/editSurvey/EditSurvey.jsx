@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   addQuestion,
@@ -36,6 +36,12 @@ function EditSurvey() {
       dispatch(setSurvey(data));
     }
   }, [data, dispatch]);
+
+  useLayoutEffect(() => {
+    if (data && !data.isAuthor) {
+      navigate("/404", { replace: true });
+    }
+  }, [data, navigate]);
 
   useEffect(() => () => dispatch(resetState()), [dispatch]);
 
@@ -93,7 +99,9 @@ function EditSurvey() {
       await promise;
 
       await getDatabaseData(dispatch);
-      navigate(`/`);
+      if (type === "publish") {
+        navigate(`/`);
+      }
     } catch (err) {
       // error is handled in toast
     } finally {

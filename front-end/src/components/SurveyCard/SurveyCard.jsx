@@ -133,8 +133,10 @@ export default function SurveyCard({
             Дата проходження:{" "}
             {new Date(data.createdAt).toLocaleDateString("en-GB")}
           </p>
-          <div className={`${data.verified ? "text-[green]" : "text-[red]"}`}>
-            {data.verified ? "Перевірене" : "Не перевірене"}
+          <div
+            className={`${data.survey.verified ? "text-[green]" : "text-[red]"}`}
+          >
+            {data.survey.verified ? "Перевірене" : "Не перевірене"}
           </div>
         </CardFooter>
       </Card>

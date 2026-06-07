@@ -95,6 +95,7 @@ export const getSurvey = async (req, res, next) => {
     const { surveyId } = req.params;
     const user = req.user;
     let isPassed = false;
+    let isAuthor = false;
 
     const survey = await Survey.findById(surveyId).populate({
       path: "author",
@@ -117,12 +118,19 @@ export const getSurvey = async (req, res, next) => {
       isPassed = true;
     }
 
+    if (survey.author) {
+      const authorId = survey.author._id;
+
+      isAuthor = authorId.toString() === user.id.toString();
+    }
+
     return res.status(200).json({
       success: true,
       message: "Опитування знайдено",
       survey: {
         ...survey.toObject(),
         isPassed,
+        isAuthor,
       },
     });
   } catch (error) {
