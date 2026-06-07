@@ -1,7 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Register from "../pages/register/Register";
 import Login from "../pages/login/Login";
-import Dashboard from "../pages/dashboard/Dashboard";
 import Err403 from "../pages/error/403";
 import RoleCheck from "../components/RoleCheck/RoleCheck";
 import Err404 from "../pages/error/404";
@@ -42,16 +41,6 @@ function Router() {
       />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
-      <Route
-        path="/dashboard"
-        element={
-          <RoleCheck roles={["civis", "admin"]}>
-            <Layout>
-              <Dashboard />
-            </Layout>
-          </RoleCheck>
-        }
-      />
       <Route
         path="/new-survey"
         element={

@@ -72,10 +72,14 @@ function NewSurvey() {
         },
       });
 
-      await promise;
+      const result = await promise;
 
       await getDatabaseData(dispatch);
-      navigate(`/`);
+      if (type === "publish") {
+        navigate(`/`);
+      } else {
+        navigate(`/survey-info/${result.survey._id}`);
+      }
     } catch (err) {
       // error is handled in toast
     } finally {
