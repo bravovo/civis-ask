@@ -112,18 +112,19 @@ function Question({ question, variant }) {
               <h4 className="font-semibold text-white">Коментар</h4>
               {analysis.comment}
             </div>
-            {analysis.recommendations.length > 0 && (
-              <div className="flex flex-col gap-2">
-                <h4 className="font-semibold text-white">Рекомендації</h4>
-                <div className="flex flex-col gap-1">
-                  {(analysis.recommendations ?? []).map((rec, index) => (
-                    <p key={index} className="mb-0!">
-                      {index + 1}: {rec}
-                    </p>
-                  ))}
+            {analysis.recommendations &&
+              analysis.recommendations.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <h4 className="font-semibold text-white">Рекомендації</h4>
+                  <div className="flex flex-col gap-1">
+                    {(analysis.recommendations ?? []).map((rec, index) => (
+                      <p key={index} className="mb-0!">
+                        {index + 1}: {rec}
+                      </p>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </AlertDescription>
         </Alert>
       );

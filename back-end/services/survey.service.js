@@ -158,7 +158,7 @@ const aiInstruction = `Answer in ukrainian. Be polite, but honest. Don't add too
   Your task is to analyze the questions for validity, neutrality, 
   mutual exclusivity and completeness, 
   and give some recommendations on how to improve questions or responses, 
-  or fix them if necessary. There are only radio and checkbox types of questions.Also analyze if the question type is appropriate for the given question. 
+  or fix them if necessary. There are only radio and checkbox types of questions. Also analyze if the question type is appropriate for the given question. 
   Don't recommend to add a possibility for users to write their own answers because there is no such option.\n
   Be consistent in your analysis and recommendations. Don't recommend something, but when it is addressed, don't change your mind and say it should be changed back. 
   If you recommend something, it should be a final recommendation.
