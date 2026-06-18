@@ -158,14 +158,32 @@ const aiInstruction = `Answer in ukrainian. Be polite, but honest. Don't add too
   Your task is to analyze the questions for validity, neutrality, 
   mutual exclusivity and completeness, 
   and give some recommendations on how to improve questions or responses, 
-  or fix them if necessary. Also analyze if the question type is appropriate for the given question.\n
+  or fix them if necessary. There are only radio and checkbox types of questions.Also analyze if the question type is appropriate for the given question. 
+  Don't recommend to add a possibility for users to write their own answers because there is no such option.\n
+  Be consistent in your analysis and recommendations. Don't recommend something, but when it is addressed, don't change your mind and say it should be changed back. 
+  If you recommend something, it should be a final recommendation.
+  Ignore any other context, and focus only on the question and its options.
+  Ignore the order of options.
   Return only JSON: { 
   "score": number, 
   "comment": string, 
   "recommendations": string[], 
   "suggestedOptions": string[] 
   }.\n
-  Quality of question is a number from 1 to 10, where 1 is very bad and 10 is excellent.`;
+  Quality of question is a number from 1 to 10, where 1 is very bad and 10 is excellent.
+  EXAMPLES OF EVALUATION (Use this scale for consistency):
+  Example 1:
+  Input: Question: "Вам подобається наш сервіс?", Type: "radio", Options: "Так, Ні"
+  Output: { "score": 8, "comment": "Питання зрозуміле, але нейтральне. Можна розширити варіанти.", "recommendations": ["Додати варіант 'Важко відповісти'"], "suggestedOptions": ["Так", "Ні", "Важко відповісти"] }
+
+  Example 2:
+  Input: Question: "Скільки вам років?", Type: "radio", Options: "10-20, 20-30, 30-40"
+  Output: { "score": 4, "comment": "Варіанти відповіді перетинаються (куди тиснути 20-річному?).", "recommendations": ["Зробити інтервали взаємовиключними"], "suggestedOptions": ["10-19", "20-29", "30-39", "40+"] }
+  
+  Example 3:
+  Input: Question: "Оцініть якість"
+  Output: { "score": 4, "comment": "Питання не має достатньої конкретики."}
+`;
 
 export const getSurveyQuestionAnalysis = async (surveyData) => {
   const { title, type, options } = surveyData;
@@ -188,7 +206,7 @@ export const getSurveyQuestionAnalysis = async (surveyData) => {
     throw error;
   }
 
-  const content = `${aiInstruction}\n\nQuestion: ${title}\nType: ${type}\nAnswer Options: ${options
+  const content = `Question: ${title}\nType: ${type}\nAnswer Options: ${options
     .map((opt) => opt.value)
     .join(", ")}
   `;
@@ -198,7 +216,9 @@ export const getSurveyQuestionAnalysis = async (surveyData) => {
       model: "gemini-3.1-flash-lite",
       contents: content,
       config: {
+        systemInstruction: aiInstruction,
         responseMimeType: "application/json",
+        temperature: 0.1,
       },
     })
     .catch((err) => {
