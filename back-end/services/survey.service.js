@@ -203,10 +203,21 @@ Input: Question: "Оцініть якість роботи", Type: "radio", Opti
 Output: { "score": 3, "comment": "Питання не має достатньої конкретики та містить лише один варіант відповіді, що унеможливлює вибір.", "recommendations": ["Додати повноцінну шкалу оцінювання."], "suggestedOptions": ["Погано", "Задовільно", "Добре", "Відмінно"] }`;
 
 const surveyAnalysisSchema = {
-  score: "number",
-  comment: "string",
-  recommendations: "string[]",
-  suggestedOptions: "string[]",
+  type: "object",
+  properties: {
+    score: { type: "number", minimum: 1, maximum: 10 },
+    comment: { type: "string" },
+    recommendations: {
+      type: "array",
+      items: { type: "string" },
+    },
+    suggestedOptions: {
+      type: "array",
+      items: { type: "string" },
+    },
+  },
+  required: ["score", "comment", "recommendations", "suggestedOptions"],
+  additionalProperties: false,
 };
 
 export const getSurveyQuestionAnalysis = async (surveyData) => {
